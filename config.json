@@ -1,0 +1,15 @@
+{
+  "app": {
+    "rate_limit": {
+      "enable": true,
+      "time": 1
+    },
+    "default_export_location": "./list.txt",
+    "streamers": []
+  },
+  "youtube-dl": {
+    "binary": "youtube-dl",
+    "config": "configs/youtube-dl.config"
+  },
+  "auto_reload_config": true
+}
