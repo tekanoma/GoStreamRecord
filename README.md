@@ -1,7 +1,7 @@
 # GoRecordurbate WebUI
 
 ## Intro
-A golang version of recordurbate with some differences. One key difference is that this doesent use a deamon. It can instead be compiled into a binary file and started as a service, docker container or whatever you prefer. 
+A golang version of recordurbate with some differences. One key difference is that this doesent use a deamon, but instead runs a webserver (Web UI). It can instead be compiled into a binary file and started as a service, docker container or whatever you prefer. 
 
 Sends a request to check if the [spesific](https://github.com/luna-nightbyte/GoRecordurbate/blob/ec0b1fa79e2bb82cf948bef3415ace3aac52e523/modules/bot/bot.go#L176) user is online rather than requesting a [list of 500](https://github.com/luna-nightbyte/GoRecordurbate/blob/ec0b1fa79e2bb82cf948bef3415ace3aac52e523/modules/bot/bot.go#L175) and checking that for the correct user. 
 ### Notes
@@ -18,7 +18,7 @@ A release will be made once i have finished fixing the bare minimum below:
 - [ ] Export streamers
 - [ ] Docker example
 - [ ] Service example
-
+- [ ] Imbed index file into code
 #### WebUI
 - [x] Start, stop, restart
 - [ ] Add / delete streamer
@@ -26,7 +26,6 @@ A release will be made once i have finished fixing the bare minimum below:
 - [ ] Export streamers
 - [ ] Show log
 - [ ] View videos in web ui
-
 ![image](https://github.com/user-attachments/assets/a02e40a1-1a39-4cd4-9b53-a8b88568f38b)
 ![image](https://github.com/user-attachments/assets/9aabf47f-62eb-4065-b7ef-278cb98bd916)
 ![image](https://github.com/user-attachments/assets/3e0f4f3a-dd0b-42cc-8929-1439b26495fe)
