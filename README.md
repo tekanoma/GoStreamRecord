@@ -42,4 +42,4 @@ A release will be made once i have finished fixing the bare minimum below:
 
 ## Thanks
 
-Special thanks to oliverjrose99 for the inspiration and their work API information in the source code of [Recordurbate](https://github.com/oliverjrose99/Recordurbate)
+Special thanks to oliverjrose99 for the inspiration and their work on [Recordurbate](https://github.com/oliverjrose99/Recordurbate)
