@@ -26,6 +26,8 @@ A release will be made once i have finished fixing the bare minimum below:
 - [ ] Export streamers
 - [ ] Show log
 - [ ] View videos in web ui
+
+## WebUI (Will probably be modified)
 ![image](https://github.com/user-attachments/assets/a02e40a1-1a39-4cd4-9b53-a8b88568f38b)
 ![image](https://github.com/user-attachments/assets/9aabf47f-62eb-4065-b7ef-278cb98bd916)
 ![image](https://github.com/user-attachments/assets/3e0f4f3a-dd0b-42cc-8929-1439b26495fe)
