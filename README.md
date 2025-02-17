@@ -1,4 +1,4 @@
-# GoRecordurbate
+# GoRecordurbate WebUI
 
 ## Intro
 A golang version of recordurbate with some differences. One key difference is that this doesent use a deamon. It can instead be compiled into a binary file and started as a service, docker container or whatever you prefer. 
