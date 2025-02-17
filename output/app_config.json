@@ -1,37 +1,17 @@
 {
-    "app": {
-      "port": 8055,
-      "output_folder": "output/videos",
-      "rate_limit": {
-        "enable": true,
-        "time": 1
-      },
-      "default_export_location": "./list.txt",
-      "streamers": [
-        {
-          "name": "true_sm1le"
-        },
-        {
-          "name": "vixenp"
-        },
-        {
-          "name": "pixie_pie"
-        },
-        {
-          "name": "oh_sunny_"
-        },
-        {
-          "name": "cherrycrush"
-        },
-        {
-          "name": "yumihex"
-        }
-      ]
+  "app": {
+    "port": 8050,
+    "output_folder": "output/videos",
+    "rate_limit": {
+      "enable": true,
+      "time": 5
     },
-    "youtube-dl": {
-      "binary": "youtube-dl",
-      "config": "output/youtube-dl.config"
-    },
-    "auto_reload_config": true
-  }
-  
+    "default_export_location": "./list.txt",
+    "streamers": null
+  },
+  "youtube-dl": {
+    "binary": "youtube-dl",
+    "config": "output/youtube-dl.config"
+  },
+  "auto_reload_config": true
+}
