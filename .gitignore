@@ -1,5 +1,7 @@
 ./videos
 
+**.log
+
 **.jpg
 **.png
 **.PNG 
@@ -7,3 +9,6 @@
 **.mov
 **.avi
 **.mp4
+
+go.mod
+go.sum

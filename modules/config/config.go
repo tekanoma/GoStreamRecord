@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"os/exec"
 	"strings"
 	"sync"
 )
@@ -20,10 +21,13 @@ type youtubeDL struct {
 	Config string `json:"config"`
 }
 type app struct {
-	mux        sync.Mutex
-	RateLimit  rate_limit `json:"rate_limit"`
-	ExportPath string     `json:"default_export_location"`
-	Streamers  []streamer `json:"streamers"`
+	mux sync.Mutex
+
+	Port          int        `json:"port"`
+	Videos_folder string     `json:"output_folder"`
+	RateLimit     rate_limit `json:"rate_limit"`
+	ExportPath    string     `json:"default_export_location"`
+	Streamers     []streamer `json:"streamers"`
 }
 type rate_limit struct {
 	Enable bool `json:"enable"`
@@ -33,12 +37,21 @@ type streamer struct {
 	Name string `json:"name"`
 }
 
+// internal for running recorders. not saved on shutdown.
+type Streamer_status struct {
+	Name    string
+	Running bool
+	Cmd     *exec.Cmd
+}
+
 var (
-	C    Config
-	Path string
+	Streamer_Statuses = []Streamer_status{}
+	C                 Config
+	Path              string
 )
 
-func (c *Config) Init() {
+func (c *Config) Init(config_path string) {
+	Path = config_path
 	if len(Path) == 0 {
 		log.Fatal("Config path not provided")
 	}
@@ -58,6 +71,51 @@ func (c *Config) Init() {
 		return
 	}
 }
+
+func (c *Config) Reload() {
+	var newConfig Config
+	err := file.ReadJson(Path, &newConfig)
+	if err != nil {
+		log.Printf("Error loading config: %v", err)
+		return
+	}
+
+	// If this is the first load, initialize our streamer list.
+	if c == nil {
+		c = &newConfig
+		for _, s := range c.App.Streamers {
+			Streamer_Statuses = append(Streamer_Statuses, Streamer_status{Name: s.Name, Running: false})
+		}
+		return
+	}
+
+	// Remove streamers that were removed in the new config.
+	newStreamerMap := make(map[string]bool)
+	for _, s := range newConfig.App.Streamers {
+		newStreamerMap[s.Name] = true
+	}
+	updatedStreamers := []streamer{}
+	for _, s := range c.App.Streamers {
+		if _, exists := newStreamerMap[s.Name]; exists {
+			updatedStreamers = append(updatedStreamers, s)
+		} else {
+			log.Printf("%s has been removed", s.Name)
+		}
+	}
+	c.App.Streamers = updatedStreamers
+	// Add and log any new streamers.
+	currentMap := make(map[string]bool)
+	for _, s := range c.App.Streamers {
+		currentMap[s.Name] = true
+	}
+	for _, s := range newConfig.App.Streamers {
+		if !currentMap[s.Name] {
+			Streamer_Statuses = append(Streamer_Statuses, Streamer_status{Name: s.Name, Running: false})
+			log.Printf("%s has been added", s.Name)
+		}
+	}
+}
+
 func (c *Config) Update() {
 	var tmpConfig Config
 	tmpConfig.read()

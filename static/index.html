@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GoRecordurbate WebUI</title>
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <style>
+    body {
+      background-color: #f8f9fa;
+      padding-top: 20px;
+    }
+    .container {
+      max-width: 800px;
+    }
+    .nav-tabs .nav-link.active {
+      font-weight: bold;
+    }
+    #responseArea {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      z-index: 1050;
+      width: 300px;
+    }
+    /* Status Indicator (always visible) */
+    #statusIndicator {
+      position: fixed;
+      top: 10px;
+      right: 10px;
+      padding: 5px 10px;
+      background-color: #28a745; /* Green for online */
+      color: white;
+      border-radius: 5px;
+      font-weight: bold;
+      z-index: 1100;
+    }
+
+    /* Terminal-style log area */
+    .terminal {
+      background-color: #000;
+      color: #0f0;
+      padding: 10px;
+      font-family: monospace;
+      height: 300px;
+      overflow-y: auto;
+      border-radius: 5px;
+    }
+  </style>
+</head>
+<body>
+  <!-- Persistent Status Indicator -->
+  <div id="statusIndicator">Status: </div>
+
+  <div class="container">
+    <h1 class="text-center mb-4">GoRecordurbate WebUI</h1>
+
+    <!-- Nav tabs -->
+    <ul class="nav nav-tabs" id="controlTabs" role="tablist">
+      <li class="nav-item" role="presentation">
+        <button class="nav-link active" id="tab1-tab" data-bs-toggle="tab" data-bs-target="#tab1" type="button" role="tab">
+          New streamer
+        </button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link" id="tab2-tab" data-bs-toggle="tab" data-bs-target="#tab2" type="button" role="tab">
+          Remove streamer
+        </button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link" id="tab3-tab" data-bs-toggle="tab" data-bs-target="#tab3" type="button" role="tab">
+          Control Panel
+        </button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link" id="tab4-tab" data-bs-toggle="tab" data-bs-target="#tab4" type="button" role="tab">
+          Import / Export
+        </button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link" id="tab5-tab" data-bs-toggle="tab" data-bs-target="#tab5" type="button" role="tab">
+          Log
+        </button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link" id="tab6-tab" data-bs-toggle="tab" data-bs-target="#tab6" type="button" role="tab">
+          Video Files
+        </button>
+      </li>
+    </ul>
+
+    <!-- Tab content -->
+    <div class="tab-content mt-4" id="controlTabsContent">
+      <!-- Tab 1: New streamer -->
+      <div class="tab-pane fade show active" id="tab1" role="tabpanel" aria-labelledby="tab1-tab">
+        <div class="mb-3">
+          <label for="stringInput" class="form-label">Enter a streamer name:</label>
+          <input type="text" id="stringInput" class="form-control" placeholder="Type your string here" />
+        </div>
+        <button class="btn btn-primary" onclick="sendString()">Add</button>
+      </div>
+
+      <!-- Tab 2: Remove streamer -->
+      <div class="tab-pane fade" id="tab2" role="tabpanel" aria-labelledby="tab2-tab">
+        <div class="mb-3">
+          <label for="dropdownList" class="form-label">Select a streamer:</label>
+          <select id="dropdownList" class="form-select">
+            <!-- Options will be populated dynamically -->
+          </select>
+        </div>
+        <button class="btn btn-primary" onclick="sendSelected()">Remove Selected</button>
+      </div>
+
+      <!-- Tab 3: Control Panel -->
+      <div class="tab-pane fade" id="tab3" role="tabpanel" aria-labelledby="tab3-tab">
+        <div class="mb-3">
+          <button class="btn btn-success me-2" onclick="sendControlCommand('start')">Start</button>
+          <button class="btn btn-danger me-2" onclick="sendControlCommand('stop')">Stop</button>
+          <button class="btn btn-warning me-2" onclick="sendControlCommand('restart')">Restart</button>
+        </div>
+      </div>
+
+      <!-- Tab 4: Import / Export -->
+      <div class="tab-pane fade" id="tab4" role="tabpanel" aria-labelledby="tab4-tab">
+        <div class="mb-3">
+          <label for="importFile" class="form-label">Import File:</label>
+          <input type="file" id="importFile" class="form-control" />
+          <button class="btn btn-secondary mt-2" onclick="uploadFile()">Upload</button>
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Export File:</label><br />
+          <button class="btn btn-secondary" onclick="downloadFile()">Download</button>
+        </div>
+      </div>
+
+      <!-- Tab 5: Log Terminal -->
+      <div class="tab-pane fade" id="tab5" role="tabpanel" aria-labelledby="tab5-tab">
+        <h4>Log</h4>
+        <div class="terminal" id="logTerminal"></div>
+      </div>
+
+      <!-- Tab 6: Video Files -->
+      <div class="tab-pane fade" id="tab6" role="tabpanel" aria-labelledby="tab6-tab">
+        <h4>Video Files</h4>
+        <div id="videoFilesContainer"></div>
+      </div>
+    </div>
+
+    <!-- Response area for messages -->
+    <div id="responseArea"></div>
+  </div>
+
+  <!-- Bootstrap JS bundle -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+  <script>
+    // Helper function to display response messages
+    function showResponse(message, isError = false) {
+      const responseDiv = document.getElementById("responseArea");
+      const alertDiv = document.createElement("div");
+      alertDiv.className = "alert " + (isError ? "alert-danger" : "alert-info");
+      alertDiv.innerText = message;
+      responseDiv.appendChild(alertDiv);
+      // Automatically remove the alert after 5 seconds
+      setTimeout(() => {
+        alertDiv.remove();
+      }, 5000);
+    }
+
+    // Tab 1: Send a string to the backend
+    function sendString() {
+      const inputValue = document.getElementById("stringInput").value;
+      fetch("/api/add-streamer", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ data: inputValue })
+      })
+        .then(response => response.json())
+        .then(data => {
+          showResponse("String sent successfully: " + JSON.stringify(data));
+        })
+        .catch(err => {
+          console.error(err);
+          showResponse("Error sending string", true);
+        });
+    }
+
+    // Tab 2: Populate dropdown with list from the backend
+    function populateDropdown() {
+      fetch("/api/get-streamers")
+        .then(response => response.json())
+        .then(data => {
+          const dropdown = document.getElementById("dropdownList");
+          dropdown.innerHTML = "";
+          data.forEach(item => {
+            const option = document.createElement("option");
+            option.value = item;
+            option.text = item;
+            dropdown.appendChild(option);
+          });
+        })
+        .catch(err => {
+          console.error(err);
+          showResponse("Error retrieving list", true);
+        });
+    }
+
+    function sendSelected() {
+      const selectedValue = document.getElementById("dropdownList").value;
+      fetch("/api/remove-streamer", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ selected: selectedValue })
+      })
+        .then(response => response.json())
+        .then(data => {
+          showResponse("Selection sent successfully: " + JSON.stringify(data));
+        })
+        .catch(err => {
+          console.error(err);
+          showResponse("Error sending selection", true);
+        });
+    }
+
+    // Tab 3: Send control commands (start, stop, restart)
+    function sendControlCommand(command) {
+      fetch("/api/control", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ command: command })
+      })
+        .then(response => response.json())
+        .then(data => {
+          showResponse('Command "' + command + '" executed: ' + JSON.stringify(data));
+        })
+        .catch(err => {
+          console.error(err);
+          showResponse('Error executing command "' + command + '"', true);
+        });
+    }
+
+    // File upload for import
+    function uploadFile() {
+      const fileInput = document.getElementById("importFile");
+      const file = fileInput.files[0];
+      if (!file) {
+        showResponse("Please select a file to upload.", true);
+        return;
+      }
+      const formData = new FormData();
+      formData.append("file", file);
+
+      fetch("/api/import", {
+        method: "POST",
+        body: formData
+      })
+        .then(response => response.json())
+        .then(data => {
+          showResponse("File uploaded successfully: " + JSON.stringify(data));
+        })
+        .catch(err => {
+          console.error(err);
+          showResponse("Error uploading file", true);
+        });
+    }
+
+    // File download for export
+    function downloadFile() {
+      // Simply redirecting the browser to the download endpoint
+      window.location.href = "/api/export";
+    }
+
+    // --- New: Log Terminal auto-update ---
+    function updateLogs() {
+      fetch("/api/logs")
+        .then(response => response.json())
+        .then(data => {
+          // Assume data is an array of log lines
+          const logTerminal = document.getElementById("logTerminal");
+          logTerminal.innerText = data.join('\n');
+          // Auto scroll to the bottom
+          logTerminal.scrollTop = logTerminal.scrollHeight;
+        })
+        .catch(err => {
+          console.error("Error fetching logs:", err);
+        });
+    }
+
+    // Start auto-updating the logs every 3 seconds
+    setInterval(updateLogs, 3000);
+
+    // --- New: Status Indicator update ---
+    function updateStatus() {
+      fetch("/api/status")
+        .then(response => response.json())
+        .then(data => {
+          // Assume data.status contains a string like "Online" or "Offline"
+          const statusIndicator = document.getElementById("statusIndicator");
+          statusIndicator.innerText = "Status: " + data.status;
+          // Change color based on status
+          console.log(data)
+          statusIndicator.style.backgroundColor = data.status === "Running" ? "#28a745" : "#dc3545";
+        })
+        .catch(err => {
+          console.error("Error fetching status:", err);
+        });
+    }
+
+    // Poll status every 5 seconds
+    setInterval(updateStatus, 5000);
+
+    // --- New: Video Files tab ---
+    function populateVideoFiles() {
+      fetch("/api/video-files")
+        .then(response => response.json())
+        .then(data => {
+          const container = document.getElementById("videoFilesContainer");
+          container.innerHTML = "";
+          // Assume data is an array of objects with properties: filename and url
+          data.forEach(video => {
+            const videoDiv = document.createElement("div");
+            videoDiv.className = "mb-2";
+            videoDiv.innerHTML = `<a href="${video.url}" target="_blank">${video.filename}</a>`;
+            container.appendChild(videoDiv);
+          });
+        })
+        .catch(err => {
+          console.error("Error retrieving video files:", err);
+          showResponse("Error retrieving video files", true);
+        });
+    }
+
+    // When the DOM is fully loaded, populate the dropdown and set up tab events.
+    document.addEventListener("DOMContentLoaded", function () {
+      populateDropdown();
+      updateLogs(); // initial log fetch
+
+      // When the Video Files tab is shown, update its content
+      var videoTabTrigger = document.getElementById("tab6-tab");
+      videoTabTrigger.addEventListener("shown.bs.tab", function () {
+        populateVideoFiles();
+      });
+    });
+  </script>
+</body>
+</html>

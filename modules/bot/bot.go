@@ -2,7 +2,6 @@ package bot
 
 import (
 	"GoRecordurbate/modules/config"
-	"GoRecordurbate/modules/file"
 	"encoding/json"
 	"fmt"
 	"log"
@@ -23,13 +22,6 @@ var (
 	RESTART = "restart"
 )
 
-// StreamerStatus tracks a streamer and whether a recording process is running.
-type StreamerStatus struct {
-	mu        sync.Mutex
-	Name      string
-	Recording bool
-}
-
 // ProcessRecord holds the recording process associated with a streamer.
 type ProcessRecord struct {
 	streamer string
@@ -43,15 +35,8 @@ type Bot struct {
 	// running flag: set to false when a stop signal is caught
 	running bool
 
-	// config holds the configuration loaded from your config module.
-	// (Assumes your config module defines a Config struct with fields like AutoReload,
-	// YoutubeDL (with Binary and Config), and App with RateLimit and Streamers.)
-	config *config.Config
-
-	// streamers holds our local list of streamers along with a “recording” flag.
-	streamers []StreamerStatus
 	// processes holds our active recording processes.
-	processes []ProcessRecord
+	processes []config.Streamer_status
 
 	logger *log.Logger
 }
@@ -65,7 +50,7 @@ func NewBot(logger *log.Logger) *Bot {
 	}
 
 	// Load config for the first time.
-	b.ReloadConfig()
+	config.C.Reload()
 
 	// Register to catch SIGINT and SIGTERM and trigger Stop.
 	sigs := make(chan os.Signal, 1)
@@ -80,58 +65,12 @@ func NewBot(logger *log.Logger) *Bot {
 
 // Stop sets the running flag to false so that the bot can exit gracefully.
 func (b *Bot) Stop() {
+	log.Println("Stopping bot..")
 	if b.running {
-		b.logger.Println("Caught stop signal, stopping")
+		log.Println("Caught stop signal, stopping")
 		b.running = false
 	}
-}
-
-// ReloadConfig loads (or reloads) the configuration.
-// On the first call it creates a local list of streamers (all marked as not recording).
-// On subsequent calls it removes streamers no longer in the config and adds any new ones.
-func (b *Bot) ReloadConfig() {
-	var newConfig config.Config
-	err := file.ReadJson("./config.json", &newConfig)
-	if err != nil {
-		b.logger.Printf("Error loading config: %v", err)
-		return
-	}
-
-	// If this is the first load, initialize our streamer list.
-	if b.config == nil {
-		b.config = &newConfig
-		for _, s := range b.config.App.Streamers {
-			b.streamers = append(b.streamers, StreamerStatus{Name: s.Name, Recording: false})
-		}
-		return
-	}
-
-	// Remove streamers that were removed in the new config.
-	newStreamerMap := make(map[string]bool)
-	for _, s := range newConfig.App.Streamers {
-		newStreamerMap[s.Name] = true
-	}
-	updatedStreamers := []StreamerStatus{}
-	for _, s := range b.streamers {
-		if _, exists := newStreamerMap[s.Name]; exists {
-			updatedStreamers = append(updatedStreamers, s)
-		} else {
-			b.logger.Printf("%s has been removed", s.Name)
-		}
-	}
-	b.streamers = updatedStreamers
-
-	// Add any new streamers.
-	currentMap := make(map[string]bool)
-	for _, s := range b.streamers {
-		currentMap[s.Name] = true
-	}
-	for _, s := range newConfig.App.Streamers {
-		if !currentMap[s.Name] {
-			b.streamers = append(b.streamers, StreamerStatus{Name: s.Name, Recording: false})
-		}
-	}
-	b.config = &newConfig
+	b.processes = []config.Streamer_status{}
 }
 
 // IsRoomPublic checks if a given room (streamer) is public by sending a POST request.
@@ -143,7 +82,7 @@ func (b *Bot) IsRoomPublic(username string) bool {
 	data.Set("room_slug", username)
 	req, err := http.NewRequest("POST", urlStr, strings.NewReader(data.Encode()))
 	if err != nil {
-		b.logger.Printf("Error creating request: %v", err)
+		log.Printf("Error creating request: %v", err)
 		return false
 	}
 	req.Header.Add("X-Requested-With", "XMLHttpRequest")
@@ -152,7 +91,7 @@ func (b *Bot) IsRoomPublic(username string) bool {
 	client := &http.Client{}
 	resp, err := client.Do(req)
 	if err != nil {
-		b.logger.Printf("An error occurred while making the request: %v", err)
+		log.Printf("An error occurred while making the request: %v", err)
 		return false
 	}
 	defer resp.Body.Close()
@@ -162,7 +101,7 @@ func (b *Bot) IsRoomPublic(username string) bool {
 		RoomStatus string `json:"room_status"`
 	}
 	if err := json.NewDecoder(resp.Body).Decode(&res); err != nil {
-		b.logger.Printf("Error decoding JSON: %v", err)
+		log.Printf("Error decoding JSON: %v", err)
 		return false
 	}
 	return res.Success && res.RoomStatus == "public"
@@ -176,7 +115,7 @@ func (b *Bot) IsOnline(username string) bool {
 	urlStr = "https://chaturbate.com/api/chatvideocontext/" + username
 	resp, err := http.Get(urlStr)
 	if err != nil {
-		b.logger.Printf("Error in GET request: %v", err)
+		log.Printf("Error in GET request: %v", err)
 		return false
 	}
 	defer resp.Body.Close()
@@ -186,11 +125,11 @@ func (b *Bot) IsOnline(username string) bool {
 		CurrentShow string `json:"room_status"`
 	}
 	if err := json.NewDecoder(resp.Body).Decode(&res); err != nil {
-		b.logger.Printf("Error decoding JSON: %v", err)
+		log.Printf("Error decoding JSON: %v", err)
 		return false
 	}
 
-	b.logger.Printf("Checking online for username: %s", username)
+	log.Printf("Checking online for username: %s", username)
 
 	if res.Username == username && res.CurrentShow == "public" {
 		return true
@@ -202,32 +141,58 @@ func (b *Bot) IsOnline(username string) bool {
 // Run starts the main loop of the Bot. While running, it reloads configuration (if enabled),
 // checks for finished recording processes, and starts a new recording for any streamer that is online.
 func (b *Bot) Run() {
+
 	for b.running {
+
+		// Write youtube dl config
+		/*
+
+			Default:
+			-o "./videos/%(id)s/%(title)s.%(ext)s"
+
+			To reduce output video filesize, use the following instead to limit to [height<1080][fps<?60]:
+			-f 'best[height<1080][fps<?60]' -o "./videos/%(id)s/%(title)s.%(ext)s"
+			 --quiet
+
+		*/
+		//os.Remove(config.C.YoutubeDL.Config) // ensure empty file
+		f, err := os.Create(config.C.YoutubeDL.Config)
+		if err != nil {
+			log.Println("Error Creating to file: ", err)
+			continue
+		}
+		folder := config.C.App.Videos_folder
+		_, err = f.Write([]byte("-o \"" + folder + "/%(id)s/%(title)s.%(ext)s\""))
+		if err != nil {
+			log.Println("Error writing to file: ", err)
+			continue
+		}
 		// Catch any panic in this iteration.
 		func() {
 			defer func() {
 				if r := recover(); r != nil {
-					b.logger.Printf("Loop error: %v", r)
+					log.Printf("Loop error: %v", r)
 					time.Sleep(1 * time.Second)
 				}
 			}()
 
 			// Reload config if auto_reload_config is enabled.
-			if b.config != nil && b.config.AutoReload {
-				b.ReloadConfig()
+			if config.C.AutoReload {
+				config.C.Reload()
+
 			}
 
 			// Check current recording processes.
 			for i := 0; i < len(b.processes); i++ {
 				rec := b.processes[i]
 				// Send signal 0 to check if the process is still running.
-				err := rec.cmd.Process.Signal(syscall.Signal(0))
+				err := rec.Cmd.Process.Signal(syscall.Signal(0))
 				if err != nil {
-					b.logger.Printf("Stopped recording %s", rec.streamer)
+					log.Printf("Stopped recording %s", rec.Name)
 					// Mark the streamer as not recording.
-					for j, s := range b.streamers {
-						if s.Name == rec.streamer {
-							b.streamers[j].Recording = false
+					for j, s := range config.Streamer_Statuses {
+						if s.Name == rec.Name {
+							config.Streamer_Statuses[j].Running = false
 						}
 					}
 					// Remove the finished process from our slice.
@@ -235,46 +200,56 @@ func (b *Bot) Run() {
 					i-- // adjust index after removal
 				}
 			}
+
 			var wg sync.WaitGroup
 			// Check each streamer and start recording if needed.
-			for i, s := range b.streamers {
-				s.mu.Lock()
-				defer s.mu.Unlock()
-				if s.Recording {
-					b.logger.Println("Recorder already running!")
+			for _, s := range config.C.App.Streamers {
+				is_processed := false
+				for _, p := range b.processes {
+					if p.Name == s.Name {
+						is_processed = true
+					}
+				}
+
+				if is_processed {
 					continue
 				}
+
 				wg.Add(1)
 				go func() {
 					defer wg.Done()
 					if b.IsOnline(s.Name) {
-						b.logger.Printf("Started to record %s", s.Name)
-						// Prepare the command.
-						// We assume your configuration holds the YouTube-DL command as a string in YoutubeDL.Binary
-						// and the config location in YoutubeDL.Config.
-						args := strings.Fields(b.config.YoutubeDL.Binary)
+						log.Printf("Started to record %s", s.Name)
+						args := strings.Fields(config.C.YoutubeDL.Binary)
 						recordURL := fmt.Sprintf("https://chaturbate.com/%s/", s.Name)
-						args = append(args, recordURL, "--config-location", b.config.YoutubeDL.Config)
+						args = append(args, recordURL, "--config-location", config.C.YoutubeDL.Config)
 						cmd := exec.Command(args[0], args[1:]...)
-						log.Println(cmd)
+
 						// Start the recording process.
 						if err := cmd.Start(); err != nil {
-							b.logger.Printf("Error starting recording for %s: %v", s.Name, err)
+							log.Printf("Error starting recording for %s: %v", s.Name, err)
 						} else {
-							b.processes = append(b.processes, ProcessRecord{streamer: s.Name, cmd: cmd})
-							b.streamers[i].Recording = true
+							b.processes = append(b.processes, config.Streamer_status{Name: s.Name, Cmd: cmd, Running: true})
+
+							for _, p := range b.processes {
+								if p.Name == s.Name {
+									is_processed = true
+								}
+							}
 							fmt.Println("Recording has started")
 						}
 					} else {
-						b.logger.Printf("Streamer is not online.. %s", s.Name)
+						log.Printf("Streamer is not online.. %s", s.Name)
 					}
 					// Respect rate limiting if enabled.
-					if b.config.App.RateLimit.Enable {
-						time.Sleep(time.Duration(b.config.App.RateLimit.Time) * time.Second)
+					if config.C.App.RateLimit.Enable {
+						time.Sleep(time.Duration(config.C.App.RateLimit.Time) * time.Second)
 					}
 				}()
+				config.C.Update()
 				time.Sleep(time.Duration(config.C.App.RateLimit.Time) * time.Second)
 			}
+
 			// Wait for 1 minute in 1-second intervals.
 			for i := 0; i < 60; i++ {
 				if !b.running {
@@ -287,8 +262,13 @@ func (b *Bot) Run() {
 
 	// When the loop ends, stop all active recording processes.
 	for _, rec := range b.processes {
-		rec.cmd.Process.Signal(syscall.SIGINT)
-		rec.cmd.Wait()
+		for i := range config.Streamer_Statuses {
+			config.Streamer_Statuses[i].Running = false
+		}
+		fmt.Println(rec.Name)
+		rec.Cmd.Process.Signal(syscall.SIGINT)
+		rec.Cmd.Wait()
 	}
-	b.logger.Println("Successfully stopped")
+	config.C.Update()
+	log.Println("Successfully stopped")
 }

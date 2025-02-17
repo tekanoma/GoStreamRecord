@@ -1,52 +1,32 @@
 package main
 
 import (
-	"GoRecordurbate/modules/bot"
 	"GoRecordurbate/modules/config"
+	"GoRecordurbate/modules/file"
+	"GoRecordurbate/modules/handlers"
+	"encoding/json"
 	"fmt"
-	"log"
 	"os"
-	"strings"
 )
 
 func init() {
-	config.Path = "./config.json"
-	config.C.Init()
+
+	file.Config_path = "./output/app_config.json"
+	_, err := os.Stat(file.Config_path)
+	if os.IsNotExist(err) {
+		fmt.Println("No config found. Generating.. Please fill in details in:", file.Config_path)
+		f, _ := os.Create(file.Config_path)
+		tmp := config.Config{}
+		b, _ := json.Marshal(tmp)
+		f.Write(b)
+		os.Exit(0)
+	}
+	file.InitLog("./output/app.log")
+	config.C.Init("./output/app_config.json")
 
 }
-func main() {
-	args := os.Args
-	if len(args) == 1 {
-		fmt.Println("No args provided..")
-		return
-	}
-	switch strings.ToLower(args[1]) {
-	case "help": // To be added
-	case "add":
-		if len(args) < 3 {
-			return
-		}
-		config.C.App.AddStreamer(args[2])
-	case "del":
-		if len(args) < 3 {
-			return
-		}
-		config.C.App.RemoveStreamer(args[2])
-	case "list":
-		config.C.App.ListStreamers()
-	case "import":
-		if len(args) < 3 {
-			return
-		}
-		config.C.App.ImportStreamers(args[2])
-	case "export":
-		config.C.App.ExportStreamers()
-	case "start":
-		logger := log.New(os.Stdout, "", log.LstdFlags)
-		b := bot.NewBot(logger)
-		b.Run()
-	default:
-		fmt.Println("Nothing to do..")
-	}
 
+// bot/command.go handles incoming commands
+func main() {
+	handlers.StartWebUI()
 }
