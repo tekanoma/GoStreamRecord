@@ -10,15 +10,15 @@ This is un-tested on Windows and Mac, but golang is cross-compatible which means
 A release will be made once i have finished fixing the bare minimum below:
 
 - [x] Start recording
-- [ ] Restart recording
-- [ ] stop recording (Might be dropped since the recording already stops when signal interrupt is sent.)
+- [x] Restart recording
+- [x] stop recording
 - [x] Add streamer
 - [x] Remove streamer
 - [ ] Import streamers
 - [ ] Export streamers
 - [ ] Docker example
 - [ ] Service example
-- [ ] Imbed index file into code
+- [ ] Embed index file into code
 #### WebUI
 - [x] Start, stop, restart
 - [ ] Add / delete streamer
