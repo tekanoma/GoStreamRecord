@@ -118,7 +118,7 @@ func (b *Bot) IsRoomPublic(username string) bool {
 // IsOnline checks if the streamer is online by sending a GET request to the API.
 // It waits for 3 seconds before making the call.
 func (b *Bot) IsOnline(username string) bool {
-	time.Sleep(3 * time.Second)
+	time.Sleep(200 * time.Millisecond)
 	urlStr := "https://chaturbate.com/api/public/affiliates/onlinerooms/?wm=DkfRj&client_ip=request_ip&limit=500"
 	urlStr = "https://chaturbate.com/api/chatvideocontext/" + username
 	resp, err := http.Get(urlStr)
