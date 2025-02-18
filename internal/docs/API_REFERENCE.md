@@ -1,4 +1,6 @@
-# API Reference (Incomplete since this provject is still in early development)
+# API Reference 
+
+Note: Note all backend logic has been implemented, so the api has "dummy" responses in some places
 
 ## Endpoints
 | Endpoint               | Method | Description |
