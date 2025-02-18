@@ -86,7 +86,7 @@ Executes a control command (`start`, `stop`, or `restart`).
 
 ## **4. API Status**
 ### **GET /api/status**
-Returns wether recorder is running or not.
+Returns a string of the recorder status
 
 #### **Request**
 - **Method**: `GET`
