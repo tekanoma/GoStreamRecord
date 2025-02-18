@@ -1,5 +1,8 @@
 # GoRecordurbate WebUI
 
+Readme is incomplete and will be completely refactored at a later point. Still relevant tho. 
+
+Checkput the API doc for info on how to use the api.
 ## Intro
 A golang version of recordurbate with some differences. One key difference is that this doesent use a deamon, but instead runs a webserver (Web UI). It can instead be compiled into a binary file and started as a service, docker container or whatever you prefer. 
 
@@ -18,7 +21,7 @@ A release will be made once i have finished fixing the bare minimum below:
 - [ ] Export streamers
 - [ ] Docker example
 - [ ] Service example
-- [ ] Embed index file into code
+- [ ] Embed index file into code
 #### WebUI
 - [x] Start, stop, restart
 - [x] Add / delete streamer
