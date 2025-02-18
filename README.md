@@ -1,6 +1,6 @@
 # GoRecordurbate WebUI
 
-Readme is incomplete and will be completely refactored at a later point. Still relevant tho. 
+Readme is incomplete and will modified a lot during development.
 
 Checkout the [API doc](https://github.com/luna-nightbyte/GoRecordurbate-WebUI/blob/main/internal/docs/API_REFERENCE.md) for info on how to use the api.
 
