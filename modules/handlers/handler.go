@@ -2,12 +2,14 @@ package handlers
 
 import (
 	"GoRecordurbate/modules/config"
+	"GoRecordurbate/modules/file"
 	"context"
 	"fmt"
 	"log"
 	"net/http"
 	"os"
 	"os/signal"
+	"path/filepath"
 	"syscall"
 	"time"
 )
@@ -29,8 +31,7 @@ func StartWebUI() {
 	http.HandleFunc("/api/import", uploadHandler)
 	http.HandleFunc("/api/export", downloadHandler)
 	http.HandleFunc("/api/status", statusHandler)
-
-	fs := http.FileServer(http.Dir("./static"))
+	fs := http.FileServer(http.Dir(filepath.Dir(file.Index_path)))
 	http.Handle("/", fs)
 
 	server := &http.Server{

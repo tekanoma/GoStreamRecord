@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"os/exec"
 	"strings"
 	"sync"
 )
@@ -18,13 +17,12 @@ type Config struct {
 
 type youtubeDL struct {
 	Binary string `json:"binary"`
-	Config string `json:"config"`
 }
 type app struct {
 	mux sync.Mutex
 
 	Port          int        `json:"port"`
-	Videos_folder string     `json:"output_folder"`
+	Videos_folder string     `json:"video_output_folder"`
 	RateLimit     rate_limit `json:"rate_limit"`
 	ExportPath    string     `json:"default_export_location"`
 	Streamers     []streamer `json:"streamers"`
@@ -37,35 +35,22 @@ type streamer struct {
 	Name string `json:"name"`
 }
 
-// internal for running recorders. not saved on shutdown.
-type Streamer_status struct {
-	Name    string
-	Running bool
-	Cmd     *exec.Cmd
-}
-
 var (
-	Streamer_Statuses = []Streamer_status{}
-	C                 Config
-	Path              string
+	C Config
 )
 
-func (c *Config) Init(config_path string) {
-	Path = config_path
-	if len(Path) == 0 {
-		log.Fatal("Config path not provided")
-	}
-	_, err := os.ReadFile(Path)
+func (c *Config) Init() {
+	_, err := os.ReadFile(file.Config_path)
 	if os.IsNotExist(err) {
-		log.Fatal(Path, " was not found..")
+		log.Fatal(file.Config_path, " was not found..")
 	}
 
-	ok, err := file.CheckJson(Path, &c)
+	ok, err := file.CheckJson(file.Config_path, &c)
 	if !ok {
 		log.Fatal("Config error: ", err)
 		return
 	}
-	err = file.ReadJson(Path, &c)
+	err = file.ReadJson(file.Config_path, &c)
 	if err != nil {
 		log.Fatal("Error reading config: ", err)
 		return
@@ -73,47 +58,13 @@ func (c *Config) Init(config_path string) {
 }
 
 func (c *Config) Reload() {
-	var newConfig Config
-	err := file.ReadJson(Path, &newConfig)
+
+	err := file.ReadJson(file.Config_path, &c)
 	if err != nil {
 		log.Printf("Error loading config: %v", err)
 		return
 	}
 
-	// If this is the first load, initialize our streamer list.
-	if c == nil {
-		c = &newConfig
-		for _, s := range c.App.Streamers {
-			Streamer_Statuses = append(Streamer_Statuses, Streamer_status{Name: s.Name, Running: false})
-		}
-		return
-	}
-
-	// Remove streamers that were removed in the new config.
-	newStreamerMap := make(map[string]bool)
-	for _, s := range newConfig.App.Streamers {
-		newStreamerMap[s.Name] = true
-	}
-	updatedStreamers := []streamer{}
-	for _, s := range c.App.Streamers {
-		if _, exists := newStreamerMap[s.Name]; exists {
-			updatedStreamers = append(updatedStreamers, s)
-		} else {
-			log.Printf("%s has been removed", s.Name)
-		}
-	}
-	c.App.Streamers = updatedStreamers
-	// Add and log any new streamers.
-	currentMap := make(map[string]bool)
-	for _, s := range c.App.Streamers {
-		currentMap[s.Name] = true
-	}
-	for _, s := range newConfig.App.Streamers {
-		if !currentMap[s.Name] {
-			Streamer_Statuses = append(Streamer_Statuses, Streamer_status{Name: s.Name, Running: false})
-			log.Printf("%s has been added", s.Name)
-		}
-	}
 }
 
 func (c *Config) Update() {
@@ -126,7 +77,7 @@ func (c *Config) Update() {
 }
 
 func (c *Config) verify() bool {
-	ok, err := file.CheckJson(Path, &c)
+	ok, err := file.CheckJson(file.Config_path, &c)
 	if !ok {
 		log.Fatal("Config error: ", err)
 		return false
@@ -135,7 +86,7 @@ func (c *Config) verify() bool {
 }
 
 func (c *Config) read() bool {
-	err := file.ReadJson(Path, &c)
+	err := file.ReadJson(file.Config_path, &c)
 	if err != nil {
 		log.Println("Error reading config: ", err)
 		return false
@@ -144,7 +95,7 @@ func (c *Config) read() bool {
 }
 
 func (c *Config) write() bool {
-	err := file.WriteJson(Path, &c)
+	err := file.WriteJson(file.Config_path, &c)
 	if err != nil {
 		log.Println("Error writing config: ", err)
 		return false
@@ -152,13 +103,13 @@ func (c *Config) write() bool {
 	return true
 }
 
-func (app *app) AddStreamer(streamerName string) {
+func (app *app) AddStreamer(streamerName string) string {
 	app.mux.Lock()
 	defer app.mux.Unlock()
 	for _, streamer := range app.Streamers {
 		if streamerName == streamer.Name {
 			log.Printf("%s has already been addded.", streamerName)
-			return
+			return fmt.Sprintf("%s has already been addded.", streamerName)
 		}
 	}
 	app.Streamers = append(app.Streamers, streamer{Name: streamerName})
@@ -166,11 +117,13 @@ func (app *app) AddStreamer(streamerName string) {
 	ok := C.write()
 	if !ok {
 		log.Printf("Error adding %s..\n", streamerName)
+		return fmt.Sprintf("Error adding %s..\n", streamerName)
 	}
 	log.Printf("%s has been added", streamerName)
+	return fmt.Sprintf("%s has been added", streamerName)
 }
 
-func (app *app) RemoveStreamer(streamerName string) {
+func (app *app) RemoveStreamer(streamerName string) string {
 	app.mux.Lock()
 	defer app.mux.Unlock()
 	newList := []streamer{}
@@ -184,15 +137,17 @@ func (app *app) RemoveStreamer(streamerName string) {
 	}
 	if !wasAdded {
 		log.Printf("%s hasn't been added", streamerName)
-		return
+		return fmt.Sprintf("%s hasn't been added", streamerName)
 	}
 	app.Streamers = newList
 	C.App = *app
 	ok := C.write()
 	if !ok {
 		log.Printf("Error removing %s..\n", streamerName)
+		return fmt.Sprintf("Error removing %s..\n", streamerName)
 	}
 	log.Printf("%s has been deleted", streamerName)
+	return fmt.Sprintf("%s has been deleted", streamerName)
 
 }
 

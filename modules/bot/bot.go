@@ -2,6 +2,7 @@ package bot
 
 import (
 	"GoRecordurbate/modules/config"
+	"GoRecordurbate/modules/file"
 	"encoding/json"
 	"fmt"
 	"log"
@@ -16,16 +17,8 @@ import (
 	"time"
 )
 
-var (
-	START   = "start"
-	STOP    = "stop"
-	RESTART = "restart"
-)
-
-// ProcessRecord holds the recording process associated with a streamer.
-type ProcessRecord struct {
-	streamer string
-	cmd      *exec.Cmd
+type Interface interface {
+	AppendStreamer(streamer string)
 }
 
 // Bot encapsulates the recording bot’s state.
@@ -36,19 +29,34 @@ type Bot struct {
 	running bool
 
 	// processes holds our active recording processes.
-	processes []config.Streamer_status
+	processes []Streamer_status
 
 	logger *log.Logger
+	Interface
+}
+
+// internal for running recorders. not saved on shutdown.
+type Streamer_status struct {
+	Name    string
+	Running bool
+	Cmd     *exec.Cmd
+}
+
+func (b *Bot) AppendStreamer(name string, running bool) {
+	b.processes = append(b.processes, Streamer_status{Name: name, Running: running})
+}
+
+func (b *Bot) ListRecorders() []Streamer_status {
+	return b.processes
 }
 
 // NewBot creates a new Bot, loads the configuration, and registers signal handlers.
 func NewBot(logger *log.Logger) *Bot {
 	b := &Bot{
 		error:   false,
-		running: true,
+		running: false,
 		logger:  logger,
 	}
-
 	// Load config for the first time.
 	config.C.Reload()
 
@@ -70,7 +78,7 @@ func (b *Bot) Stop() {
 		log.Println("Caught stop signal, stopping")
 		b.running = false
 	}
-	b.processes = []config.Streamer_status{}
+	b.processes = []Streamer_status{}
 }
 
 // IsRoomPublic checks if a given room (streamer) is public by sending a POST request.
@@ -141,7 +149,11 @@ func (b *Bot) IsOnline(username string) bool {
 // Run starts the main loop of the Bot. While running, it reloads configuration (if enabled),
 // checks for finished recording processes, and starts a new recording for any streamer that is online.
 func (b *Bot) Run() {
-
+	if !b.running {
+		log.Println("Bot not running..")
+	} else {
+		log.Println("Bot started")
+	}
 	for b.running {
 
 		// Write youtube dl config
@@ -156,7 +168,7 @@ func (b *Bot) Run() {
 
 		*/
 		//os.Remove(config.C.YoutubeDL.Config) // ensure empty file
-		f, err := os.Create(config.C.YoutubeDL.Config)
+		f, err := os.Create(file.YoutubeDL_configPath)
 		if err != nil {
 			log.Println("Error Creating to file: ", err)
 			continue
@@ -190,9 +202,9 @@ func (b *Bot) Run() {
 				if err != nil {
 					log.Printf("Stopped recording %s", rec.Name)
 					// Mark the streamer as not recording.
-					for j, s := range config.Streamer_Statuses {
+					for j, s := range b.processes {
 						if s.Name == rec.Name {
-							config.Streamer_Statuses[j].Running = false
+							b.processes[j].Running = false
 						}
 					}
 					// Remove the finished process from our slice.
@@ -222,14 +234,14 @@ func (b *Bot) Run() {
 						log.Printf("Started to record %s", s.Name)
 						args := strings.Fields(config.C.YoutubeDL.Binary)
 						recordURL := fmt.Sprintf("https://chaturbate.com/%s/", s.Name)
-						args = append(args, recordURL, "--config-location", config.C.YoutubeDL.Config)
+						args = append(args, recordURL, "--config-location", file.YoutubeDL_configPath)
 						cmd := exec.Command(args[0], args[1:]...)
 
 						// Start the recording process.
 						if err := cmd.Start(); err != nil {
 							log.Printf("Error starting recording for %s: %v", s.Name, err)
 						} else {
-							b.processes = append(b.processes, config.Streamer_status{Name: s.Name, Cmd: cmd, Running: true})
+							b.processes = append(b.processes, Streamer_status{Name: s.Name, Cmd: cmd, Running: true})
 
 							for _, p := range b.processes {
 								if p.Name == s.Name {
@@ -262,9 +274,6 @@ func (b *Bot) Run() {
 
 	// When the loop ends, stop all active recording processes.
 	for _, rec := range b.processes {
-		for i := range config.Streamer_Statuses {
-			config.Streamer_Statuses[i].Running = false
-		}
 		fmt.Println(rec.Name)
 		rec.Cmd.Process.Signal(syscall.SIGINT)
 		rec.Cmd.Wait()

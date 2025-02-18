@@ -3,6 +3,7 @@ package bot
 import (
 	"GoRecordurbate/modules/config"
 	"fmt"
+	"log"
 	"strings"
 	"time"
 )
@@ -13,35 +14,31 @@ func (b *Bot) Command(command string) {
 		return
 	}
 	switch strings.ToLower(command) {
-	case "help": // To be added
 	case "add":
-		if len(command) < 3 {
-			return
-		}
-		config.C.App.AddStreamer(command)
+		log.Println("Adding ")
+		config.C.App.AddStreamer("STREAMER_NAME_PLACEHOLDER")
 	case "del":
-		if len(command) < 3 {
-			return
-		}
-		config.C.App.RemoveStreamer(command)
-	case "list":
-		config.C.App.ListStreamers()
+		log.Println("Removing ")
+		config.C.App.RemoveStreamer("STREAMER_NAME_PLACEHOLDER")
 	case "import":
-		if len(command) < 3 {
-			return
-		}
-		config.C.App.ImportStreamers(command)
+		log.Println("Importing streamers..")
+		config.C.App.ImportStreamers(config.C.App.ExportPath)
 	case "export":
+		log.Println("Exporting streamers..")
 		config.C.App.ExportStreamers()
 	case "start":
-		fmt.Println("Starting", b)
+		log.Println("Starting bot")
+		if b.running {
+			log.Println("Bot already started. Use 'Restart'.")
+			return
+		}
 		b.running = true
 		go b.Run()
 	case "stop":
-		fmt.Println("Stopping", b)
-		b.Stop()
+		log.Println("Stopping bot")
+		go b.Stop()
 	case "restart":
-		fmt.Println("Restarting", b)
+		log.Println("Restarting bot")
 		b.Stop()
 		time.Sleep(1 * time.Second)
 		b.running = true
