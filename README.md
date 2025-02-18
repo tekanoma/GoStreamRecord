@@ -21,7 +21,7 @@ A release will be made once i have finished fixing the bare minimum below:
 - [ ] Embed index file into code
 #### WebUI
 - [x] Start, stop, restart
-- [ ] Add / delete streamer
+- [x] Add / delete streamer
 - [ ] Import streamers
 - [ ] Export streamers
 - [ ] Show log
