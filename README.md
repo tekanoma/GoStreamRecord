@@ -5,7 +5,20 @@ Readme is incomplete and will be completely refactored at a later point. Still r
 Checkout the [API doc](https://github.com/luna-nightbyte/GoRecordurbate-WebUI/blob/main/internal/docs/API_REFERENCE.md) for info on how to use the api.
 
 ## Intro
-A golang version of recordurbate with some differences. One key difference is that this doesent use a deamon, but instead runs a webserver (Web UI). It can instead be compiled into a binary file and started as a service, docker container or whatever you prefer. 
+A [golang](https://go.dev/) version of recordurbate with some differences. One key difference is that this doesent use a deamon, but instead runs a webserver (Web UI). It can be compiled into a binary file and started as a service, docker container or whatever you prefer. 
+
+### Usage
+
+#### Build
+Building the code wil create a binary for your os system. Golang is cross-compatible for windows, linux and mac.
+```
+go mod tidy GoRecordurbate
+go build
+```
+#### Source
+```
+go run main.go
+```
 
 Sends a request to check if the [spesific](https://github.com/luna-nightbyte/GoRecordurbate/blob/ec0b1fa79e2bb82cf948bef3415ace3aac52e523/modules/bot/bot.go#L176) user is online rather than requesting a [list of 500](https://github.com/luna-nightbyte/GoRecordurbate/blob/ec0b1fa79e2bb82cf948bef3415ace3aac52e523/modules/bot/bot.go#L175) and checking that for the correct user. 
 ### Notes
