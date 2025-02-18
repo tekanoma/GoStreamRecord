@@ -10,7 +10,7 @@ GoRecordurbate send a request to check if the [spesific](https://github.com/luna
 ### Usage
 
 #### Build
-Building the code wil create a binary for your os system. Golang is cross-compatible for windows, linux and mac.
+Building the code wil create a binary for your os system. Golang is [cross-compatible](https://go.dev/wiki/GccgoCrossCompilation) for windows, linux and mac.
 ```bash
 go mod init GoRecordurbate # Only run this line once
 go mod tidy
