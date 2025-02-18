@@ -71,12 +71,21 @@ func NewBot(logger *log.Logger) *Bot {
 	return b
 }
 
+var Running bool
+
 // Stop sets the running flag to false so that the bot can exit gracefully.
 func (b *Bot) Stop() {
 	log.Println("Stopping bot..")
 	if b.running {
 		log.Println("Caught stop signal, stopping")
 		b.running = false
+
+		// When the loop ends, stop all active recording processes.
+		for _, rec := range b.processes {
+			fmt.Println(rec.Name)
+			rec.Cmd.Process.Signal(syscall.SIGINT)
+			rec.Cmd.Wait()
+		}
 	}
 	b.processes = []Streamer_status{}
 }
@@ -243,9 +252,12 @@ func (b *Bot) Run() {
 						} else {
 							b.processes = append(b.processes, Streamer_status{Name: s.Name, Cmd: cmd, Running: true})
 
-							for _, p := range b.processes {
+							for i, p := range b.processes {
 								if p.Name == s.Name {
 									is_processed = true
+									b.processes[i].Cmd = cmd
+									b.processes[i].Name = s.Name
+
 								}
 							}
 							fmt.Println("Recording has started")
@@ -264,6 +276,9 @@ func (b *Bot) Run() {
 
 			// Wait for 1 minute in 1-second intervals.
 			for i := 0; i < 60; i++ {
+				if !b.running {
+					break
+				}
 				if !b.running {
 					break
 				}
