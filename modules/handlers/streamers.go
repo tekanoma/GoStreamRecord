@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"GoRecordurbate/modules/config"
 	"encoding/json"
 	"net/http"
 )
@@ -23,9 +24,10 @@ func addStreamer(w http.ResponseWriter, r *http.Request) {
 	}
 
 	resp := Response{
-		Message: "Received string successfully",
+		Message: config.C.App.AddStreamer(reqData.Data),
 		Data:    reqData.Data,
 	}
+
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(resp)
 }
@@ -38,8 +40,11 @@ func getStreamers(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	list := []string{"fuck 1", "Option 2", "Option 3"}
 	w.Header().Set("Content-Type", "application/json")
+	list := []string{}
+	for _, s := range config.C.App.Streamers {
+		list = append(list, s.Name)
+	}
 	json.NewEncoder(w).Encode(list)
 }
 
@@ -61,9 +66,10 @@ func removeStreamer(w http.ResponseWriter, r *http.Request) {
 	}
 
 	resp := Response{
-		Message: "Received selected item successfully",
+		Message: config.C.App.RemoveStreamer(reqData.Selected),
 		Data:    reqData.Selected,
 	}
+	
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(resp)
 }
