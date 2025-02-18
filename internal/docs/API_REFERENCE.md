@@ -1,4 +1,4 @@
-# API Reference
+# API Reference (Incomplete since this provject is still in early development)
 
 ## Endpoints
 | Endpoint               | Method | Description |
