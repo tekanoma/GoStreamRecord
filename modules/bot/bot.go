@@ -287,12 +287,12 @@ func (b *Bot) Run() {
 		}()
 	}
 
-	// When the loop ends, stop all active recording processes.
-	for _, rec := range b.processes {
-		fmt.Println(rec.Name)
-		rec.Cmd.Process.Signal(syscall.SIGINT)
-		rec.Cmd.Wait()
-	}
+	// // When the loop ends, stop all active recording processes.
+	// for _, rec := range b.processes {
+	// 	fmt.Println(rec.Name)
+	// 	rec.Cmd.Process.Signal(syscall.SIGINT)
+	// 	rec.Cmd.Wait()
+	// }
 	config.C.Update()
 	log.Println("Successfully stopped")
 }
