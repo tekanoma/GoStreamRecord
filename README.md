@@ -1,12 +1,28 @@
 # GoRecordurbate WebUI
 
-Readme is incomplete and will be completely refactored at a later point. Still relevant tho. 
+Readme is incomplete and will modified a lot during development.
 
-Checkput the API doc for info on how to use the api.
+Checkout the [API doc](https://github.com/luna-nightbyte/GoRecordurbate-WebUI/blob/main/internal/docs/API_REFERENCE.md) for info on how to use the api.
+
 ## Intro
-A golang version of recordurbate with some differences. One key difference is that this doesent use a deamon, but instead runs a webserver (Web UI). It can instead be compiled into a binary file and started as a service, docker container or whatever you prefer. 
+A [golang](https://go.dev/) version of recordurbate with some differences. One key difference is that this doesent use a deamon, but instead runs a webserver (Web UI). It can be compiled into a binary file and started as a service, docker container or whatever you prefer. 
+GoRecordurbate send a request to check if the [spesific](https://github.com/luna-nightbyte/GoRecordurbate/blob/ec0b1fa79e2bb82cf948bef3415ace3aac52e523/modules/bot/bot.go#L176) user is online rather than requesting a [list of 500](https://github.com/luna-nightbyte/GoRecordurbate/blob/ec0b1fa79e2bb82cf948bef3415ace3aac52e523/modules/bot/bot.go#L175) and checking that for the correct user. 
+### Usage
 
-Sends a request to check if the [spesific](https://github.com/luna-nightbyte/GoRecordurbate/blob/ec0b1fa79e2bb82cf948bef3415ace3aac52e523/modules/bot/bot.go#L176) user is online rather than requesting a [list of 500](https://github.com/luna-nightbyte/GoRecordurbate/blob/ec0b1fa79e2bb82cf948bef3415ace3aac52e523/modules/bot/bot.go#L175) and checking that for the correct user. 
+#### Build
+Building the code wil create a binary for your os system. Golang is [cross-compatible](https://go.dev/wiki/GccgoCrossCompilation) for windows, linux and mac.
+```bash
+go mod init GoRecordurbate # Only run this line once
+go mod tidy
+go build
+```
+#### Source
+```bash
+go mod init GoRecordurbate # Only run this line once
+go mod tidy
+go run main.go
+```
+
 ### Notes
 This is un-tested on Windows and Mac, but golang is cross-compatible which means that this should run just as fine on Windows as on Linux.
 

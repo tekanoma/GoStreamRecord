@@ -1,4 +1,6 @@
-# API Reference
+# API Reference 
+
+Note: Note all backend logic has been implemented, so the api has "dummy" responses in some places
 
 ## Endpoints
 | Endpoint               | Method | Description |
@@ -6,7 +8,7 @@
 | `/api/upload`         | `POST` | Uploads a file |
 | `/api/download`       | `GET`  | Downloads a file |
 | `/api/control`        | `POST` | Executes a control command |
-| `/api/status`        | `GET`  | Returns application status |
+| `/api/status`        | `GET`  | Returns recorder status |
 | `/api/add-streamer`   | `POST` | Adds a streamer |
 | `/api/get-streamers`  | `GET`  | Retrieves a list of streamers |
 | `/api/remove-streamer` | `POST` | Removes a streamer |
@@ -84,7 +86,7 @@ Executes a control command (`start`, `stop`, or `restart`).
 
 ## **4. API Status**
 ### **GET /api/status**
-Returns the current status of the application.
+Returns a string of the recorder status
 
 #### **Request**
 - **Method**: `GET`
