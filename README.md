@@ -27,24 +27,17 @@ go run main.go
 This is un-tested on Windows and Mac, but golang is cross-compatible which means that this should run just as fine on Windows as on Linux.
 
 A release will be made once i have finished fixing the bare minimum below:
-
 - [x] Start recording
 - [ ] Restart recording
 - [x] stop recording
-- [x] Add streamer
-- [x] Remove streamer
-- [ ] Import streamers
-- [ ] Export streamers
-- [ ] Docker example
-- [ ] Service example
-- [ ] Embed index file into code
-#### WebUI
-- [x] Start, stop, restart
 - [x] Add / delete streamer
 - [ ] Import streamers
 - [ ] Export streamers
 - [ ] Show log
 - [ ] View videos in web ui
+- [ ] Docker example
+- [ ] Service example
+- [ ] Embed index file into code
 
 ## WebUI (Will probably be modified)
 ![StreamerTab](https://github.com/user-attachments/assets/56913a17-b200-4416-b32f-fe92460cc34f)
