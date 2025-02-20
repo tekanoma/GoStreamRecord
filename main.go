@@ -1,6 +1,7 @@
 package main
 
 import (
+	"GoRecordurbate/modules/bot"
 	"GoRecordurbate/modules/config"
 	"GoRecordurbate/modules/file"
 	"GoRecordurbate/modules/handlers"
@@ -10,7 +11,7 @@ import (
 )
 
 func init() {
-
+	bot.First_run = true
 	_, err := os.Stat(file.Config_path)
 	if os.IsNotExist(err) {
 		fmt.Println("No config found. Generating.. Please fill in details in:", file.Config_path)
