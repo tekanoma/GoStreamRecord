@@ -29,7 +29,7 @@ This is un-tested on Windows and Mac, but golang is cross-compatible which means
 A release will be made once i have finished fixing the bare minimum below:
 
 - [x] Start recording
-- [x] Restart recording
+- [ ] Restart recording
 - [x] stop recording
 - [x] Add streamer
 - [x] Remove streamer
