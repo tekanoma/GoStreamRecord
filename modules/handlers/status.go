@@ -20,7 +20,7 @@ func statusHandler(w http.ResponseWriter, r *http.Request) {
 	config.C.Reload()
 	// Assuming config.C.App.Streamers is accessible
 	for _, s := range Bot.ListRecorders() {
-		if s.Running {
+		if s.IsRecording {
 			recorder.Status = "Running"
 			break // No need to continue checking
 		} else {

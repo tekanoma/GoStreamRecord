@@ -28,11 +28,6 @@ func (b *Bot) Command(command string) {
 		config.C.App.ExportStreamers()
 	case "start":
 		log.Println("Starting bot")
-		if b.running {
-			log.Println("Bot already started. Use 'Restart'.")
-			return
-		}
-		b.running = true
 		go b.Run()
 	case "stop":
 		log.Println("Stopping bot")
@@ -41,7 +36,6 @@ func (b *Bot) Command(command string) {
 		log.Println("Restarting bot")
 		b.Stop()
 		time.Sleep(1 * time.Second)
-		b.running = true
 		go b.Run()
 	default:
 		fmt.Println("Nothing to do..")
