@@ -43,8 +43,12 @@ A release will be made once i have finished fixing the bare minimum below:
 ![StreamerTab](https://github.com/user-attachments/assets/56913a17-b200-4416-b32f-fe92460cc34f)
 ![ControlTab](https://github.com/user-attachments/assets/83186720-f056-41f1-b6fa-433c9869d9c1)
 
+## Other
 
-
+### Ideas, but not planned
+- Log online time of streamers and save to csv for graph plotting. Can help understand the work-hours of different streamers.
+- Option to login and use follower list instead of config?
+- Option for max video length (and size?)
 
 
 
