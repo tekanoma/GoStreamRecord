@@ -1,7 +1,8 @@
-package handlers
+package web_config
 
 import (
 	"GoRecordurbate/modules/config"
+	web_response "GoRecordurbate/modules/handlers/response"
 	"encoding/json"
 	"net/http"
 )
@@ -23,7 +24,7 @@ func AddStreamer(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	resp := Response{
+	resp := web_response.Response{
 		Message: config.C.App.AddStreamer(reqData.Data),
 		Data:    reqData.Data,
 	}
@@ -65,7 +66,7 @@ func RemoveStreamer(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	resp := Response{
+	resp := web_response.Response{
 		Message: config.C.App.RemoveStreamer(reqData.Selected),
 		Data:    reqData.Selected,
 	}

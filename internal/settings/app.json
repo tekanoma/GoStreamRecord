@@ -1,6 +1,6 @@
 {
   "app": {
-    "port": 8050,
+    "port": 8055,
     "loop_interval_in_minutes": 2,
     "video_output_folder": "output/videos",
     "rate_limit": {
@@ -9,15 +9,6 @@
     },
     "default_export_location": "./output/list.txt",
     "streamers": [
-      {
-        "name": "florencewilliam"
-      },
-      {
-        "name": "bunnydollstella"
-      },
-      {
-        "name": "euphoria_life"
-      }
     ]
   },
   "youtube-dl": {

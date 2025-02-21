@@ -1,18 +1,18 @@
-package handlers
+package login
 
 import (
 	"GoRecordurbate/modules/file"
+	"GoRecordurbate/modules/handlers/cookies"
+	web_response "GoRecordurbate/modules/handlers/response"
 	"encoding/json"
 	"fmt"
 	"html/template"
 	"net/http"
 	"os"
 
-	"github.com/gorilla/sessions"
 	"golang.org/x/crypto/bcrypt"
 )
 
-var Store = sessions.NewCookieStore([]byte("very-secret-key-here"))
 var tmpl *template.Template
 
 func init() {
@@ -20,16 +20,7 @@ func init() {
 	contentBytes, _ := os.ReadFile(file.Login_path)
 
 	tmpl = template.Must(template.New("login").Parse(string(contentBytes)))
-
-	Store.Options = &sessions.Options{
-		Path:     "/",
-		HttpOnly: true,
-		Secure:   false, // Set to false for HTTP
-		MaxAge:   3600,
-	}
 }
-
-var UserStore map[string]string
 
 func GetLogin(w http.ResponseWriter, r *http.Request) {
 
@@ -46,9 +37,9 @@ func PostLogin(w http.ResponseWriter, r *http.Request) {
 	}
 	username := r.FormValue("username")
 	password := r.FormValue("password")
-	resp := Response{}
+	resp := web_response.Response{}
 
-	storedHash, ok := UserStore[username]
+	storedHash, ok := cookies.UserStore[username]
 	if !ok {
 
 		fmt.Println(username, password)
@@ -66,7 +57,7 @@ func PostLogin(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	session, err := Store.Get(r, "session")
+	session, err := cookies.Store.Get(r, "session")
 	if err != nil {
 		resp.Message = "Session error"
 		w.Header().Set("Content-Type", "application/json")

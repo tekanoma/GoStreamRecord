@@ -12,11 +12,8 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
-	"path/filepath"
 	"syscall"
 	"time"
-
-	"golang.org/x/crypto/bcrypt"
 )
 
 func init() {
@@ -36,58 +33,8 @@ func init() {
 }
 
 func main() {
-	// API endpoints
-
-	http.Handle("/videos/", http.StripPrefix("/videos/", http.FileServer(http.Dir(config.C.App.Videos_folder))))
-
-	http.HandleFunc("/api/add-streamer", handlers.AddStreamer)
-	http.HandleFunc("/api/get-streamers", handlers.GetStreamers)
-	http.HandleFunc("/api/remove-streamer", handlers.RemoveStreamer)
-	http.HandleFunc("/api/control", handlers.ControlHandler)
-	http.HandleFunc("/api/import", handlers.UploadHandler)
-	http.HandleFunc("/api/export", handlers.DownloadHandler)
-	http.HandleFunc("/api/status", handlers.StatusHandler)
-	http.HandleFunc("/api/get-videos", handlers.GetVideos)
-
-	password := "password"
-	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
-	if err != nil {
-		log.Fatal("Error generating password hash:", err)
-	}
-	handlers.UserStore = map[string]string{
-		"admin": string(hashedPassword),
-	}
-
-	fs := http.FileServer(http.Dir(filepath.Dir(file.Index_path)))
-
-	http.HandleFunc("/login", func(w http.ResponseWriter, r *http.Request) {
-
-		if r.Method == http.MethodGet {
-			handlers.GetLogin(w, r)
-		} else if r.Method == http.MethodPost {
-			handlers.PostLogin(w, r)
-		} else {
-			http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
-		}
-	})
-
-	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		session, err := handlers.Store.Get(r, "session")
-		if err != nil {
-			http.Error(w, "Session error", http.StatusInternalServerError)
-			return
-		}
-		if auth, ok := session.Values["authenticated"].(bool); !ok || !auth {
-			http.Redirect(w, r, "/login", http.StatusFound)
-			//http.HandleFunc("/login", handlers.GetLogin)
-
-		} else {
-			fs.ServeHTTP(w, r)
-		}
-	})
-
 	//http.Handle("/", fs)
-
+	handlers.Handle()
 	server := &http.Server{
 		Addr: fmt.Sprintf(":%d", config.C.App.Port),
 	}

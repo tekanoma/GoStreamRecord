@@ -1,4 +1,4 @@
-package handlers
+package web_status
 
 import (
 	"GoRecordurbate/modules/bot"

@@ -1,7 +1,8 @@
-package handlers
+package web_config
 
 import (
 	"GoRecordurbate/modules/config"
+	web_response "GoRecordurbate/modules/handlers/response"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -61,28 +62,9 @@ func UploadHandler(w http.ResponseWriter, r *http.Request) {
 		}
 		config.C.App.AddStreamer(line)
 	}
-	resp := Response{
+	resp := web_response.Response{
 		Message: fmt.Sprintf("Added %d new streamers!", len(newStreamers)),
 	}
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(resp)
-}
-
-// downloadHandler handles GET /api/download.
-// It sends a dummy file for download.
-func DownloadHandler(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodGet {
-		http.Error(w, "Only GET allowed", http.StatusMethodNotAllowed)
-		return
-	}
-
-	// Dummy file content
-	fileContent := ""
-
-	for _, s := range config.C.App.Streamers {
-		fileContent = fileContent + s.Name + "\n"
-	}
-	w.Header().Set("Content-Type", "application/octet-stream")
-	w.Header().Set("Content-Disposition", "attachment; filename=export.txt")
-	w.Write([]byte(fileContent))
 }
