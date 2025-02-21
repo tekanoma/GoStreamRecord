@@ -19,7 +19,7 @@
       top: 10px;
       right: 10px;
       padding: 5px 10px;
-      background-color: #74b9ff;
+      background-color: #9c9c9cce;
       color: #fff;
       border-radius: 5px;
       font-weight: bold;
@@ -369,7 +369,7 @@
         console.log(data.status)
         statusIndicator.innerText = "Status: " + data.status;
         statusIndicator.style.backgroundColor =
-          data.status === "Running" ? "#74b9ff" : "#fab1a0";
+          data.status === "Running" ? "#3dbb24af" : "#fab1a0";
       } catch (err) {
         console.error("Error fetching status:", err);
       }
