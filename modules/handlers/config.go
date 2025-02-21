@@ -8,6 +8,7 @@ import (
 	"log"
 	"net/http"
 	"path/filepath"
+	"strings"
 )
 
 // uploadHandler handles POST /api/upload.

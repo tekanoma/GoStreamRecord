@@ -37,6 +37,9 @@ func init() {
 
 func main() {
 	// API endpoints
+
+	http.Handle("/videos/", http.StripPrefix("/videos/", http.FileServer(http.Dir(config.C.App.Videos_folder))))
+
 	http.HandleFunc("/api/add-streamer", handlers.AddStreamer)
 	http.HandleFunc("/api/get-streamers", handlers.GetStreamers)
 	http.HandleFunc("/api/remove-streamer", handlers.RemoveStreamer)
@@ -44,6 +47,7 @@ func main() {
 	http.HandleFunc("/api/import", handlers.UploadHandler)
 	http.HandleFunc("/api/export", handlers.DownloadHandler)
 	http.HandleFunc("/api/status", handlers.StatusHandler)
+	http.HandleFunc("/api/get-videos", handlers.GetVideos)
 
 	password := "password"
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
