@@ -28,7 +28,7 @@ func Handle() {
 	http.HandleFunc("/api/export", web_config.DownloadHandler)
 	http.HandleFunc("/api/status", web_status.StatusHandler)
 	http.HandleFunc("/api/get-videos", web_recorder.GetVideos)
-
+	http.HandleFunc("/api/logs", web_recorder.HandleLogs)
 	password := "password"
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
 	if err != nil {
