@@ -32,7 +32,7 @@ A release will be made once i have finished fixing the bare minimum below:
 - [ ] Restart recording
 - [x] stop recording
 - [x] Add / delete streamer
-- [ ] Import streamers
+- [x] Import streamers
 - [x] Export streamers
 - [ ] Show log
 - [ ] View videos in web ui
