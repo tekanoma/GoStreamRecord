@@ -35,7 +35,7 @@ A release will be made once i have finished fixing the bare minimum below:
 - [x] Import streamers
 - [x] Export streamers
 - [ ] Show log
-- [ ] View videos in web ui
+- [x] View videos in web ui
 - [ ] Docker example
 - [ ] Service example
 - [ ] Embed index file into code
