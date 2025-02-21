@@ -64,6 +64,7 @@ A release will be made once i have finished fixing the bare minimum below:
 - Option to login to the streaming site and use follower list instead of config?
 - Option for max video length (and size?)
 - headless mode without webui
+- Move frontend to Vue (?)
 
 
 
