@@ -14,12 +14,6 @@ func (b *Bot) Command(command string) {
 		return
 	}
 	switch strings.ToLower(command) {
-	case "add":
-		log.Println("Adding ")
-		config.C.App.AddStreamer("STREAMER_NAME_PLACEHOLDER")
-	case "del":
-		log.Println("Removing ")
-		config.C.App.RemoveStreamer("STREAMER_NAME_PLACEHOLDER")
 	case "import":
 		log.Println("Importing streamers..")
 		config.C.App.ImportStreamers(config.C.App.ExportPath)
