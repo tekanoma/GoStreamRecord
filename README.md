@@ -45,8 +45,8 @@ A release will be made once i have finished fixing the bare minimum below:
 
 <p align="center">
   <img src="https://github.com/user-attachments/assets/35e4633b-702b-45f9-9075-a8522a6b334b" alt="Login page"/>
-  <img src="https://github.com/user-attachments/assets/56913a17-b200-4416-b32f-fe92460cc34f" alt="Streamers tab"/>
-  <img src="https://github.com/user-attachments/assets/83186720-f056-41f1-b6fa-433c9869d9c1" alt="Control tab"/>
+  <img src="https://github.com/user-attachments/assets/bdc34f03-d2ca-4450-af27-013f29ec2cd5" alt="Streamers tab"/>
+  <img src="https://github.com/user-attachments/assets/dbf8de5f-77cc-46ac-91a8-eca76fe64111" alt="Control tab"/>
 </p>
 
 ## Other
