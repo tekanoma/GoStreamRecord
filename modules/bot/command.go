@@ -2,13 +2,14 @@ package bot
 
 import (
 	"GoRecordurbate/modules/config"
+	"context"
 	"fmt"
 	"log"
 	"strings"
-	"time"
 )
 
 func (b *bot) Command(command string) {
+	b.ctx, b.cancel = context.WithCancel(context.Background())
 	if len(command) == 0 {
 		fmt.Println("No command provided..")
 		return
@@ -28,9 +29,8 @@ func (b *bot) Command(command string) {
 		b.Stop()
 	case "restart":
 		log.Println("Restarting bot")
-		b.Stop()
-		time.Sleep(1 * time.Second)
-		go b.Run()
+		b.Command("stop")
+		b.Command("start")
 	case "start_monitoring":
 		log.Println("Monitoring not implemented")
 	case "restarting bot":

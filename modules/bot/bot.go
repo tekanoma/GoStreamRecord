@@ -172,13 +172,8 @@ func (b *bot) IsOnline(username string) bool {
 // Once the context is cancelled (via Stop), no new recordings are started.
 func (b *bot) Run() {
 	b.mux.Lock()
-	if b.isRunning {
-		b.mux.Unlock()
-		return
-	}
 	b.isRunning = true
 	b.mux.Unlock()
-
 	// Write youtube-dl config.
 	if err := b.writeYoutubeDLConfig(); err != nil {
 		log.Println("Error writing youtube-dl config:", err)
@@ -200,6 +195,7 @@ func (b *bot) Run() {
 			wg.Wait()
 			// Now send SIGINT to active processes.
 			b.stopActiveProcesses()
+			log.Println("Stopped!")
 			return
 		case <-ticker.C:
 			// Optionally reload config.
@@ -281,7 +277,7 @@ func (b *bot) runRecordLoop(wg *sync.WaitGroup, streamerName string) {
 	err := cmd.Wait()
 	if err != nil {
 		log.Printf("[bot]: Recording for %s ended with error: %v", streamerName, err)
-		log.Printf("[bot]: Command was: %v", cmd)
+		time.Sleep(5 * time.Second)
 	} else {
 		log.Printf("[bot]: Recording for %s finished successfully", streamerName)
 	}
@@ -342,6 +338,7 @@ func (b *bot) stopActiveProcesses() {
 			rec.Cmd.Wait()
 		}
 	}
+	b.isRunning = false
 }
 
 // writeYoutubeDLConfig writes the youtube-dl configuration file.
