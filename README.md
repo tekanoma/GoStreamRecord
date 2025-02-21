@@ -37,8 +37,8 @@ A release will be made once i have finished fixing the bare minimum below:
 - [x] Show logs in web ui
 - [x] Show videos in web ui
 - [ ] Better implementation of default username & password
-- [ ] Docker example
-- [ ] Service example
+- [x] Docker example
+- [x] Service example
 - [ ] Embed index file into code
 
 ## WebUI (Will probably be modified)
