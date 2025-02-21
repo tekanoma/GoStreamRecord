@@ -1,30 +1,36 @@
 # GoRecordurbate WebUI
+This project offers a simple, self-hosted web UI for managing and recording streams.
 
-Readme is incomplete and will modified a lot during development.
-
-## Intro
-A [golang](https://go.dev/) version of recordurbate with some differences. One key difference is that this doesent use a deamon, but instead runs a webserver (Web UI). It can be compiled into a binary file and started as a service, docker container or whatever you prefer. 
-GoRecordurbate send a request to check if the [spesific](https://github.com/luna-nightbyte/GoRecordurbate/blob/ec0b1fa79e2bb82cf948bef3415ace3aac52e523/modules/bot/bot.go#L176) user is online rather than requesting a [list of 500](https://github.com/luna-nightbyte/GoRecordurbate/blob/ec0b1fa79e2bb82cf948bef3415ace3aac52e523/modules/bot/bot.go#L175) and checking that for the correct user. 
-### Usage
+## Core Features:
+- Login with cookies for each client (prevents unsupervised access)
+- Start, restart, and stop recordings
+- Add/delete streamers, with import/export options
+- View logs and recorded videos directly in the web UI
+- Docker and service examples for easier setup
+## In Progress:
+- Better handling of default usernames and passwords
+- Embedding the index file directly into the code
+  
+## Usage
 Default login (will be modified):
 User: `admin`
 Password: `password`
 
-#### Build
+### Build
 Building the code wil create a binary for your os system. Golang is [cross-compatible](https://go.dev/wiki/GccgoCrossCompilation) for windows, linux and mac.
 ```bash
 go mod init GoRecordurbate # Only run this line once
 go mod tidy
 go build
 ```
-#### Source
+### Source
 ```bash
 go mod init GoRecordurbate # Only run this line once
 go mod tidy
 go run main.go
 ```
 
-### Notes
+## Notes
 This is un-tested on Windows and Mac, but golang is cross-compatible which means that this should run just as fine on Windows as on Linux.
 
 A release will be made once i have finished fixing the bare minimum below:
@@ -34,8 +40,9 @@ A release will be made once i have finished fixing the bare minimum below:
 - [x] Add / delete streamer
 - [x] Import streamers
 - [x] Export streamers
-- [x] Show logs in web ui
-- [x] Show videos in web ui
+- [x] Show logs in web UI
+- [x] Show videos in web UI
+- [ ] Change username/password directly in the web UI
 - [ ] Better implementation of default username & password
 - [x] Docker example
 - [x] Service example
