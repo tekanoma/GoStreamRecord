@@ -1,0 +1,14 @@
+services:
+  GoRecord-WebUI:
+    container_name: Go-Recordurbate-WebUI
+    image: Go-Recordurbate-WebUI:latest
+    build:
+      context: .
+      dockerfile: Dockerfile 
+    ports:
+      - "8050:80"
+    volumes:
+      - ./internal/settings/docker_settings.json:/app/internal/settings/settings.json
+      - ./output:/app/videos
+    tty: true
+    privileged: true
