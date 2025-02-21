@@ -34,7 +34,7 @@ A release will be made once i have finished fixing the bare minimum below:
 - [x] Add / delete streamer
 - [x] Import streamers
 - [x] Export streamers
-- [ ] Show logs in web ui
+- [x] Show logs in web ui
 - [x] Show videos in web ui
 - [ ] Better implementation of default username & password
 - [ ] Docker example
