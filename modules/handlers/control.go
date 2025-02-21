@@ -28,7 +28,6 @@ func controlHandler(w http.ResponseWriter, r *http.Request) {
 	type RequestData struct {
 		Command string `json:"command"`
 	}
-	fmt.Println("Got command")
 	var reqData RequestData
 	if err := json.NewDecoder(r.Body).Decode(&reqData); err != nil {
 		http.Error(w, "Invalid request payload", http.StatusBadRequest)
