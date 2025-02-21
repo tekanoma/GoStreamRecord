@@ -52,7 +52,7 @@ A release will be made once i have finished fixing the bare minimum below:
 ## Other
 
 ### Ideas, but not planned
-- Log online time of streamers and save to csv for graph plotting. Can help understand the work-hours of different streamers.
+- Log online-time of streamers and save to csv for graph plotting. Can help understand the work-hours of different streamers.
 - Option to login to the streaming site and use follower list instead of config?
 - Option for max video length (and size?)
 
