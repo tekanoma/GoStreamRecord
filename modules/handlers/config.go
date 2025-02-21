@@ -59,8 +59,12 @@ func downloadHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Dummy file content
-	fileContent := []byte("This is the content of the exported file.")
+	fileContent := ""
+
+	for _, s := range config.C.App.Streamers {
+		fileContent = fileContent + s.Name + "\n"
+	}
 	w.Header().Set("Content-Type", "application/octet-stream")
 	w.Header().Set("Content-Disposition", "attachment; filename=export.txt")
-	w.Write(fileContent)
+	w.Write([]byte(fileContent))
 }
