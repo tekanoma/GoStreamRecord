@@ -19,17 +19,25 @@ import (
 	"time"
 )
 
+var Bot *bot
+
+func Init() {
+	Bot = NewBot(log.New(os.Stdout, "lpg.log", log.LstdFlags))
+
+}
+
 // Interface can be expanded as needed.
 type Interface interface {
 	AppendStreamer(streamer string)
 }
 
 // Bot encapsulates the recording bot’s state.
-type Bot struct {
-	mux       sync.Mutex
-	isRunning bool
-	processes []StreamerStatus
-	logger    *log.Logger
+type bot struct {
+	mux        sync.Mutex
+	isFirstRun bool
+	isRunning  bool
+	processes  []StreamerStatus
+	logger     *log.Logger
 	Interface
 
 	// ctx is used to signal shutdown.
@@ -45,13 +53,14 @@ type StreamerStatus struct {
 }
 
 // NewBot creates a new Bot, sets up its cancellation context, and registers a signal handler.
-func NewBot(logger *log.Logger) *Bot {
+func NewBot(logger *log.Logger) *bot {
 	ctx, cancel := context.WithCancel(context.Background())
-	b := &Bot{
-		logger:    logger,
-		ctx:       ctx,
-		cancel:    cancel,
-		isRunning: false,
+	b := &bot{
+		logger:     logger,
+		ctx:        ctx,
+		cancel:     cancel,
+		isRunning:  false,
+		isFirstRun: true,
 	}
 	// Register to catch SIGINT and SIGTERM and trigger Stop.
 	sigs := make(chan os.Signal, 1)
@@ -65,31 +74,39 @@ func NewBot(logger *log.Logger) *Bot {
 }
 
 // AppendStreamer adds a new StreamerStatus for a given streamer.
-func (b *Bot) AppendStreamer(name string) {
+func (b *bot) ResetBot() *bot {
+	b.mux.Lock()
+	defer b.mux.Unlock()
+	b.Stop()
+	b.cancel()
+	return NewBot(b.logger)
+}
+
+// AppendStreamer adds a new StreamerStatus for a given streamer.
+func (b *bot) AppendStreamer(name string) {
 	b.mux.Lock()
 	defer b.mux.Unlock()
 	b.processes = append(b.processes, StreamerStatus{Name: name, IsRecording: false})
 }
 
 // ListRecorders returns the current list of recorder statuses.
-func (b *Bot) ListRecorders() []StreamerStatus {
+func (b *bot) ListRecorders() []StreamerStatus {
 	b.mux.Lock()
 	defer b.mux.Unlock()
 	return b.processes
 }
 
 // Stop signals the bot to stop starting new recordings and then gracefully stops active processes.
-func (b *Bot) Stop() {
+func (b *bot) Stop() {
 	// Signal cancellation.
 	b.cancel()
-	log.Println("Stopping bot: no new recordings will be started.")
-
+	log.Println("Stopping bot..")
 	// Give current recorders time to finish (or exit gracefully).
 	b.stopActiveProcesses()
 }
 
 // IsRoomPublic checks if a given room is public by sending a POST request.
-func (b *Bot) IsRoomPublic(username string) bool {
+func (b *bot) IsRoomPublic(username string) bool {
 	// Wait for the configured rate limit.
 	time.Sleep(time.Duration(config.C.App.RateLimit.Time) * time.Second)
 	urlStr := "https://chaturbate.com/get_edge_hls_url_ajax/"
@@ -123,7 +140,7 @@ func (b *Bot) IsRoomPublic(username string) bool {
 }
 
 // IsOnline checks if the streamer is online by sending a GET request.
-func (b *Bot) IsOnline(username string) bool {
+func (b *bot) IsOnline(username string) bool {
 	// Short delay before making the call.
 	time.Sleep(3 * time.Second)
 	urlStr := "https://chaturbate.com/api/chatvideocontext/" + username
@@ -149,13 +166,11 @@ func (b *Bot) IsOnline(username string) bool {
 	return res.Username == username && res.CurrentShow == "public"
 }
 
-var First_run bool
-
 // Run starts the main loop of the Bot.
 // It reloads the configuration, checks running processes, and for each configured streamer
 // starts a recording if one isn’t already running.
 // Once the context is cancelled (via Stop), no new recordings are started.
-func (b *Bot) Run() {
+func (b *bot) Run() {
 	b.mux.Lock()
 	if b.isRunning {
 		b.mux.Unlock()
@@ -172,7 +187,6 @@ func (b *Bot) Run() {
 
 	var wg sync.WaitGroup
 	var ticker *time.Ticker
-	First_run = true
 	ticker = time.NewTicker(time.Duration(1) * time.Second)
 
 	defer ticker.Stop()
@@ -215,8 +229,8 @@ func (b *Bot) Run() {
 				time.Sleep(time.Duration(config.C.App.RateLimit.Time) * time.Second)
 
 			}
-			if First_run {
-				First_run = false
+			if b.isFirstRun {
+				b.isFirstRun = false
 				fmt.Println(time.Duration(config.C.App.Loop_interval) * time.Minute)
 				ticker.Reset(time.Duration(config.C.App.Loop_interval) * time.Minute)
 
@@ -226,7 +240,7 @@ func (b *Bot) Run() {
 }
 
 // runRecordLoop starts a recording for the given streamer (if online) and waits for the process to finish.
-func (b *Bot) runRecordLoop(wg *sync.WaitGroup, streamerName string) {
+func (b *bot) runRecordLoop(wg *sync.WaitGroup, streamerName string) {
 	defer wg.Done()
 
 	// If the bot is stopping, do not check online status.
@@ -284,7 +298,7 @@ func (b *Bot) runRecordLoop(wg *sync.WaitGroup, streamerName string) {
 }
 
 // checkProcesses looks through the list of processes and removes any that have finished.
-func (b *Bot) checkProcesses() {
+func (b *bot) checkProcesses() {
 	b.mux.Lock()
 	defer b.mux.Unlock()
 	for i := 0; i < len(b.processes); i++ {
@@ -302,7 +316,7 @@ func (b *Bot) checkProcesses() {
 }
 
 // isRecorderActive returns true if a recorder for the given streamer is already running.
-func (b *Bot) isRecorderActive(streamerName string) bool {
+func (b *bot) isRecorderActive(streamerName string) bool {
 	b.mux.Lock()
 	defer b.mux.Unlock()
 	for _, rec := range b.processes {
@@ -314,7 +328,7 @@ func (b *Bot) isRecorderActive(streamerName string) bool {
 }
 
 // stopActiveProcesses sends a SIGINT to all active recording processes and waits for them to finish.
-func (b *Bot) stopActiveProcesses() {
+func (b *bot) stopActiveProcesses() {
 	b.mux.Lock()
 	processesCopy := make([]StreamerStatus, len(b.processes))
 	copy(processesCopy, b.processes)
@@ -331,7 +345,7 @@ func (b *Bot) stopActiveProcesses() {
 }
 
 // writeYoutubeDLConfig writes the youtube-dl configuration file.
-func (b *Bot) writeYoutubeDLConfig() error {
+func (b *bot) writeYoutubeDLConfig() error {
 	// Ensure we start with an empty file.
 	f, err := os.Create(file.YoutubeDL_configPath)
 	if err != nil {

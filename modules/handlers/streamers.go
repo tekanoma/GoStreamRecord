@@ -8,7 +8,7 @@ import (
 
 // sendStringHandler handles POST /api/add-streamer.
 // It decodes a JSON payload with a "data" field and returns a dummy response.
-func addStreamer(w http.ResponseWriter, r *http.Request) {
+func AddStreamer(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		http.Error(w, "Only POST allowed", http.StatusMethodNotAllowed)
 		return
@@ -34,7 +34,7 @@ func addStreamer(w http.ResponseWriter, r *http.Request) {
 
 // getListHandler handles GET /api/get-streamers.
 // It returns a dummy list of options.
-func getStreamers(w http.ResponseWriter, r *http.Request) {
+func GetStreamers(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodGet {
 		http.Error(w, "Only GET allowed", http.StatusMethodNotAllowed)
 		return
@@ -50,7 +50,7 @@ func getStreamers(w http.ResponseWriter, r *http.Request) {
 
 // selectItemHandler handles POST /api/remove-streamer.
 // It decodes a JSON payload with the selected option and returns a dummy response.
-func removeStreamer(w http.ResponseWriter, r *http.Request) {
+func RemoveStreamer(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		http.Error(w, "Only POST allowed", http.StatusMethodNotAllowed)
 		return
@@ -69,7 +69,7 @@ func removeStreamer(w http.ResponseWriter, r *http.Request) {
 		Message: config.C.App.RemoveStreamer(reqData.Selected),
 		Data:    reqData.Selected,
 	}
-	
+
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(resp)
 }

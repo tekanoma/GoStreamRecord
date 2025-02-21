@@ -8,7 +8,7 @@ import (
 	"time"
 )
 
-func (b *Bot) Command(command string) {
+func (b *bot) Command(command string) {
 	if len(command) == 0 {
 		fmt.Println("No command provided..")
 		return
@@ -25,11 +25,17 @@ func (b *Bot) Command(command string) {
 		go b.Run()
 	case "stop":
 		log.Println("Stopping bot")
-		go b.Stop()
+		b.Stop()
 	case "restart":
 		log.Println("Restarting bot")
 		b.Stop()
 		time.Sleep(1 * time.Second)
+		go b.Run()
+	case "start_monitoring":
+		log.Println("Monitoring not implemented")
+	case "restarting bot":
+		log.Println("Stopping bot")
+		b.ResetBot()
 		go b.Run()
 	default:
 		fmt.Println("Nothing to do..")

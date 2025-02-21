@@ -4,22 +4,12 @@ import (
 	"GoRecordurbate/modules/bot"
 	"encoding/json"
 	"fmt"
-	"log"
 	"net/http"
-	"os"
 )
-
-var Bot *bot.Bot
-
-func Init() {
-
-	Bot = bot.NewBot(log.New(os.Stdout, "lpg.log", log.LstdFlags))
-
-}
 
 // dcodes a JSON payload with a "command" field (start, stop, or restart)
 // and returns a dummy response.
-func controlHandler(w http.ResponseWriter, r *http.Request) {
+func ControlHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		http.Error(w, "Only POST allowed", http.StatusMethodNotAllowed)
 		return
@@ -33,7 +23,8 @@ func controlHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Invalid request payload", http.StatusBadRequest)
 		return
 	}
-	Bot.Command(reqData.Command)
+	
+	bot.Bot.Command(reqData.Command)
 	resp := Response{
 		Message: fmt.Sprintf("Control command '%s' executed", reqData.Command),
 	}
