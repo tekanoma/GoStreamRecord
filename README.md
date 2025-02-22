@@ -1,6 +1,7 @@
 # GoRecordurbate WebUI
 This project offers a simple, self-hosted web UI for managing and recording streams.
 
+__API NOTE__: The api is basically un-tested after adding login credentials. The plan is to use API key in the future for credentials via API.
 ## Core Features:
 - Login with cookies for each client (prevents unsupervised access)
 - Start, restart, and stop recordings
@@ -8,13 +9,15 @@ This project offers a simple, self-hosted web UI for managing and recording stre
 - View logs and recorded videos directly in the web UI
 - Docker and service examples for easier setup
 ## In Progress:
-- Better handling of default usernames and passwords
+- ~~Better handling of default usernames and passwords~~
 - Embedding the index file directly into the code
+- API secret key
   
 ## Usage
-Default login (will be modified):
-User: `admin`
-Password: `password`
+Default login:
+
+- User: `admin`
+- Password: `password`
 
 ### Build
 Building the code wil create a binary for your os system. Golang is [cross-compatible](https://go.dev/wiki/GccgoCrossCompilation) for windows, linux and mac.
@@ -47,6 +50,7 @@ A release will be made once i have finished fixing the bare minimum below:
 - [x] Docker example
 - [x] Service example
 - [ ] Embed frontend files into binary
+- [ ] API secret key implementation 
 
 ## WebUI (Will probably be modified)
 
