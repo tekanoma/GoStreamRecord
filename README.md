@@ -45,7 +45,7 @@ A release will be made once i have finished fixing the bare minimum below:
 - [x] Export streamers
 - [x] Show logs in web UI
 - [x] Show videos in web UI
-- [ ] Change username/password directly in the web UI
+- [x] Change username/password directly in the web UI
 - [x] Better implementation of default username & password
 - [x] Docker example
 - [x] Service example
