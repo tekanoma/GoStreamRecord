@@ -26,6 +26,11 @@ func Handle() {
 	http.HandleFunc("/api/status", web_status.StatusHandler)
 	http.HandleFunc("/api/get-videos", web_recorder.GetVideos)
 	http.HandleFunc("/api/logs", web_recorder.HandleLogs)
+
+	http.HandleFunc("/api/get-users", web_config.GetUsers)
+	http.HandleFunc("/api/add-user", web_config.AddUser)
+	http.HandleFunc("/api/update-user", web_config.UpdateUsers)
+
 	if cookies.UserStore == nil {
 		cookies.UserStore = make(map[string]string)
 	}
