@@ -7,6 +7,7 @@ import (
 	"GoRecordurbate/modules/handlers"
 	"GoRecordurbate/modules/handlers/cookies"
 	"context"
+	_ "embed"
 	"fmt"
 	"log"
 	"net/http"
@@ -18,12 +19,22 @@ import (
 	"github.com/joho/godotenv"
 )
 
-func init() {
+// Embed static HTML files
+//
+//go:embed internal/web/index.html
+var IndexHTML string
 
+//go:embed internal/web/login.html
+var LoginHTML string
+
+func init() {
+	handlers.IndexHTML = IndexHTML
+	handlers.LoginHTML = LoginHTML
 	err := godotenv.Load(".env")
 	if err != nil {
 		log.Fatalf("Some error occured. Err: %s", err)
 	}
+	os.Mkdir("./output", 0755)
 	cookies.Session = cookies.New([]byte(os.Getenv("SESSION_KEY")))
 	file.InitLog(file.Log_path)
 	bot.Init()

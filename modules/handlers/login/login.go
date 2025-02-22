@@ -1,34 +1,14 @@
 package login
 
 import (
-	"GoRecordurbate/modules/file"
 	"GoRecordurbate/modules/handlers/cookies"
 	web_response "GoRecordurbate/modules/handlers/response"
 	"encoding/json"
 	"fmt"
-	"html/template"
 	"net/http"
-	"os"
 
 	"golang.org/x/crypto/bcrypt"
 )
-
-var tmpl *template.Template
-
-func init() {
-
-	contentBytes, _ := os.ReadFile(file.Login_path)
-
-	tmpl = template.Must(template.New("login").Parse(string(contentBytes)))
-}
-
-func GetLogin(w http.ResponseWriter, r *http.Request) {
-
-	if err := tmpl.Execute(w, nil); err != nil {
-		http.Error(w, "Server error", http.StatusInternalServerError)
-	}
-
-}
 
 func PostLogin(w http.ResponseWriter, r *http.Request) {
 	if err := r.ParseMultipartForm(1024); err != nil {

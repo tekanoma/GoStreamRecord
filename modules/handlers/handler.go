@@ -2,14 +2,13 @@ package handlers
 
 import (
 	"GoRecordurbate/modules/config"
-	"GoRecordurbate/modules/file"
 	web_config "GoRecordurbate/modules/handlers/config"
 	"GoRecordurbate/modules/handlers/cookies"
 	"GoRecordurbate/modules/handlers/login"
 	web_recorder "GoRecordurbate/modules/handlers/recorder"
 	web_status "GoRecordurbate/modules/handlers/status"
 	"net/http"
-	"path/filepath"
+	"text/template"
 )
 
 func Handle() {
@@ -38,12 +37,12 @@ func Handle() {
 	for _, u := range config.Users.Users {
 		cookies.UserStore[u.Name] = u.Key
 	}
-	fs := http.FileServer(http.Dir(filepath.Dir(file.Index_path)))
+	//	fs := http.FileServer(http.Dir(filepath.Dir(file.Index_path)))
 
 	http.HandleFunc("/login", func(w http.ResponseWriter, r *http.Request) {
 
 		if r.Method == http.MethodGet {
-			login.GetLogin(w, r)
+			GetLogin(w, r)
 		} else if r.Method == http.MethodPost {
 			login.PostLogin(w, r)
 		} else {
@@ -62,7 +61,34 @@ func Handle() {
 			//http.HandleFunc("/login", handlers.GetLogin)
 
 		} else {
-			fs.ServeHTTP(w, r)
+			GetIndex(w, r)
 		}
 	})
+}
+
+var IndexHTML, LoginHTML string
+
+type Template struct {
+	W    http.ResponseWriter
+	Tmpl *template.Template
+}
+
+func (t *Template) Execute(data any) error {
+	return t.Tmpl.Execute(t.W, data)
+}
+
+func GetIndex(w http.ResponseWriter, r *http.Request) {
+	tmpl := template.Must(template.New("index").Parse(IndexHTML))
+	indexTemplate := Template{W: w, Tmpl: tmpl}
+	if err := indexTemplate.Execute(nil); err != nil {
+		http.Error(w, "Server error", http.StatusInternalServerError)
+	}
+}
+
+func GetLogin(w http.ResponseWriter, r *http.Request) {
+	tmpl := template.Must(template.New("login").Parse(LoginHTML))
+	loginTemplate := Template{W: w, Tmpl: tmpl}
+	if err := loginTemplate.Execute(nil); err != nil {
+		http.Error(w, "Server error", http.StatusInternalServerError)
+	}
 }
