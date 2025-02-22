@@ -43,10 +43,10 @@ A release will be made once i have finished fixing the bare minimum below:
 - [x] Show logs in web UI
 - [x] Show videos in web UI
 - [ ] Change username/password directly in the web UI
-- [ ] Better implementation of default username & password
+- [x] Better implementation of default username & password
 - [x] Docker example
 - [x] Service example
-- [ ] Embed index file into code
+- [ ] Embed frontend files into binary
 
 ## WebUI (Will probably be modified)
 
