@@ -23,7 +23,11 @@ func (b *bot) Command(command string) {
 		config.Settings.App.ExportStreamers()
 	case "start":
 		log.Println("Starting bot")
-		go b.Run()
+		if b.isRunning {
+			log.Println("Bot already running..")
+			break
+		}
+		go b.RecordLoop()
 	case "stop":
 		log.Println("Stopping bot")
 		b.Stop()
