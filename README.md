@@ -8,6 +8,7 @@ __API NOTE__: The api is basically un-tested after adding login credentials. The
 - Add/delete streamers, with import/export options
 - View logs and recorded videos directly in the web UI
 - Docker and service examples for easier setup
+- Manage and add multiple users for webUI login
 ## In Progress:
 - ~~Better handling of default usernames and passwords~~
 - Embedding the index file directly into the code
