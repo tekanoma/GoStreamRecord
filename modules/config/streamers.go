@@ -84,34 +84,3 @@ func (s *Streamer) ListStreamers() {
 		log.Printf("- %s", streamer)
 	}
 }
-func ImportStreamers(importFile string) {
-	fileContent, err := os.ReadFile(importFile)
-	if os.IsNotExist(err) {
-		fmt.Println("File dont exist!")
-	}
-
-	appendStreamer(strings.Split(string(fileContent), "\n"))
-	ok := writeConfig(file.Streamers_json_path, Streamers)
-	if !ok {
-		log.Printf("Error importing from %s..\n", importFile)
-	}
-	fmt.Println("Streamers imported!")
-}
-
-func (app *app) ExportStreamers() {
-
-	app.mux.Lock()
-	defer app.mux.Unlock()
-	os.Create(app.ExportPath)
-	file, err := os.Open(app.ExportPath)
-	if err != nil {
-		fmt.Println("Error exporting streamers!")
-	}
-	defer file.Close()
-
-	for _, streamer := range Streamers.StreamerList {
-		file.Write([]byte(fmt.Sprintf("%s\n", streamer.Name)))
-	}
-
-	fmt.Println("Streamers exported to", app.ExportPath)
-}
