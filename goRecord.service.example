@@ -1,0 +1,16 @@
+[Unit]
+Description=Go Binary Service
+After=network.target
+ConditionPathExists=/path/to/internal/settings/settings.json
+ConditionPathExists=/path/to/output/videos
+ConditionPathExists=/path/to/goRec
+
+[Service]
+WorkingDirectory=/path/to/GoRecordurbate-folder
+ExecStart=/path/to/GoRecordurbate-binary
+Restart=on-failure
+RestartSec=5s
+User=your-username
+
+[Install]
+WantedBy=multi-user.target
