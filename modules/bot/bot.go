@@ -169,7 +169,7 @@ func (b *bot) IsOnline(username string) bool {
 // It reloads the configuration, checks running processes, and for each configured streamer
 // starts a recording if one isn’t already running.
 // Once the context is cancelled (via Stop), no new recordings are started.
-func (b *bot) Run() {
+func (b *bot) RecordLoop() {
 	b.mux.Lock()
 	b.isRunning = true
 	b.mux.Unlock()

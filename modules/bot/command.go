@@ -40,7 +40,7 @@ func (b *bot) Command(command string) {
 	case "restarting bot":
 		log.Println("Stopping bot")
 		b.ResetBot()
-		go b.Run()
+		go b.RecordLoop()
 	default:
 		fmt.Println("Nothing to do..")
 	}
