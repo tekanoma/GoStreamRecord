@@ -9,6 +9,7 @@ __API NOTE__: The api is basically un-tested after adding login credentials. The
 - View logs and recorded videos directly in the web UI
 - Docker and service examples for easier setup
 - Manage and add multiple users for webUI login
+- Add new streamers without restarting the recorder
   
 ## Usage
 
@@ -59,7 +60,7 @@ Building the code wil create a binary for your os system. Golang is [cross-compa
 go mod init GoRecordurbate # Only run this line once
 go mod tidy
 go build
-./GoRecordurbate
+./GoRecordurbate #windows will have 'GoRecordurbate.exe'
 ```
 ### Source
 ```bash
@@ -70,21 +71,6 @@ go run main.go
 
 ## Notes
 This is un-tested on Windows and Mac, but golang is cross-compatible which means that this should run just as fine on Windows as on Linux.
-
-A release will be made once i have finished fixing the bare minimum below:
-- [x] Start recording
-- [x] Restart recording
-- [x] stop recording
-- [x] Add / delete streamer
-- [x] Import streamers
-- [x] Export streamers
-- [x] Show logs in web UI
-- [x] Show videos in web UI
-- [x] Change username/password directly in the web UI
-- [x] Better implementation of default username & password
-- [x] Docker example
-- [x] Service example
-- [x] Embed frontend files into binary 
 
 ## WebUI (Will probably be modified)
 
