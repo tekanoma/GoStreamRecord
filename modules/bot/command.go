@@ -1,7 +1,6 @@
 package bot
 
 import (
-	"GoRecordurbate/modules/config"
 	"context"
 	"fmt"
 	"log"
