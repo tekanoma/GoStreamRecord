@@ -1,17 +1,18 @@
 # GoRecordurbate WebUI
 This project offers a simple, self-hosted web UI for managing and recording streams.
 
-__API NOTE__: The api is basically un-tested after adding login credentials. The plan is to use API key in the future for credentials via API.
+__API NOTE__: The api is basically un-tested after adding login credentials. The plan is to use API key in the future for credentials via API. This will probably not be done before the initial release.
 ## Core Features:
 - Login with cookies for each client (prevents unsupervised access)
 - Start, restart, and stop recordings
 - Add/delete streamers, with import/export options
 - View logs and recorded videos directly in the web UI
 - Docker and service examples for easier setup
+- Manage and add multiple users for webUI login
 ## In Progress:
 - ~~Better handling of default usernames and passwords~~
 - Embedding the index file directly into the code
-- API secret key
+
   
 ## Usage
 Default login:
@@ -45,12 +46,11 @@ A release will be made once i have finished fixing the bare minimum below:
 - [x] Export streamers
 - [x] Show logs in web UI
 - [x] Show videos in web UI
-- [ ] Change username/password directly in the web UI
+- [x] Change username/password directly in the web UI
 - [x] Better implementation of default username & password
 - [x] Docker example
 - [x] Service example
-- [ ] Embed frontend files into binary
-- [ ] API secret key implementation 
+- [ ] Embed frontend files into binary 
 
 ## WebUI (Will probably be modified)
 
@@ -59,7 +59,9 @@ A release will be made once i have finished fixing the bare minimum below:
   <img src="https://github.com/user-attachments/assets/35e4633b-702b-45f9-9075-a8522a6b334b" alt="Login page"/>
   <img src="https://github.com/user-attachments/assets/6c04598e-d3fe-4630-9bfc-e3c1216d67c5" alt="Streamers tab"/>
   <img src="https://github.com/user-attachments/assets/ab28c113-4c6a-4a07-ba88-05ed6b3a868e" alt="Control tab"/>
+  <img src="https://github.com/user-attachments/assets/30bc2424-e3c6-49f7-8f97-b4025698e234" alt="Settings tab"/>
 </p>
+
 
 ## Other
 
