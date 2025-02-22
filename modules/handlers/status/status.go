@@ -5,7 +5,6 @@ import (
 	"GoRecordurbate/modules/config"
 	"GoRecordurbate/modules/file"
 	"encoding/json"
-	"fmt"
 	"net/http"
 )
 
@@ -36,7 +35,7 @@ func StatusHandler(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 	recorder.BotStatus = bot.Bot.Status()
-	fmt.Println(bot.Bot.Status())
+
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(recorder)
 }
