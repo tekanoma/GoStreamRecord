@@ -4,8 +4,6 @@ import (
 	"GoRecordurbate/modules/file"
 	"fmt"
 	"log"
-	"os"
-	"strings"
 )
 
 type StreamersList struct {
