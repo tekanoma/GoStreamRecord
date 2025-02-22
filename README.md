@@ -78,11 +78,11 @@ This is un-tested on Windows and Mac, but golang is cross-compatible which means
 
 <p align="center">
   <img src="https://github.com/user-attachments/assets/35e4633b-702b-45f9-9075-a8522a6b334b" alt="Login page"/>
-  <img src="https://github.com/user-attachments/assets/6c04598e-d3fe-4630-9bfc-e3c1216d67c5" alt="Streamers tab"/>
-  <img src="https://github.com/user-attachments/assets/ab28c113-4c6a-4a07-ba88-05ed6b3a868e" alt="Control tab"/>
+  <img src="https://github.com/user-attachments/assets/cc3f013f-a530-4629-99d4-02b72a54599d" alt="Streamers tab"/>
+  <img src="https://github.com/user-attachments/assets/86b72aba-e3a8-424a-b094-8e23b66a233b" alt="Logs tab"/>
+  <img src="https://github.com/user-attachments/assets/7038689f-0c67-4ede-87aa-1d5a63a720c2" alt="Recorders tab"/>
   <img src="https://github.com/user-attachments/assets/30bc2424-e3c6-49f7-8f97-b4025698e234" alt="Settings tab"/>
 </p>
-
 
 ## Other
 
