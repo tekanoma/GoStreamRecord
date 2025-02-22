@@ -46,7 +46,7 @@ A release will be made once i have finished fixing the bare minimum below:
 - [x] Better implementation of default username & password
 - [x] Docker example
 - [x] Service example
-- [ ] Embed index file into code
+- [ ] Embed frontend files into binary
 
 ## WebUI (Will probably be modified)
 
