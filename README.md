@@ -9,6 +9,7 @@ __API NOTE__: The api is basically un-tested after adding login credentials. The
 - View logs and recorded videos directly in the web UI
 - Docker and service examples for easier setup
 - Manage and add multiple users for webUI login
+- Add new streamers without restarting the recorder
   
 ## Usage
 
