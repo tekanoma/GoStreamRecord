@@ -10,6 +10,7 @@ __API NOTE__: The api is basically un-tested after adding login credentials. The
 - Docker and service examples for easier setup
 - Manage and add multiple users for webUI login
 - Add new streamers without restarting the recorder
+- View active recorders
   
 ## Usage
 
@@ -91,6 +92,8 @@ This is un-tested on Windows and Mac, but golang is cross-compatible which means
 - Option for max video length (and size?)
 - headless mode without webui
 - Move frontend to Vue (?)
+- Stop/Restart individual recorders from the webUI
+
 
 
 
