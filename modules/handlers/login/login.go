@@ -42,13 +42,11 @@ func PostLogin(w http.ResponseWriter, r *http.Request) {
 	storedHash, ok := cookies.UserStore[username]
 	if !ok {
 
-		fmt.Println(username, password)
 		resp.Message = "Invalid credentials"
 		w.Header().Set("Content-Type", "application/json")
 		json.NewEncoder(w).Encode(resp)
 		return
 	}
-
 	if err := bcrypt.CompareHashAndPassword([]byte(storedHash), []byte(password)); err != nil {
 		fmt.Println(err)
 		resp.Message = "Invalid credentials"
@@ -57,7 +55,7 @@ func PostLogin(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	session, err := cookies.Store.Get(r, "session")
+	session, err := cookies.Session.Store().Get(r, "session")
 	if err != nil {
 		resp.Message = "Session error"
 		w.Header().Set("Content-Type", "application/json")
@@ -70,6 +68,7 @@ func PostLogin(w http.ResponseWriter, r *http.Request) {
 		resp.Message = "Could not save session"
 		w.Header().Set("Content-Type", "application/json")
 		json.NewEncoder(w).Encode(resp)
+		fmt.Println(err)
 		//http.Error(w, "Could not save session", http.StatusInternalServerError)
 		return
 	}

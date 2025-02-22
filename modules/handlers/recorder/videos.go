@@ -25,7 +25,7 @@ func GetVideos(w http.ResponseWriter, r *http.Request) {
 		page = 1
 	}
 
-	err = filepath.Walk(config.C.App.Videos_folder, func(path string, info os.FileInfo, err error) error {
+	err = filepath.Walk(config.Settings.App.Videos_folder, func(path string, info os.FileInfo, err error) error {
 		if err != nil {
 			return err
 		}
@@ -40,7 +40,7 @@ func GetVideos(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if len(videos) == 0 {
-		videos = append(videos, Video{URL: "", Name: "", NoVideos: fmt.Sprintf("No videos available. Try adding some to '%s'", config.C.App.Videos_folder)})
+		videos = append(videos, Video{URL: "", Name: "", NoVideos: fmt.Sprintf("No videos available. Try adding some to '%s'", config.Settings.App.Videos_folder)})
 
 	}
 	pageSize := 10

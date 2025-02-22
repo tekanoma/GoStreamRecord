@@ -5,8 +5,8 @@ import (
 	"GoRecordurbate/modules/config"
 	"GoRecordurbate/modules/file"
 	"GoRecordurbate/modules/handlers"
+	"GoRecordurbate/modules/handlers/cookies"
 	"context"
-	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
@@ -14,21 +14,19 @@ import (
 	"os/signal"
 	"syscall"
 	"time"
+
+	"github.com/joho/godotenv"
 )
 
 func init() {
-	_, err := os.Stat(file.Config_path)
-	if os.IsNotExist(err) {
-		fmt.Println("No config found. Generating.. Please fill in details in:", file.Config_path)
-		f, _ := os.Create(file.Config_path)
-		tmp := config.Config{}
-		b, _ := json.Marshal(&tmp)
-		f.Write(b)
-		os.Exit(0)
+
+	err := godotenv.Load(".env")
+	if err != nil {
+		log.Fatalf("Some error occured. Err: %s", err)
 	}
+	cookies.Session = cookies.New([]byte(os.Getenv("SESSION_KEY")))
 	file.InitLog(file.Log_path)
 	bot.Init()
-	config.C.Init()
 
 }
 
@@ -36,7 +34,7 @@ func main() {
 	//http.Handle("/", fs)
 	handlers.Handle()
 	server := &http.Server{
-		Addr: fmt.Sprintf(":%d", config.C.App.Port),
+		Addr: fmt.Sprintf(":%d", config.Settings.App.Port),
 	}
 
 	// Channel to listen for termination signals
@@ -45,8 +43,8 @@ func main() {
 
 	// Run the server in a separate goroutine
 	go func() {
-		log.Printf("Server starting on http://127.0.0.1:%d", config.C.App.Port)
-		fmt.Printf("Server starting on http://127.0.0.1:%d\n", config.C.App.Port)
+		log.Printf("Server starting on http://127.0.0.1:%d", config.Settings.App.Port)
+		fmt.Printf("Server starting on http://127.0.0.1:%d\n", config.Settings.App.Port)
 		if err := server.ListenAndServe(); err != http.ErrServerClosed {
 			log.Fatalf("Server failed: %v", err)
 		}

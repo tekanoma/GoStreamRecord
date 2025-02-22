@@ -46,7 +46,7 @@ func UploadHandler(w http.ResponseWriter, r *http.Request) {
 	newStreamers := []string{}
 	for _, line := range strings.Split(string(fileContent), "\n") {
 		exist := false
-		for _, s := range config.C.App.Streamers {
+		for _, s := range config.Streamers.StreamerList {
 			if line == s.Name {
 				exist = true
 			}
@@ -60,7 +60,7 @@ func UploadHandler(w http.ResponseWriter, r *http.Request) {
 		if len(line) == 0 {
 			continue
 		}
-		config.C.App.AddStreamer(line)
+		config.AddStreamer(line)
 	}
 	resp := web_response.Response{
 		Message: fmt.Sprintf("Added %d new streamers!", len(newStreamers)),

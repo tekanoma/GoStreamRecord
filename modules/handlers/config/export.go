@@ -16,7 +16,7 @@ func DownloadHandler(w http.ResponseWriter, r *http.Request) {
 	// Dummy file content
 	fileContent := ""
 
-	for _, s := range config.C.App.Streamers {
+	for _, s := range config.Streamers.StreamerList {
 		fileContent = fileContent + s.Name + "\n"
 	}
 	w.Header().Set("Content-Type", "application/octet-stream")

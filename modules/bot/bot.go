@@ -108,7 +108,7 @@ func (b *bot) Stop() {
 // IsRoomPublic checks if a given room is public by sending a POST request.
 func (b *bot) IsRoomPublic(username string) bool {
 	// Wait for the configured rate limit.
-	time.Sleep(time.Duration(config.C.App.RateLimit.Time) * time.Second)
+	time.Sleep(time.Duration(config.Settings.App.RateLimit.Time) * time.Second)
 	urlStr := "https://chaturbate.com/get_edge_hls_url_ajax/"
 	data := url.Values{}
 	data.Set("room_slug", username)
@@ -199,14 +199,14 @@ func (b *bot) Run() {
 			return
 		case <-ticker.C:
 			// Optionally reload config.
-			if config.C.AutoReload {
-				config.C.Reload()
+			if config.Settings.AutoReload {
+				config.Reload(file.Config_json_path, &config.Settings)
 			}
 
 			// Remove finished processes.
 			b.checkProcesses()
 			// For each streamer in the config, start a recorder if one isn’t already running.
-			for _, streamer := range config.C.App.Streamers {
+			for _, streamer := range config.Streamers.StreamerList {
 
 				if b.isRecorderActive(streamer.Name) {
 					continue
@@ -222,13 +222,13 @@ func (b *bot) Run() {
 				wg.Add(1)
 				go b.runRecordLoop(&wg, streamer.Name)
 				// Respect rate limiting.
-				time.Sleep(time.Duration(config.C.App.RateLimit.Time) * time.Second)
+				time.Sleep(time.Duration(config.Settings.App.RateLimit.Time) * time.Second)
 
 			}
 			if b.isFirstRun {
 				b.isFirstRun = false
-				fmt.Println(time.Duration(config.C.App.Loop_interval) * time.Minute)
-				ticker.Reset(time.Duration(config.C.App.Loop_interval) * time.Minute)
+				fmt.Println(time.Duration(config.Settings.App.Loop_interval) * time.Minute)
+				ticker.Reset(time.Duration(config.Settings.App.Loop_interval) * time.Minute)
 
 			}
 		}
@@ -253,7 +253,7 @@ func (b *bot) runRecordLoop(wg *sync.WaitGroup, streamerName string) {
 	}
 
 	log.Printf("[bot]: Starting recording for %s", streamerName)
-	args := strings.Fields(config.C.YoutubeDL.Binary)
+	args := strings.Fields(config.Settings.YoutubeDL.Binary)
 	recordURL := fmt.Sprintf("https://chaturbate.com/%s/", streamerName)
 	args = append(args, recordURL, "--config-location", file.YoutubeDL_configPath)
 	cmd := exec.Command(args[0], args[1:]...)
@@ -350,7 +350,7 @@ func (b *bot) writeYoutubeDLConfig() error {
 	}
 	defer f.Close()
 
-	folder := config.C.App.Videos_folder
+	folder := config.Settings.App.Videos_folder
 	configLine := fmt.Sprintf("-o \"%s", folder) + "/%(id)s/%(title)s.%(ext)s\""
 	_, err = f.Write([]byte(configLine))
 	return err

@@ -17,10 +17,10 @@ func (b *bot) Command(command string) {
 	switch strings.ToLower(command) {
 	case "import":
 		log.Println("Importing streamers..")
-		config.C.App.ImportStreamers(config.C.App.ExportPath)
+		config.ImportStreamers(config.Settings.App.ExportPath)
 	case "export":
 		log.Println("Exporting streamers..")
-		config.C.App.ExportStreamers()
+		config.Settings.App.ExportStreamers()
 	case "start":
 		log.Println("Starting bot")
 		go b.Run()

@@ -40,17 +40,15 @@ func WriteJson(filename string, v interface{}) error {
 
 // CheckJson compares the JSON content of a file with the expected data.
 // If they don't match, it returns an error explaining the difference.
-func CheckJson(filename string, expected interface{}) (bool, error) {
+func CheckJson(filename string, expected any) (bool, error) {
 	var actual map[string]interface{}
 	if err := ReadJson(filename, &actual); err != nil {
 		return false, fmt.Errorf("failed to read JSON file: %w", err)
 	}
-
 	expectedBytes, err := json.Marshal(expected)
 	if err != nil {
 		return false, fmt.Errorf("failed to marshal expected data: %w", err)
 	}
-
 	var expectedMap map[string]interface{}
 	if err := json.Unmarshal(expectedBytes, &expectedMap); err != nil {
 		return false, fmt.Errorf("failed to unmarshal expected data: %w", err)
@@ -66,10 +64,8 @@ func compareJSON(actual, expected map[string]interface{}) (bool, error) {
 		if !exists {
 			return false, fmt.Errorf("missing key '%s' in actual JSON", key)
 		}
-
 		if !compareValues(actualValue, expectedValue) {
-			return false, fmt.Errorf("value mismatch for key '%s': expected '%v', but got '%v'", key, reflect.TypeOf(expectedValue), reflect.TypeOf(actualValue))
-
+			return false, fmt.Errorf("value mismatch for key '%s': expected '%v', but got '%v'", key, expectedValue, actualValue)
 		}
 	}
 

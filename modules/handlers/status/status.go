@@ -3,6 +3,7 @@ package web_status
 import (
 	"GoRecordurbate/modules/bot"
 	"GoRecordurbate/modules/config"
+	"GoRecordurbate/modules/file"
 	"encoding/json"
 	"net/http"
 )
@@ -18,8 +19,8 @@ func StatusHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var recorder Rec
-	config.C.Reload()
-	// Assuming config.C.App.Streamers is accessible
+	config.Reload(file.Config_json_path, &config.Streamers)
+	// Assuming config.Settings.App.Streamers is accessible
 	for _, s := range bot.Bot.ListRecorders() {
 		if s.IsRecording {
 			recorder.Status = "Running"

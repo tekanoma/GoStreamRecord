@@ -7,9 +7,8 @@
       "enable": true,
       "time": 5
     },
-    "default_export_location": "./output/list.txt",
-    "streamers": [
-    ]
+    "default_export_location": "./output/list.txt"
+
   },
   "youtube-dl": {
     "binary": "youtube-dl"

@@ -8,17 +8,14 @@ import (
 	"GoRecordurbate/modules/handlers/login"
 	web_recorder "GoRecordurbate/modules/handlers/recorder"
 	web_status "GoRecordurbate/modules/handlers/status"
-	"log"
 	"net/http"
 	"path/filepath"
-
-	"golang.org/x/crypto/bcrypt"
 )
 
 func Handle() {
 	// API endpoints
 
-	http.Handle("/videos/", http.StripPrefix("/videos/", http.FileServer(http.Dir(config.C.App.Videos_folder))))
+	http.Handle("/videos/", http.StripPrefix("/videos/", http.FileServer(http.Dir(config.Settings.App.Videos_folder))))
 
 	http.HandleFunc("/api/add-streamer", web_config.AddStreamer)
 	http.HandleFunc("/api/get-streamers", web_config.GetStreamers)
@@ -29,15 +26,13 @@ func Handle() {
 	http.HandleFunc("/api/status", web_status.StatusHandler)
 	http.HandleFunc("/api/get-videos", web_recorder.GetVideos)
 	http.HandleFunc("/api/logs", web_recorder.HandleLogs)
-	password := "password"
-	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
-	if err != nil {
-		log.Fatal("Error generating password hash:", err)
-	}
-	cookies.UserStore = map[string]string{
-		"admin": string(hashedPassword),
+	if cookies.UserStore == nil {
+		cookies.UserStore = make(map[string]string)
 	}
 
+	for _, u := range config.Users.Users {
+		cookies.UserStore[u.Name] = u.Key
+	}
 	fs := http.FileServer(http.Dir(filepath.Dir(file.Index_path)))
 
 	http.HandleFunc("/login", func(w http.ResponseWriter, r *http.Request) {
@@ -52,7 +47,7 @@ func Handle() {
 	})
 
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		session, err := cookies.Store.Get(r, "session")
+		session, err := cookies.Session.Store().Get(r, "session")
 		if err != nil {
 			http.Error(w, "Session error", http.StatusInternalServerError)
 			return
