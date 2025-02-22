@@ -158,8 +158,7 @@ func (b *bot) IsOnline(username string) bool {
 	if err := json.NewDecoder(resp.Body).Decode(&res); err != nil {
 		body, _ := io.ReadAll(resp.Body)
 		if err := json.Unmarshal(body, &res); err != nil {
-			log.Printf("Error decoding JSON: %v", err)
-			log.Println("Most likely rate limit issue..")
+			log.Println("Error recieving online status. Try restarting the app and/or increase the rate limit in config")
 			return false
 		}
 	}
@@ -274,13 +273,8 @@ func (b *bot) runRecordLoop(wg *sync.WaitGroup, streamerName string) {
 	b.mux.Unlock()
 
 	// Wait for the command to finish.
-	err := cmd.Wait()
-	if err != nil {
-		log.Printf("[bot]: Recording for %s ended with error: %v", streamerName, err)
-		time.Sleep(5 * time.Second)
-	} else {
-		log.Printf("[bot]: Recording for %s finished successfully", streamerName)
-	}
+	cmd.Wait()
+	log.Printf("[bot]: Recording for %s finished", streamerName)
 
 	// Remove this process from our list.
 	b.mux.Lock()
