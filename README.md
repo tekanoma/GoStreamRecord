@@ -71,21 +71,6 @@ go run main.go
 ## Notes
 This is un-tested on Windows and Mac, but golang is cross-compatible which means that this should run just as fine on Windows as on Linux.
 
-A release will be made once i have finished fixing the bare minimum below:
-- [x] Start recording
-- [x] Restart recording
-- [x] stop recording
-- [x] Add / delete streamer
-- [x] Import streamers
-- [x] Export streamers
-- [x] Show logs in web UI
-- [x] Show videos in web UI
-- [x] Change username/password directly in the web UI
-- [x] Better implementation of default username & password
-- [x] Docker example
-- [x] Service example
-- [x] Embed frontend files into binary 
-
 ## WebUI (Will probably be modified)
 
 
