@@ -9,8 +9,9 @@ __API NOTE__: The api is basically un-tested after adding login credentials. The
 - View logs and recorded videos directly in the web UI
 - Docker and service examples for easier setup
 ## In Progress:
-- Better handling of default usernames and passwords
+- ~~Better handling of default usernames and passwords~~
 - Embedding the index file directly into the code
+- API secret key
   
 ## Usage
 Default login:
@@ -49,6 +50,7 @@ A release will be made once i have finished fixing the bare minimum below:
 - [x] Docker example
 - [x] Service example
 - [ ] Embed frontend files into binary
+- [ ] API secret key implementation 
 
 ## WebUI (Will probably be modified)
 
