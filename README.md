@@ -1,7 +1,7 @@
 # GoRecordurbate WebUI
 This project offers a simple, self-hosted web UI for managing and recording streams.
 
-__API NOTE__: The api is basically intested after adding login credentials. The plan is to use API key in the future for credentials via API.
+__API NOTE__: The api is basically un-tested after adding login credentials. The plan is to use API key in the future for credentials via API.
 ## Core Features:
 - Login with cookies for each client (prevents unsupervised access)
 - Start, restart, and stop recordings
