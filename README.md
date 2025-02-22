@@ -60,7 +60,7 @@ Building the code wil create a binary for your os system. Golang is [cross-compa
 go mod init GoRecordurbate # Only run this line once
 go mod tidy
 go build
-./GoRecordurbate
+./GoRecordurbate #windows will have 'GoRecordurbate.exe'
 ```
 ### Source
 ```bash
