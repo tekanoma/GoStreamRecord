@@ -9,23 +9,57 @@ __API NOTE__: The api is basically un-tested after adding login credentials. The
 - View logs and recorded videos directly in the web UI
 - Docker and service examples for easier setup
 - Manage and add multiple users for webUI login
-## In Progress:
-- ~~Better handling of default usernames and passwords~~
-- Embedding the index file directly into the code
-
   
 ## Usage
-Default login:
 
-- User: `admin`
-- Password: `password`
+|Username|Password|
+|-|-|
+|`admin`| `password`|
 
+### Setup
+- Copy [`.env.example`](https://github.com/luna-nightbyte/Recordurbate-WebUI/blob/main/.env.example) to `.env` and add your own session key. 
+    - Can be generated with: `head -c 32 /dev/urandom | base64`
+    - Example:
+      ```bash
+      user@user:~/Recordurbate$ head -c 32 /dev/urandom | base64
+      # Output:
+      Fl60B6sTqAUARyDiC6GIor8AIu6QXLF2RMvWK1Wz3eE=
+      ```
+
+#### Optional config settings
+The main settings can be found in [`settings.json`](https://github.com/luna-nightbyte/Recordurbate-WebUI/blob/main/internal/settings/settings.json):
+```json
+{
+  "app": {
+    "port": 8055,
+    "loop_interval_in_minutes": 2,
+    "video_output_folder": "output/videos",
+    "rate_limit": {
+      "enable": true,
+      "time": 5
+    },
+    "default_export_location": "./output/list.txt"
+
+  },
+  "youtube-dl": {
+    "binary": "youtube-dl"
+  },
+  "auto_reload_config": true
+}
+```
+#### Reset password
+To change forgotten password, start the program with the `reset-pwd` argument. I.e:
+```
+./GoRecordurbate reset-pwd admin newpassword 
+```
+New login for the user `admin` would then be `newpassword`
 ### Build
 Building the code wil create a binary for your os system. Golang is [cross-compatible](https://go.dev/wiki/GccgoCrossCompilation) for windows, linux and mac.
 ```bash
 go mod init GoRecordurbate # Only run this line once
 go mod tidy
 go build
+./GoRecordurbate
 ```
 ### Source
 ```bash
@@ -50,7 +84,7 @@ A release will be made once i have finished fixing the bare minimum below:
 - [x] Better implementation of default username & password
 - [x] Docker example
 - [x] Service example
-- [ ] Embed frontend files into binary 
+- [x] Embed frontend files into binary 
 
 ## WebUI (Will probably be modified)
 
