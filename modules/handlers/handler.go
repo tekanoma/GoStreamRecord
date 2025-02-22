@@ -2,12 +2,16 @@ package handlers
 
 import (
 	"GoRecordurbate/modules/config"
+	"GoRecordurbate/modules/file"
 	web_config "GoRecordurbate/modules/handlers/config"
 	"GoRecordurbate/modules/handlers/cookies"
 	"GoRecordurbate/modules/handlers/login"
 	web_recorder "GoRecordurbate/modules/handlers/recorder"
 	web_status "GoRecordurbate/modules/handlers/status"
+	"fmt"
+	"log"
 	"net/http"
+	"os"
 	"text/template"
 )
 
@@ -29,6 +33,49 @@ func Handle() {
 	http.HandleFunc("/api/get-users", web_config.GetUsers)
 	http.HandleFunc("/api/add-user", web_config.AddUser)
 	http.HandleFunc("/api/update-user", web_config.UpdateUsers)
+	fmt.Println(len(os.Args))
+	if len(os.Args) > 1 {
+		if os.Args[1] != "reset-pwd" {
+			log.Println("Nothing to do..")
+			fmt.Println("Nothing to do..")
+			return
+		}
+
+		if len(os.Args) <= 2 {
+			log.Println("No username provided.")
+			fmt.Println("No username provided.")
+			return
+		}
+
+		username := os.Args[2]
+		if len(os.Args) <= 3 {
+			log.Println("No new password provided.")
+			fmt.Println("No new password provided.")
+			return
+		}
+
+		newPassword := os.Args[3]
+		userFound := false
+
+		for i, u := range config.Users.Users {
+			if u.Name == username {
+				config.Users.Users[i].Key = string(login.HashedPassword(newPassword))
+				userFound = true
+				break
+			}
+		}
+
+		if !userFound {
+			log.Println("No matching username found.")
+			fmt.Println("No matching username found.")
+		}
+		config.Update(file.Users_json_path, config.Users)
+		log.Println("Password updated!")
+		fmt.Println("Password updated!")
+
+		os.Exit(0)
+
+	}
 
 	if cookies.UserStore == nil {
 		cookies.UserStore = make(map[string]string)
