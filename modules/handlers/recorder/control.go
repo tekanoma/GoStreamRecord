@@ -2,7 +2,7 @@ package web_recorder
 
 import (
 	"GoRecordurbate/modules/bot"
-	web_response "GoRecordurbate/modules/handlers/response"
+	web_status "GoRecordurbate/modules/handlers/status"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -26,7 +26,7 @@ func ControlHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	bot.Bot.Command(reqData.Command)
-	resp := web_response.Response{
+	resp := web_status.Response{
 		Message: fmt.Sprintf("Control command '%s' executed", reqData.Command),
 	}
 	w.Header().Set("Content-Type", "application/json")

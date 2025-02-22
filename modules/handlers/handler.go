@@ -72,7 +72,6 @@ func Handle() {
 		config.Update(file.Users_json_path, config.Users)
 		log.Println("Password updated!")
 		fmt.Println("Password updated!")
-
 		os.Exit(0)
 
 	}

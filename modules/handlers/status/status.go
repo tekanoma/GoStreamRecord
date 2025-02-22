@@ -5,8 +5,17 @@ import (
 	"GoRecordurbate/modules/config"
 	"GoRecordurbate/modules/file"
 	"encoding/json"
+	"fmt"
 	"net/http"
 )
+
+// Response is a generic response structure for our API endpoints.
+type Response struct {
+	Status    string        `json:"status"`
+	Message   string        `json:"message"`
+	Data      interface{}   `json:"data,omitempty"`
+	BotStatus bot.BotStatus `json:"botStatus"`
+}
 
 func StatusHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodGet {
@@ -14,11 +23,7 @@ func StatusHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	type Rec struct {
-		Status string `json:"status"`
-	}
-
-	var recorder Rec
+	var recorder Response
 	config.Reload(file.Config_json_path, &config.Streamers)
 	// Assuming config.Settings.App.Streamers is accessible
 	for _, s := range bot.Bot.ListRecorders() {
@@ -30,7 +35,8 @@ func StatusHandler(w http.ResponseWriter, r *http.Request) {
 
 		}
 	}
-
+	recorder.BotStatus = bot.Bot.Status()
+	fmt.Println(bot.Bot.Status())
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(recorder)
 }

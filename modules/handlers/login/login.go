@@ -2,7 +2,7 @@ package login
 
 import (
 	"GoRecordurbate/modules/handlers/cookies"
-	web_response "GoRecordurbate/modules/handlers/response"
+	web_status "GoRecordurbate/modules/handlers/status"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -17,7 +17,7 @@ func PostLogin(w http.ResponseWriter, r *http.Request) {
 	}
 	username := r.FormValue("username")
 	password := r.FormValue("password")
-	resp := web_response.Response{}
+	resp := web_status.Response{}
 
 	storedHash, ok := cookies.UserStore[username]
 	if !ok {

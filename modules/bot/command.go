@@ -15,14 +15,14 @@ func (b *bot) Command(command string) {
 	}
 	switch strings.ToLower(command) {
 	case "start":
-		if b.isRunning {
+		if b.status.IsRunning {
 			log.Println("Bot already running..")
 			break
 		}
 		log.Println("Starting bot")
 		go b.RecordLoop()
 	case "stop":
-		if !b.isRunning {
+		if !b.status.IsRunning {
 			log.Println("Bot already running..")
 			break
 		}
@@ -31,7 +31,7 @@ func (b *bot) Command(command string) {
 		b.Stop()
 	case "restart":
 		log.Println("Restarting bot")
-		if b.isRunning {
+		if b.status.IsRunning {
 			b.Command("stop")
 		}
 		b.Command("start")

@@ -1,81 +1,97 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>GoRecordurbate WebUI</title>
-    <!-- Bootstrap CSS -->
-    <link
-      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
-      rel="stylesheet"
-    />
-    <style>
-      /* Overall page background */
-      body {
-        background-color: #f0f4f8;
-      }
-      /* Status Indicator (calm pastel blue for Running) */
-      #statusIndicator {
-        position: fixed;
-        top: 10px;
-        right: 10px;
-        padding: 5px 10px;
-        background-color: #9c9c9cce;
-        color: #fff;
-        border-radius: 5px;
-        font-weight: bold;
-        z-index: 1100;
-      }
-      /* Vertical pill navigation styles */
-      .nav-pills .nav-link {
-        color: #636e72;
-        font-weight: 500;
-        margin-bottom: 10px;
-      }
-      .nav-pills .nav-link.active {
-        background-color: #6b5f6a13;
-        color: #2d3436;
-      }
-      /* Card styling */
-      .card {
-        border: none;
-        border-radius: 8px;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        margin-bottom: 30px;
-      }
-      .card-header {
-        background-color: #dfe6e9;
-        border-bottom: 1px solid #b2bec3;
-        font-weight: bold;
-      }
-      /* List items */
-      .list-group-item {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        background-color: #ffffff;
-        border: 1px solid #dfe4ea;
-      }
-      /* Terminal styles for logs */
-      .terminal {
-        background-color: #2d3436;
-        color: #dfe6e9;
-        font-family: monospace;
-        padding: 10px;
-        height: 300px;
-        overflow-y: auto;
-        border-radius: 5px;
-      }
-      /* Response area for transient messages */
-      #responseArea {
-        position: fixed;
-        bottom: 20px;
-        right: 20px;
-        z-index: 1050;
-        width: 300px;
-      }
-    </style>
-  </head>
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>GoRecordurbate WebUI</title>
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <style>
+    /* Title styling */
+    .page-title {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      font-size: 2.5rem;
+      color: #333;
+      text-align: center;
+      margin-top: 20px;
+      text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.2);
+    }
+
+    /* Overall page background */
+    body {
+      background-color: #f0f4f8;
+    }
+
+    /* Status Indicator (calm pastel blue for Running) */
+    #statusIndicator {
+      position: fixed;
+      top: 10px;
+      right: 10px;
+      padding: 5px 10px;
+      background-color: #9c9c9cce;
+      color: #fff;
+      border-radius: 5px;
+      font-weight: bold;
+      z-index: 1100;
+    }
+
+    /* Vertical pill navigation styles */
+    .nav-pills .nav-link {
+      color: #636e72;
+      font-weight: 500;
+      margin-bottom: 10px;
+    }
+
+    .nav-pills .nav-link.active {
+      background-color: #6b5f6a13;
+      color: #2d3436;
+    }
+
+    /* Card styling */
+    .card {
+      border: none;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      margin-bottom: 30px;
+    }
+
+    .card-header {
+      background-color: #dfe6e9;
+      border-bottom: 1px solid #b2bec3;
+      font-weight: bold;
+    }
+
+    /* List items */
+    .list-group-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background-color: #ffffff;
+      border: 1px solid #dfe4ea;
+    }
+
+    /* Terminal styles for logs */
+    .terminal {
+      background-color: #2d3436;
+      color: #dfe6e9;
+      font-family: monospace;
+      padding: 10px;
+      height: 300px;
+      overflow-y: auto;
+      border-radius: 5px;
+    }
+
+    /* Response area for transient messages */
+    #responseArea {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      z-index: 1050;
+      width: 300px;
+    }
+  </style>
+</head>
 
   <body>
     <!-- Persistent Status Indicator -->
@@ -85,43 +101,17 @@
       <div class="row">
         <!-- Vertical Navigation (Sidebar) -->
         <div class="col-md-3">
-          <div
-            class="nav flex-column nav-pills"
-            id="v-pills-tab"
-            role="tablist"
-            aria-orientation="vertical"
-          >
-            <a
-              class="nav-link active"
-              id="v-pills-streamers-tab"
-              data-bs-toggle="pill"
-              href="#v-pills-streamers"
-              role="tab"
-              aria-controls="v-pills-streamers"
-              aria-selected="true"
-            >
+          <div class="nav flex-column nav-pills" id="v-pills-tab" role="tablist" aria-orientation="vertical">
+            <a class="nav-link active" id="v-pills-streamers-tab" data-bs-toggle="pill" href="#v-pills-streamers"
+              role="tab" aria-controls="v-pills-streamers" aria-selected="true">
               Streamers
             </a>
-            <a
-              class="nav-link"
-              id="v-pills-recorder-tab"
-              data-bs-toggle="pill"
-              href="#v-pills-recorder"
-              role="tab"
-              aria-controls="v-pills-recorder"
-              aria-selected="false"
-            >
+            <a class="nav-link" id="v-pills-recorder-tab" data-bs-toggle="pill" href="#v-pills-recorder" role="tab"
+              aria-controls="v-pills-recorder" aria-selected="false">
               Recorder
             </a>
-            <a
-              class="nav-link"
-              id="v-pills-settings-tab"
-              data-bs-toggle="pill"
-              href="#v-pills-settings"
-              role="tab"
-              aria-controls="v-pills-settings"
-              aria-selected="false"
-            >
+            <a class="nav-link" id="v-pills-settings-tab" data-bs-toggle="pill" href="#v-pills-settings" role="tab"
+              aria-controls="v-pills-settings" aria-selected="false">
               Settings
             </a>
           </div>
@@ -132,26 +122,15 @@
           <div class="tab-content" id="v-pills-tabContent">
             <h1 class="mb-4">GoRecordurbate WebUI</h1>
             <!-- Streamers Tab -->
-            <div
-              class="tab-pane fade show active"
-              id="v-pills-streamers"
-              role="tabpanel"
-              aria-labelledby="v-pills-streamers-tab"
-            >
+            <div class="tab-pane fade show active" id="v-pills-streamers" role="tabpanel"
+              aria-labelledby="v-pills-streamers-tab">
               <div class="card">
                 <div class="card-header">Manage Streamers</div>
                 <div class="card-body">
                   <div class="mb-3">
-                    <label for="streamerInput" class="form-label"
-                      >Add a New Streamer:</label
-                    >
+                    <label for="streamerInput" class="form-label">Add a New Streamer:</label>
                     <div class="input-group">
-                      <input
-                        type="text"
-                        id="streamerInput"
-                        class="form-control"
-                        placeholder="Streamer name"
-                      />
+                      <input type="text" id="streamerInput" class="form-control" placeholder="Streamer name" />
                       <button class="btn btn-primary" id="addStreamerButton">
                         Add
                       </button>
@@ -185,12 +164,7 @@
             </div>
 
             <!-- Recorder Tab -->
-            <div
-              class="tab-pane fade"
-              id="v-pills-recorder"
-              role="tabpanel"
-              aria-labelledby="v-pills-recorder-tab"
-            >
+            <div class="tab-pane fade" id="v-pills-recorder" role="tabpanel" aria-labelledby="v-pills-recorder-tab">
               <div class="card">
                 <div class="card-header">Control Panel</div>
                 <div class="card-body text-center">
@@ -211,27 +185,22 @@
                   <!-- Nested Tabs for Monitor -->
                   <ul class="nav nav-tabs" id="recorderTabs" role="tablist">
                     <li class="nav-item" role="presentation">
-                      <button
-                        class="nav-link active"
-                        id="logs-tab"
-                        data-bs-toggle="tab"
-                        data-bs-target="#logs"
-                        type="button"
-                        role="tab"
-                      >
+                      <button class="nav-link active" id="logs-tab" data-bs-toggle="tab" data-bs-target="#logs"
+                        type="button" role="tab">
                         Logs
                       </button>
                     </li>
                     <li class="nav-item" role="presentation">
-                      <button
-                        class="nav-link"
-                        id="video-tab"
-                        data-bs-toggle="tab"
-                        data-bs-target="#video"
-                        type="button"
-                        role="tab"
-                      >
+                      <button class="nav-link" id="video-tab" data-bs-toggle="tab" data-bs-target="#video" type="button"
+                        role="tab">
                         Video Files
+                      </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+
+                      <button class="nav-link" id="recorderStatus-tab" data-bs-toggle="tab"
+                        data-bs-target="#recorderProcesses" type="button" role="tab">
+                        Recorders
                       </button>
                     </li>
                   </ul>
@@ -242,18 +211,16 @@
                     <div class="tab-pane fade" id="video" role="tabpanel">
                       <div id="videoFilesContainer"></div>
                     </div>
+                    <div class="tab-pane fade" id="recorderProcesses" role="tabpanel">
+                      <div id="recorderProcessesContainer"></div>
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
 
             <!-- Settings Tab -->
-            <div
-              class="tab-pane fade"
-              id="v-pills-settings"
-              role="tabpanel"
-              aria-labelledby="v-pills-settings-tab"
-            >
+            <div class="tab-pane fade" id="v-pills-settings" role="tabpanel" aria-labelledby="v-pills-settings-tab">
               <div class="card">
                 <div class="card-header">Users</div>
                 <div class="card-body">
@@ -261,21 +228,11 @@
                   <h5>Add New User</h5>
                   <div class="mb-3">
                     <label for="addUserName" class="form-label">Username:</label>
-                    <input
-                      type="text"
-                      id="addUserName"
-                      class="form-control"
-                      placeholder="Username"
-                    />
+                    <input type="text" id="addUserName" class="form-control" placeholder="Username" />
                   </div>
                   <div class="mb-3">
                     <label for="addUserPassword" class="form-label">Password:</label>
-                    <input
-                      type="password"
-                      id="addUserPassword"
-                      class="form-control"
-                      placeholder="Password"
-                    />
+                    <input type="password" id="addUserPassword" class="form-control" placeholder="Password" />
                   </div>
                   <button class="btn btn-primary" id="addUserButton">
                     Add User
@@ -286,26 +243,12 @@
                   <!-- Form for updating an existing user -->
                   <h5>Update User</h5>
                   <div class="mb-3">
-                    <label for="updateUserName" class="form-label"
-                      >New Username:</label
-                    >
-                    <input
-                      type="text"
-                      id="updateUserName"
-                      class="form-control"
-                      placeholder="New Username"
-                    />
+                    <label for="updateUserName" class="form-label">New Username:</label>
+                    <input type="text" id="updateUserName" class="form-control" placeholder="New Username" />
                   </div>
                   <div class="mb-3">
-                    <label for="updateUserPassword" class="form-label"
-                      >New Password:</label
-                    >
-                    <input
-                      type="password"
-                      id="updateUserPassword"
-                      class="form-control"
-                      placeholder="New Password"
-                    />
+                    <label for="updateUserPassword" class="form-label">New Password:</label>
+                    <input type="password" id="updateUserPassword" class="form-control" placeholder="New Password" />
                   </div>
                   <button class="btn btn-primary" id="updateUserButton">
                     Update User
@@ -376,9 +319,9 @@
             const li = document.createElement("li");
             li.className = "list-group-item";
             li.innerHTML = `<span>${streamer}</span>
-              <button class="btn btn-sm btn-danger remove-streamer" data-name="${streamer}">
-                Remove
-              </button>`;
+                <button class="btn btn-sm btn-danger remove-streamer" data-name="${streamer}">
+                  Remove
+                </button>`;
             list.appendChild(li);
           });
           document.querySelectorAll(".remove-streamer").forEach((btn) => {
@@ -476,17 +419,41 @@
             const videoElement = document.createElement("div");
             videoElement.className = "video-item mb-3";
             videoElement.innerHTML = `
-              <h6>${obj.name}</h6>
-              <video controls width="100%" class="border rounded">
-                <source src="${obj.url}" type="video/mp4">
-                Your browser does not support the video tag.
-              </video>
-            `;
+                <h6>${obj.name}</h6>
+                <video controls width="100%" class="border rounded">
+                  <source src="${obj.url}" type="video/mp4">
+                  Your browser does not support the video tag.
+                </video>
+              `;
             container.appendChild(videoElement);
           });
         } catch (err) {
           console.error(err);
           showResponse("Error fetching videos.", true);
+        }
+      };
+
+      let recorder_processes = null;
+      // Updates the Recorder Processes container in the UI
+      const updateRecorders = () => {
+        const container = document.getElementById("recorderProcessesContainer");
+        container.innerHTML = ""; // clear any existing content
+
+        // Check if botStatus and its processes exist and have items
+        if (recorder_processes && Array.isArray(recorder_processes.processes) && recorder_processes.processes.length > 0) {
+          console.log("Updated recorder processes:");
+          console.table(recorder_processes);
+
+          // Create an element for each process
+          recorder_processes.processes.forEach((process, index) => {
+            const processElement = document.createElement("div");
+            processElement.className = "recorder-process";
+            processElement.innerHTML = `<strong>${process.name}</strong> - ${process.isRecording ? "Recording" : "Not Recording"}`;
+            container.appendChild(processElement);
+          });
+        } else {
+          console.warn("No active recorder processes found.");
+          container.innerHTML = '<p>No active recorder processes found.</p>';
         }
       };
 
@@ -496,14 +463,23 @@
           const res = await fetch("/api/status");
           const data = await res.json();
           const statusIndicator = document.getElementById("statusIndicator");
+
           if (!data.status) {
             data.status = "Not recording";
           }
+
+          // Check if botStatus exists and has content
+          recorder_processes = Object.keys(data.botStatus).length ? data.botStatus : null;
+
+          console.log("Recorder processes updated:", recorder_processes);
+
           statusIndicator.innerText = "Status: " + data.status;
           statusIndicator.style.backgroundColor =
             data.status === "Running" ? "#3dbb24af" : "#fab1a0";
+
+          updateRecorders();
         } catch (err) {
-          console.error("Error fetching status:", err);
+          console.error("Error fetching status from /api/status:", err);
         }
       };
 
@@ -521,9 +497,9 @@
             li.className =
               "list-group-item d-flex justify-content-between align-items-center";
             li.innerHTML = `<span>${user.name}</span>
-                              <div>
-                                <button class="btn btn-sm btn-info edit-user" data-username="${user.name}">Edit</button>
-                              </div>`;
+                                <div>
+                                  <button class="btn btn-sm btn-info edit-user" data-username="${user.name}">Edit</button>
+                                </div>`;
             list.appendChild(li);
           });
           document.querySelectorAll(".edit-user").forEach((btn) => {
@@ -613,7 +589,7 @@
         // Add event listeners for user management
         document.getElementById("addUserButton").addEventListener("click", addUser);
         document.getElementById("updateUserButton").addEventListener("click", updateUser);
-
+        updateStatus();
         populateStreamers();
         populateUsers();
         updateLogs();
@@ -621,8 +597,10 @@
         setInterval(updateStatus, 5000);
       });
 
-      // Call populateVideos when switching to the Video tab
+      // Call populateVideos when switching to the Video tab  recorderStatus-tab
       document.getElementById("video-tab").addEventListener("click", populateVideos);
+      document.getElementById("recorderStatus-tab").addEventListener("click", updateRecorders);
     </script>
   </body>
-</html>
+
+  </html>

@@ -34,9 +34,8 @@ type Interface interface {
 // Bot encapsulates the recording bot’s state.
 type bot struct {
 	mux        sync.Mutex
+	status     BotStatus
 	isFirstRun bool
-	isRunning  bool
-	processes  []StreamerStatus
 	logger     *log.Logger
 	Interface
 
@@ -44,22 +43,28 @@ type bot struct {
 	ctx    context.Context
 	cancel context.CancelFunc
 }
+type BotStatus struct {
+	IsRunning bool             `json:"isRunning"`
+	Processes []StreamerStatus `json:"processes"`
+}
 
-// StreamerStatus holds info for a recording process.
 type StreamerStatus struct {
-	Name        string
-	IsRecording bool
-	Cmd         *exec.Cmd
+	Name        string    `json:"name"`
+	IsRecording bool      `json:"isRecording"`
+	Cmd         *exec.Cmd `json:"-"`
 }
 
 // NewBot creates a new Bot, sets up its cancellation context, and registers a signal handler.
 func NewBot(logger *log.Logger) *bot {
 	ctx, cancel := context.WithCancel(context.Background())
+	s := BotStatus{
+		IsRunning: false,
+	}
 	b := &bot{
 		logger:     logger,
 		ctx:        ctx,
 		cancel:     cancel,
-		isRunning:  false,
+		status:     s,
 		isFirstRun: true,
 	}
 	// Register to catch SIGINT and SIGTERM and trigger Stop.
@@ -73,27 +78,21 @@ func NewBot(logger *log.Logger) *bot {
 	return b
 }
 
-// AppendStreamer adds a new StreamerStatus for a given streamer.
-func (b *bot) ResetBot() *bot {
-	b.mux.Lock()
-	defer b.mux.Unlock()
-	b.Stop()
-	b.cancel()
-	return NewBot(b.logger)
+func (b *bot) Status() BotStatus {
+	return b.status
 }
 
-// AppendStreamer adds a new StreamerStatus for a given streamer.
 func (b *bot) AppendStreamer(name string) {
 	b.mux.Lock()
 	defer b.mux.Unlock()
-	b.processes = append(b.processes, StreamerStatus{Name: name, IsRecording: false})
+	b.status.Processes = append(b.status.Processes, StreamerStatus{Name: name, IsRecording: false})
 }
 
 // ListRecorders returns the current list of recorder statuses.
 func (b *bot) ListRecorders() []StreamerStatus {
 	b.mux.Lock()
 	defer b.mux.Unlock()
-	return b.processes
+	return b.status.Processes
 }
 
 // Stop signals the bot to stop starting new recordings and then gracefully stops active processes.
@@ -171,7 +170,7 @@ func (b *bot) IsOnline(username string) bool {
 // Once the context is cancelled (via Stop), no new recordings are started.
 func (b *bot) RecordLoop() {
 	b.mux.Lock()
-	b.isRunning = true
+	b.status.IsRunning = true
 	b.mux.Unlock()
 	// Write youtube-dl config.
 	if err := b.writeYoutubeDLConfig(); err != nil {
@@ -265,7 +264,7 @@ func (b *bot) runRecordLoop(wg *sync.WaitGroup, streamerName string) {
 
 	// Add the process to our list.
 	b.mux.Lock()
-	b.processes = append(b.processes, StreamerStatus{
+	b.status.Processes = append(b.status.Processes, StreamerStatus{
 		Name:        streamerName,
 		IsRecording: true,
 		Cmd:         cmd,
@@ -278,9 +277,9 @@ func (b *bot) runRecordLoop(wg *sync.WaitGroup, streamerName string) {
 
 	// Remove this process from our list.
 	b.mux.Lock()
-	for i, p := range b.processes {
+	for i, p := range b.status.Processes {
 		if p.Name == streamerName && p.Cmd == cmd {
-			b.processes = append(b.processes[:i], b.processes[i+1:]...)
+			b.status.Processes = append(b.status.Processes[:i], b.status.Processes[i+1:]...)
 			break
 		}
 	}
@@ -291,15 +290,15 @@ func (b *bot) runRecordLoop(wg *sync.WaitGroup, streamerName string) {
 func (b *bot) checkProcesses() {
 	b.mux.Lock()
 	defer b.mux.Unlock()
-	for i := 0; i < len(b.processes); i++ {
-		rec := b.processes[i]
+	for i := 0; i < len(b.status.Processes); i++ {
+		rec := b.status.Processes[i]
 		// Use signal 0 to check if process is still running.
 		if rec.Cmd == nil || rec.Cmd.Process == nil {
 			continue
 		}
 		if err := rec.Cmd.Process.Signal(syscall.Signal(0)); err != nil {
 			log.Printf("[bot]: Process for %s has stopped", rec.Name)
-			b.processes = append(b.processes[:i], b.processes[i+1:]...)
+			b.status.Processes = append(b.status.Processes[:i], b.status.Processes[i+1:]...)
 			i--
 		}
 	}
@@ -309,7 +308,7 @@ func (b *bot) checkProcesses() {
 func (b *bot) isRecorderActive(streamerName string) bool {
 	b.mux.Lock()
 	defer b.mux.Unlock()
-	for _, rec := range b.processes {
+	for _, rec := range b.status.Processes {
 		if rec.Name == streamerName && rec.IsRecording {
 			return true
 		}
@@ -320,8 +319,8 @@ func (b *bot) isRecorderActive(streamerName string) bool {
 // stopActiveProcesses sends a SIGINT to all active recording processes and waits for them to finish.
 func (b *bot) stopActiveProcesses() {
 	b.mux.Lock()
-	processesCopy := make([]StreamerStatus, len(b.processes))
-	copy(processesCopy, b.processes)
+	processesCopy := make([]StreamerStatus, len(b.status.Processes))
+	copy(processesCopy, b.status.Processes)
 	b.mux.Unlock()
 
 	for _, rec := range processesCopy {
@@ -332,7 +331,7 @@ func (b *bot) stopActiveProcesses() {
 			rec.Cmd.Wait()
 		}
 	}
-	b.isRunning = false
+	b.status.IsRunning = false
 }
 
 // writeYoutubeDLConfig writes the youtube-dl configuration file.

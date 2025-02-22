@@ -5,7 +5,6 @@ import (
 	"log"
 	"os"
 	"runtime"
-	"time"
 )
 
 var (
@@ -16,14 +15,13 @@ var (
 type logWriter struct{}
 
 func (w logWriter) Write(p []byte) (n int, err error) {
-	_, file, line, ok := runtime.Caller(3) // Adjust stack depth to get the actual caller
+	_, _, line, ok := runtime.Caller(3) // Adjust stack depth to get the actual caller
 	if !ok {
-		file = "???"
+		//	file = "???"
 		line = 0
 	}
 
-	timestamp := time.Now().Format("2006-01-02 15:04:05")
-	formattedMsg := fmt.Sprintf("[%s] %s:%d %s", timestamp, file, line, p)
+	formattedMsg := fmt.Sprintf("[%d]: %s", line, p)
 	return logFile.Write([]byte(formattedMsg))
 }
 

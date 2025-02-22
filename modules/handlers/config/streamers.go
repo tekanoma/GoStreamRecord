@@ -5,7 +5,7 @@ import (
 	"GoRecordurbate/modules/file"
 	"GoRecordurbate/modules/handlers/cookies"
 	"GoRecordurbate/modules/handlers/login"
-	web_response "GoRecordurbate/modules/handlers/response"
+	web_status "GoRecordurbate/modules/handlers/status"
 	"encoding/json"
 	"net/http"
 )
@@ -27,7 +27,7 @@ func AddStreamer(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	resp := web_response.Response{
+	resp := web_status.Response{
 		Message: config.AddStreamer(reqData.Data),
 		Data:    reqData.Data,
 	}
@@ -90,7 +90,7 @@ func UpdateUsers(w http.ResponseWriter, r *http.Request) {
 		config.Update(file.Users_json_path, config.Users)
 	}
 
-	resp := web_response.Response{
+	resp := web_status.Response{
 		Message: "User modified!",
 	}
 	for _, u := range config.Users.Users {
@@ -118,7 +118,7 @@ func AddUser(w http.ResponseWriter, r *http.Request) {
 	}
 	for _, user := range config.Users.Users {
 		if user.Name == reqData.Username {
-			resp := web_response.Response{
+			resp := web_status.Response{
 				Message: "User already exists!",
 			}
 			w.Header().Set("Content-Type", "application/json")
@@ -130,7 +130,7 @@ func AddUser(w http.ResponseWriter, r *http.Request) {
 	config.Users.Users = append(config.Users.Users, config.Login{Name: reqData.Username, Key: string(login.HashedPassword(reqData.Password))})
 	config.Update(file.Users_json_path, config.Users)
 
-	resp := web_response.Response{
+	resp := web_status.Response{
 		Message: reqData.Username + " added!",
 	}
 	for _, u := range config.Users.Users {
@@ -158,7 +158,7 @@ func RemoveStreamer(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	resp := web_response.Response{
+	resp := web_status.Response{
 		Message: config.RemoveStreamer(reqData.Selected),
 		Data:    reqData.Selected,
 	}

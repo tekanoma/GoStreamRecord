@@ -2,7 +2,7 @@ package web_config
 
 import (
 	"GoRecordurbate/modules/config"
-	web_response "GoRecordurbate/modules/handlers/response"
+	web_status "GoRecordurbate/modules/handlers/status"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -62,7 +62,7 @@ func UploadHandler(w http.ResponseWriter, r *http.Request) {
 		}
 		config.AddStreamer(line)
 	}
-	resp := web_response.Response{
+	resp := web_status.Response{
 		Message: fmt.Sprintf("Added %d new streamers!", len(newStreamers)),
 	}
 	w.Header().Set("Content-Type", "application/json")
