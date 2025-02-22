@@ -12,9 +12,10 @@ This project offers a simple, self-hosted web UI for managing and recording stre
 - Embedding the index file directly into the code
   
 ## Usage
-Default login (will be modified):
-User: `admin`
-Password: `password`
+Default login:
+
+- User: `admin`
+- Password: `password`
 
 ### Build
 Building the code wil create a binary for your os system. Golang is [cross-compatible](https://go.dev/wiki/GccgoCrossCompilation) for windows, linux and mac.
