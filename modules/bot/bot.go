@@ -323,14 +323,20 @@ func (b *bot) stopActiveProcesses() {
 	copy(processesCopy, b.status.Processes)
 	b.mux.Unlock()
 
+	var wg sync.WaitGroup
 	for _, rec := range processesCopy {
-		if rec.Cmd != nil && rec.Cmd.Process != nil {
-			log.Printf("[bot]: Stopping recording for %s", rec.Name)
-			rec.Cmd.Process.Signal(syscall.SIGINT)
-			// Wait for process to exit.
-			rec.Cmd.Wait()
-		}
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			if rec.Cmd != nil && rec.Cmd.Process != nil {
+				log.Printf("[bot]: Stopping recording for %s", rec.Name)
+				rec.Cmd.Process.Signal(syscall.SIGINT)
+				// Wait for process to exit.
+				rec.Cmd.Wait()
+			}
+		}()
 	}
+	wg.Wait()
 	b.status.IsRunning = false
 }
 
