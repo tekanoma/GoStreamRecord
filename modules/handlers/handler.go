@@ -3,11 +3,12 @@ package handlers
 import (
 	"GoRecordurbate/modules/config"
 	"GoRecordurbate/modules/file"
-	web_config "GoRecordurbate/modules/handlers/config"
+	"GoRecordurbate/modules/handlers/controller"
 	"GoRecordurbate/modules/handlers/cookies"
 	"GoRecordurbate/modules/handlers/login"
-	web_recorder "GoRecordurbate/modules/handlers/recorder"
 	web_status "GoRecordurbate/modules/handlers/status"
+	"GoRecordurbate/modules/handlers/streamers"
+	"GoRecordurbate/modules/handlers/users"
 	"fmt"
 	"log"
 	"net/http"
@@ -20,19 +21,19 @@ func Handle() {
 
 	http.Handle("/videos/", http.StripPrefix("/videos/", http.FileServer(http.Dir(config.Settings.App.Videos_folder))))
 
-	http.HandleFunc("/api/add-streamer", web_config.AddStreamer)
-	http.HandleFunc("/api/get-streamers", web_config.GetStreamers)
-	http.HandleFunc("/api/remove-streamer", web_config.RemoveStreamer)
-	http.HandleFunc("/api/control", web_recorder.ControlHandler)
-	http.HandleFunc("/api/import", web_config.UploadHandler)
-	http.HandleFunc("/api/export", web_config.DownloadHandler)
+	http.HandleFunc("/api/add-streamer", streamers.AddStreamer)
+	http.HandleFunc("/api/get-streamers", streamers.GetStreamers)
+	http.HandleFunc("/api/remove-streamer", streamers.RemoveStreamer)
+	http.HandleFunc("/api/control", controller.ControlHandler)
+	http.HandleFunc("/api/import", streamers.UploadHandler)
+	http.HandleFunc("/api/export", streamers.DownloadHandler)
 	http.HandleFunc("/api/status", web_status.StatusHandler)
-	http.HandleFunc("/api/get-videos", web_recorder.GetVideos)
-	http.HandleFunc("/api/logs", web_recorder.HandleLogs)
+	http.HandleFunc("/api/get-videos", controller.GetVideos)
+	http.HandleFunc("/api/logs", controller.HandleLogs)
 
-	http.HandleFunc("/api/get-users", web_config.GetUsers)
-	http.HandleFunc("/api/add-user", web_config.AddUser)
-	http.HandleFunc("/api/update-user", web_config.UpdateUsers)
+	http.HandleFunc("/api/get-users", users.GetUsers)
+	http.HandleFunc("/api/add-user", users.AddUser)
+	http.HandleFunc("/api/update-user", users.UpdateUsers)
 	fmt.Println(len(os.Args))
 	if len(os.Args) > 1 {
 		if os.Args[1] != "reset-pwd" {

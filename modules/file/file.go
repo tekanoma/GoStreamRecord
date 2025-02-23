@@ -13,6 +13,8 @@ var (
 	Log_path             string = "./output/GoRecordurbate.log"
 )
 
+
+
 // isVideoFile returns true if the file extension indicates a video file.
 func IsVideoFile(filename string) bool {
 	extensions := []string{".mp4", ".avi", ".mov", ".mkv"}

@@ -1,56 +1,15 @@
-package web_config
+package users
 
 import (
 	"GoRecordurbate/modules/config"
 	"GoRecordurbate/modules/file"
 	"GoRecordurbate/modules/handlers/cookies"
 	"GoRecordurbate/modules/handlers/login"
-	web_status "GoRecordurbate/modules/handlers/status"
+	"GoRecordurbate/modules/handlers/status"
 	"encoding/json"
 	"net/http"
 )
 
-// sendStringHandler handles POST /api/add-streamer.
-// It decodes a JSON payload with a "data" field and returns a dummy response.
-func AddStreamer(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodPost {
-		http.Error(w, "Only POST allowed", http.StatusMethodNotAllowed)
-		return
-	}
-
-	type RequestData struct {
-		Data string `json:"data"`
-	}
-	var reqData RequestData
-	if err := json.NewDecoder(r.Body).Decode(&reqData); err != nil {
-		http.Error(w, "Invalid request payload", http.StatusBadRequest)
-		return
-	}
-
-	resp := web_status.Response{
-		Message: config.AddStreamer(reqData.Data),
-		Data:    reqData.Data,
-	}
-
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(resp)
-}
-
-// getListHandler handles GET /api/get-streamers.
-func GetStreamers(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodGet {
-		http.Error(w, "Only GET allowed", http.StatusMethodNotAllowed)
-		return
-	}
-
-	w.Header().Set("Content-Type", "application/json")
-
-	list := []string{}
-	for _, s := range config.Streamers.StreamerList {
-		list = append(list, s.Name)
-	}
-	json.NewEncoder(w).Encode(list)
-}
 func GetUsers(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodGet {
 		http.Error(w, "Only GET allowed", http.StatusMethodNotAllowed)
@@ -61,6 +20,7 @@ func GetUsers(w http.ResponseWriter, r *http.Request) {
 
 	json.NewEncoder(w).Encode(config.Users.Users)
 }
+
 func UpdateUsers(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		http.Error(w, "Only POST allowed", http.StatusMethodNotAllowed)
@@ -90,7 +50,7 @@ func UpdateUsers(w http.ResponseWriter, r *http.Request) {
 		config.Update(file.Users_json_path, config.Users)
 	}
 
-	resp := web_status.Response{
+	resp := status.Response{
 		Message: "User modified!",
 	}
 	for _, u := range config.Users.Users {
@@ -118,7 +78,7 @@ func AddUser(w http.ResponseWriter, r *http.Request) {
 	}
 	for _, user := range config.Users.Users {
 		if user.Name == reqData.Username {
-			resp := web_status.Response{
+			resp := status.Response{
 				Message: "User already exists!",
 			}
 			w.Header().Set("Content-Type", "application/json")
@@ -130,7 +90,7 @@ func AddUser(w http.ResponseWriter, r *http.Request) {
 	config.Users.Users = append(config.Users.Users, config.Login{Name: reqData.Username, Key: string(login.HashedPassword(reqData.Password))})
 	config.Update(file.Users_json_path, config.Users)
 
-	resp := web_status.Response{
+	resp := status.Response{
 		Message: reqData.Username + " added!",
 	}
 	for _, u := range config.Users.Users {
@@ -139,30 +99,4 @@ func AddUser(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(resp)
 
-}
-
-// selectItemHandler handles POST /api/remove-streamer.
-// It decodes a JSON payload with the selected option and returns a dummy response.
-func RemoveStreamer(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodPost {
-		http.Error(w, "Only POST allowed", http.StatusMethodNotAllowed)
-		return
-	}
-
-	type RequestData struct {
-		Selected string `json:"selected"`
-	}
-	var reqData RequestData
-	if err := json.NewDecoder(r.Body).Decode(&reqData); err != nil {
-		http.Error(w, "Invalid request payload", http.StatusBadRequest)
-		return
-	}
-
-	resp := web_status.Response{
-		Message: config.RemoveStreamer(reqData.Selected),
-		Data:    reqData.Selected,
-	}
-
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(resp)
 }

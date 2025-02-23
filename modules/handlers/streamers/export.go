@@ -1,11 +1,11 @@
-package web_config
+package streamers
 
 import (
 	"GoRecordurbate/modules/config"
 	"net/http"
 )
 
-// downloadHandler handles GET /api/download.
+// Handles GET /api/download.
 // It sends a dummy file for download.
 func DownloadHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodGet {

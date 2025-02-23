@@ -1,4 +1,4 @@
-package web_recorder
+package controller
 
 import (
 	"GoRecordurbate/modules/bot"

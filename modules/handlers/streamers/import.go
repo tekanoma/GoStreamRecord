@@ -1,4 +1,4 @@
-package web_config
+package streamers
 
 import (
 	"GoRecordurbate/modules/config"
@@ -11,7 +11,7 @@ import (
 	"strings"
 )
 
-// uploadHandler handles POST /api/upload.
+// Handles POST /api/upload.
 // It reads an uploaded file and returns a dummy success response.
 func UploadHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
