@@ -92,7 +92,10 @@ This is un-tested on Windows and Mac, but golang is cross-compatible which means
 - Option for max video length (and size?)
 - headless mode without webui
 - Move frontend to Vue (?)
-- Stop/Restart individual recorders from the webUI
+- Individual recorders in UI
+  - Stop/Restart individual recorders
+  - view current recording length
+  - view current recording video
 
 
 
