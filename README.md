@@ -22,7 +22,7 @@ __API NOTE__: The api is basically un-tested after adding login credentials. The
 ### Setup
 - Copy [`.env.example`](https://github.com/luna-nightbyte/Recordurbate-WebUI/blob/main/.env.example) to `.env` and add your own session key. 
     - Can be generated with: `head -c 32 /dev/urandom | base64`
-    - Example:
+      I.e:
       ```bash
       user@user:~/Recordurbate$ head -c 32 /dev/urandom | base64
       # Output:
