@@ -171,6 +171,7 @@ func (b *bot) IsOnline(username string) bool {
 func (b *bot) RecordLoop() {
 	b.mux.Lock()
 	b.status.IsRunning = true
+	b.isFirstRun = true
 	b.mux.Unlock()
 	// Write youtube-dl config.
 	if err := b.writeYoutubeDLConfig(); err != nil {
@@ -179,8 +180,7 @@ func (b *bot) RecordLoop() {
 	}
 
 	var wg sync.WaitGroup
-	var ticker *time.Ticker
-	ticker = time.NewTicker(time.Duration(1) * time.Second)
+	ticker := time.NewTicker(time.Duration(1) * time.Second)
 
 	defer ticker.Stop()
 
