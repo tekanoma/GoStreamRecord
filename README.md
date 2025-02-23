@@ -90,7 +90,7 @@ This is un-tested on Windows and Mac, but golang is cross-compatible which means
 - Log online-time of streamers and save to csv for graph plotting. Can help understand the work-hours of different streamers.
 - Option to login to the streaming site and use follower list instead of config?
 - Option for max video length (and size?)
-- headless mode without webui
+- ~~headless mode without webui~~ (Abandoned)
 - Move frontend to Vue (?)
 - Build a default docker image
 - Individual recorders in UI
