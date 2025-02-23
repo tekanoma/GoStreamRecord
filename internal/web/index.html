@@ -8,26 +8,28 @@
   <!-- Bootstrap CSS -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
   <style>
-    /* Title styling */
-    .page-title {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      font-size: 2.5rem;
-      color: #333;
-      text-align: center;
-      margin-top: 20px;
-      text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.2);
-    }
-
-    /* Overall page background */
+    /* Global styles */
     body {
       background-color: #f0f4f8;
     }
 
-    /* Status Indicator (calm pastel blue for Running) */
+    header {
+      text-align: center;
+      padding: 20px 0;
+      position: relative;
+    }
+
+    header h1 {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      font-size: 2.5rem;
+      color: #333;
+      text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.2);
+    }
+
     #statusIndicator {
-      position: fixed;
-      top: 10px;
-      right: 10px;
+      position: absolute;
+      top: 20px;
+      right: 20px;
       padding: 5px 10px;
       background-color: #9c9c9cce;
       color: #fff;
@@ -36,14 +38,14 @@
       z-index: 1100;
     }
 
-    /* Vertical pill navigation styles */
-    .nav-pills .nav-link {
+    /* Sidebar Navigation */
+    aside nav .nav-link {
       color: #636e72;
       font-weight: 500;
       margin-bottom: 10px;
     }
 
-    .nav-pills .nav-link.active {
+    aside nav .nav-link.active {
       background-color: #6b5f6a13;
       color: #2d3436;
     }
@@ -62,7 +64,6 @@
       font-weight: bold;
     }
 
-    /* List items */
     .list-group-item {
       display: flex;
       justify-content: space-between;
@@ -71,7 +72,7 @@
       border: 1px solid #dfe4ea;
     }
 
-    /* Terminal styles for logs */
+    /* Terminal styles */
     .terminal {
       background-color: #2d3436;
       color: #dfe6e9;
@@ -82,29 +83,29 @@
       border-radius: 5px;
     }
 
-    /* Ratio buttons for livestream */
+    /* Livestream radio buttons */
     input[type="radio"] {
-            appearance: none;
-            width: 20px;
-            height: 20px;
-            border: 2px solid #8d98bb;
-            border-radius: 50%;
-            outline: none;
-            transition: all 0.3s;
-            cursor: pointer;
-        }
+      appearance: none;
+      width: 20px;
+      height: 20px;
+      border: 2px solid #8d98bb;
+      border-radius: 50%;
+      outline: none;
+      transition: all 0.3s;
+      cursor: pointer;
+    }
 
-        input[type="radio"]:checked {
-            background-color: #3382d6c3;
-            border: 6px solid white;
-            box-shadow: 0 0 0 2px #194370c3;
-        }
+    input[type="radio"]:checked {
+      background-color: #3382d6c3;
+      border: 6px solid white;
+      box-shadow: 0 0 0 2px #194370c3;
+    }
 
-        label:hover {
-            background-color: #f0f8ff;
-        }
+    label:hover {
+      background-color: #f0f8ff;
+    }
 
-    /* Response area for transient messages */
+    /* Transient message area */
     #responseArea {
       position: fixed;
       bottom: 20px;
@@ -116,217 +117,236 @@
 </head>
 
 <body>
-  <!-- Persistent Status Indicator -->
-  <div id="statusIndicator">Status: </div>
+  <!-- Header with Title and Status -->
+  <header>
+    <h1>GoRecordurbate WebUI</h1>
+    <div id="statusIndicator">Status:</div>
+  </header>
 
   <div class="container-fluid">
     <div class="row">
-      <!-- Vertical Navigation (Sidebar) -->
-      <div class="col-md-3">
-        <div class="nav flex-column nav-pills" id="v-pills-tab" role="tablist" aria-orientation="vertical">
-          <a class="nav-link active" id="v-pills-streamers-tab" data-bs-toggle="pill" href="#v-pills-streamers"
-            role="tab" aria-controls="v-pills-streamers" aria-selected="true">
-            Streamers
-          </a>
-          <a class="nav-link" id="v-pills-recorder-tab" data-bs-toggle="pill" href="#v-pills-recorder" role="tab"
-            aria-controls="v-pills-recorder" aria-selected="false">
+      <!-- Sidebar Navigation -->
+      <aside class="col-md-3">
+        <nav class="nav flex-column nav-pills" id="v-pills-tab" role="tablist" aria-orientation="vertical">
+
+          <a class="nav-link active" id="v-pills-recorder-tab" data-bs-toggle="pill" href="#recorderSection" role="tab"
+            aria-controls="recorderSection" aria-selected="true">
             Recorder
           </a>
-          <a class="nav-link" id="v-pills-settings-tab" data-bs-toggle="pill" href="#v-pills-settings" role="tab"
-            aria-controls="v-pills-settings" aria-selected="false">
+          <a class="nav-link" id="v-pills-settings-tab" data-bs-toggle="pill" href="#settingsSection" role="tab"
+            aria-controls="settingsSection" aria-selected="false">
             Settings
           </a>
-          <a class="nav-link" id="v-pills-chaturbate-tab" data-bs-toggle="pill" href="#v-pills-chaturbate" role="tab"
-            aria-controls="v-pills-chaturbate" aria-selected="false">
+          <a class="nav-link" id="v-pills-chaturbate-tab" data-bs-toggle="pill" href="#chaturbateSection" role="tab"
+            aria-controls="chaturbateSection" aria-selected="false">
             Chaturbate
           </a>
-        </div>
-      </div>
+        </nav>
+      </aside>
 
-      <!-- Main Content Area (Tabs) -->
-      <div class="col-md-9">
+      <!-- Main Content Area -->
+      <main class="col-md-9">
+
         <div class="tab-content" id="v-pills-tabContent">
-          <h1 class="mb-4">GoRecordurbate WebUI</h1>
-          <!-- Streamers Tab -->
-          <div class="tab-pane fade show active" id="v-pills-streamers" role="tabpanel"
-            aria-labelledby="v-pills-streamers-tab">
-            <div class="card">
-              <div class="card-header">Manage Streamers</div>
-              <div class="card-body">
-                <div class="mb-3">
-                  <label for="streamerInput" class="form-label">Add a New Streamer:</label>
-                  <div class="input-group">
-                    <input type="text" id="streamerInput" class="form-control" placeholder="Streamer name" />
-                    <button class="btn btn-primary" id="addStreamerButton">
-                      Add
-                    </button>
-                  </div>
-                </div>
-                <h5>Current Streamers:</h5>
-                <ul class="list-group" id="streamersList">
-                  <!-- Dynamically populated -->
-                </ul>
-              </div>
-            </div>
-
-            <div class="card">
-              <div class="card-header">Import/Export</div>
-              <div class="card-body">
-                <div class="mb-4">
-                  <label for="importFile" class="form-label">Import File:</label>
-                  <input type="file" id="importFile" class="form-control mb-2" />
-                  <button class="btn btn-secondary" id="uploadFileButton">
-                    Upload
-                  </button>
-                </div>
-                <div>
-                  <label class="form-label">Export File:</label><br />
-                  <button class="btn btn-secondary" id="downloadFileButton">
-                    Download
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Recorder Tab -->
-          <div class="tab-pane fade" id="v-pills-recorder" role="tabpanel" aria-labelledby="v-pills-recorder-tab">
-            <div class="card">
+          <!-- Recorder Section -->
+          <section class="tab-pane fade show active" id="recorderSection" role="tabpanel"
+            aria-labelledby="v-pills-recorder-tab">
+            <!-- Control Panel Card -->
+            <div class="card mb-4">
               <div class="card-header">Control Panel</div>
               <div class="card-body text-center">
-                <button class="btn btn-success me-3" id="startCommand">
-                  Start recording
-                </button>
-                <button class="btn btn-dark me-3" id="stopCommand">
-                  Stop recording
-                </button>
-                <button class="btn btn-secondary" id="restartCommand">
-                  Restart recording
-                </button>
+                <button type="button" class="btn btn-success me-3" id="startCommand">Start recording</button>
+                <button type="button" class="btn btn-dark me-3" id="stopCommand">Stop recording</button>
+                <button type="button" class="btn btn-secondary" id="restartCommand">Restart recording</button>
               </div>
             </div>
+            <!-- Monitor Card with Nested Tabs -->
             <div class="card">
               <div class="card-header">Monitor</div>
               <div class="card-body">
-                <!-- Nested Tabs for Monitor -->
                 <ul class="nav nav-tabs" id="recorderTabs" role="tablist">
                   <li class="nav-item" role="presentation">
-                    <button class="nav-link active" id="logs-tab" data-bs-toggle="tab" data-bs-target="#logs"
-                      type="button" role="tab">
-                      Logs
-                    </button>
+                    <button class="nav-link active" id="logs-tab" data-bs-toggle="tab"
+                      data-bs-target="#logsTerminalSection" type="button" role="tab">Logs</button>
                   </li>
                   <li class="nav-item" role="presentation">
-                    <button class="nav-link" id="video-tab" data-bs-toggle="tab" data-bs-target="#video" type="button"
-                      role="tab">
-                      Video Files
-                    </button>
+                    <button class="nav-link" id="video-tab" data-bs-toggle="tab" data-bs-target="#videoFilesSection"
+                      type="button" role="tab">Video Files</button>
                   </li>
                   <li class="nav-item" role="presentation">
-
                     <button class="nav-link" id="recorderStatus-tab" data-bs-toggle="tab"
-                      data-bs-target="#recorderProcesses" type="button" role="tab">
-                      Recorders
-                    </button>
+                      data-bs-target="#activeRecordersSection" type="button" role="tab">Recorders</button>
                   </li>
                 </ul>
                 <div class="tab-content mt-3">
-                  <div class="tab-pane fade show active" id="logs" role="tabpanel">
+                  <div class="tab-pane fade show active" id="logsTerminalSection" role="tabpanel">
                     <div class="terminal" id="logTerminal"></div>
                   </div>
-                  <div class="tab-pane fade" id="video" role="tabpanel">
+                  <div class="tab-pane fade" id="videoFilesSection" role="tabpanel">
                     <div id="videoFilesContainer"></div>
                   </div>
-                  <div class="tab-pane fade" id="recorderProcesses" role="tabpanel">
+                  <div class="tab-pane fade" id="activeRecordersSection" role="tabpanel">
                     <div id="recorderProcessesContainer"></div>
                   </div>
                 </div>
               </div>
             </div>
-          </div>
+          </section>
 
-          <!-- Settings Tab -->
-          <div class="tab-pane fade" id="v-pills-settings" role="tabpanel" aria-labelledby="v-pills-settings-tab">
+          <!-- Settings Section -->
+          <section class="tab-pane fade" id="settingsSection" role="tabpanel" aria-labelledby="v-pills-settings-tab">
             <div class="card">
-              <div class="card-header">Users</div>
+
+
+
+
+              <div class="card-header">Settings</div>
               <div class="card-body">
-                <!-- Form for adding a new user -->
-                <h5>Add New User</h5>
-                <div class="mb-3">
-                  <label for="addUserName" class="form-label">Username:</label>
-                  <input type="text" id="addUserName" class="form-control" placeholder="Username" />
-                </div>
-                <div class="mb-3">
-                  <label for="addUserPassword" class="form-label">Password:</label>
-                  <input type="password" id="addUserPassword" class="form-control" placeholder="Password" />
-                </div>
-                <button class="btn btn-primary" id="addUserButton">
-                  Add User
-                </button>
-
-                <hr />
-
-                <!-- Form for updating an existing user -->
-                <h5>Update User</h5>
-                <div class="mb-3">
-                  <label for="updateUserName" class="form-label">New Username:</label>
-                  <input type="text" id="updateUserName" class="form-control" placeholder="New Username" />
-                </div>
-                <div class="mb-3">
-                  <label for="updateUserPassword" class="form-label">New Password:</label>
-                  <input type="password" id="updateUserPassword" class="form-control" placeholder="New Password" />
-                </div>
-                <button class="btn btn-primary" id="updateUserButton">
-                  Update User
-                </button>
-
-                <hr />
-
-                <h5>Current Users:</h5>
-                <ul class="list-group" id="userList">
-                  <!-- Dynamically populated -->
+                <ul class="nav nav-tabs" id="settingsTabs" role="tablist">
+                  <li class="nav-item" role="presentation">
+                    <button class="nav-link active" id="users-management-tab" data-bs-toggle="tab"
+                      data-bs-target="#usersSection" type="button" role="tab">Users</button>
+                  </li>
+                  <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="recorder-management-tab" data-bs-toggle="tab"
+                      data-bs-target="#recorderManagementSection" type="button" role="tab">Recorder</button>
+                  </li>
                 </ul>
+                <div class="tab-content mt-3">
+                  <div class="tab-pane fade show active" id="usersSection" role="tabpanel">
+
+                    <div class="card-body">
+                    <div class="card-header">Add user</div>
+                      <!-- Add New User -->
+                      <article class="mb-4">
+                        <form id="addUserForm">
+                          <div class="mb-3">
+                            <input type="text" id="addUserName" class="form-control" placeholder="Username" required />
+                          </div>
+                          <div class="mb-3">
+                            <input type="password" id="addUserPassword" class="form-control" placeholder="Password"
+                              required />
+                          </div>
+                          <button type="button" class="btn btn-primary" id="addUserButton">Add User</button>
+                        </form>
+                      </article>
+                      <hr />
+                      <!-- Update Existing User -->
+                      <article class="mb-4">
+                        <div class="card-header">Update User</div>
+                        <form id="updateUserForm">
+                          <div class="mb-3">
+                            <input type="text" id="updateUserName" class="form-control"
+                              placeholder="Select a user from the list to modify." />
+                          </div>
+                          <div class="mb-3">
+                            <input type="password" id="updateUserPassword" class="form-control"
+                              placeholder="New Password" />
+                          </div>
+                          <button type="button" class="btn btn-primary" id="updateUserButton">Update User</button>
+                        </form>
+                      </article>
+                      <!-- Current Users List -->
+                      <article>
+                        <div class="card-header">Current users</div>
+                        <ul class="list-group" id="userList">
+                          <!-- Dynamically populated -->
+                        </ul>
+                      </article>
+                    </div>
+                  </div>
+                  <div class="tab-pane fade" id="recorderManagementSection" role="tabpanel">
+
+                    <div class="card-header">Streamers</div>
+                    <div class="card-body">
+                      <form id="streamerForm" class="mb-3">
+                        <label for="streamerInput" class="form-label">Add a New Streamer:</label>
+                        <div class="input-group">
+                          <input type="text" id="streamerInput" class="form-control" placeholder="Streamer name"
+                            required />
+                          <button type="button" class="btn btn-primary" id="addStreamerButton">Add</button>
+                        </div>
+                      </form>
+                      <article class="mb-4">
+                        <div class="card-header">Current Streamers</div>
+                      <ul class="list-group" id="streamersList">
+                        <!-- Dynamically populated -->
+                      </ul>
+
+                    </article>
+                    </div>
+
+                  <!-- Import/Export Card -->
+                  <div class="card">
+                    <div class="card-header">Import/Export</div>
+                    <div class="card-body">
+                      <div class="mb-4">
+                        <label for="importFile" class="form-label">Import File:</label>
+                        <input type="file" id="importFile" class="form-control mb-2" />
+                        <button type="button" class="btn btn-secondary" id="uploadFileButton">Upload</button>
+                      </div>
+                      <div>
+                        <label class="form-label">Export File:</label><br />
+                        <button type="button" class="btn btn-secondary" id="downloadFileButton">Download</button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
+
           </div>
 
-          <!-- Chaturbate Tab -->
-          <div class="tab-pane fade" id="v-pills-chaturbate" role="tabpanel" aria-labelledby="v-pills-settings-tab">
-            <div class="card">
-              <div class="card-header">Live</div>
-              <div class="card-body">
-                <div class="mb-3">
-                  <label for="chatStreamerName" class="form-  label">Streamer Name:</label>
-                  <input type="text" id="chatStreamer" class="form-control" placeholder="Streamer name" />
-                </div>
-
-                <form id="livestream-options">
-                  <div class="radio-group">
-                  <label>
-                    <input type="radio" name="livestream-option" value="chat"> Show chat
-                  </label>
-                  <label>
-                    <input type="radio" name="livestream-option" value="live" checked> Live only
-                  </label>
-                  <label>
-                    <input type="radio" name="livestream-option" value="interactive"> Interactive
-                  </label>
-                  <button class="btn btn-primary" type="submit">Apply</button>
-                </div>
-                </form>
-                <hr />
-
-                <h5>Live Stream</h5>
-                <ul class="list-group" id="liveStreamCamera">
-                  <!-- Dynamically populated -->
-                </ul>
-              </div>
-            </div>
-          </div>
 
         </div>
-      </div>
+        </section>
+
+
+
+
+        <!-- Chaturbate Section -->
+        <section class="tab-pane fade" id="chaturbateSection" role="tabpanel" aria-labelledby="v-pills-chaturbate-tab">
+          <div class="card">
+            <div class="card-header">Live Stream Settings</div>
+            <div class="card-body">
+              <form id="livestreamForm" class="mb-3">
+                <div class="mb-3">
+                  <label for="chatStreamer" class="form-label">Streamer Name:</label>
+                  <input type="text" id="chatStreamer" class="form-control" placeholder="Streamer name" required />
+                </div>
+                <div class="mb-3">
+                  <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="radio" name="livestream-option" id="optionChat" value="chat">
+                    <label class="form-check-label" for="optionChat">Show chat</label>
+                  </div>
+                  <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="radio" name="livestream-option" id="optionLive" value="live"
+                      checked>
+                    <label class="form-check-label" for="optionLive">Live only</label>
+                  </div>
+                  <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="radio" name="livestream-option" id="optionInteractive"
+                      value="interactive">
+                    <label class="form-check-label" for="optionInteractive">Interactive</label>
+                  </div>
+                </div>
+                <button type="submit" class="btn btn-primary">Apply</button>
+              </form>
+              <hr />
+              
+              <article class="mb-4">
+                <div class="card-header">Live Stream</div>
+              <ul id="liveStreamCamera">
+                <!-- Dynamically populated -->
+              </ul>
+
+            </article>
+            </div>
+          </div>
+        </section>
     </div>
+    </main>
+  </div>
   </div>
 
   <!-- Response area for transient messages -->
@@ -334,7 +354,6 @@
 
   <!-- Bootstrap JS bundle -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-
   <script>
     // Helper function to display transient messages
     const showResponse = (message, isError = false) => {
@@ -346,7 +365,7 @@
       setTimeout(() => alertDiv.remove(), 5000);
     };
 
-    // STREAMERS SECTION (existing logic)
+    /* ------------------ STREAMERS SECTION ------------------ */
     const addStreamer = async () => {
       const input = document.getElementById("streamerInput");
       const name = input.value.trim();
@@ -380,15 +399,11 @@
           const li = document.createElement("li");
           li.className = "list-group-item";
           li.innerHTML = `<span>${streamer}</span>
-                <button class="btn btn-sm btn-danger remove-streamer" data-name="${streamer}">
-                  Remove
-                </button>`;
+            <button class="btn btn-sm btn-danger remove-streamer" data-name="${streamer}">Remove</button>`;
           list.appendChild(li);
         });
         document.querySelectorAll(".remove-streamer").forEach((btn) => {
-          btn.addEventListener("click", () =>
-            removeStreamer(btn.dataset.name)
-          );
+          btn.addEventListener("click", () => removeStreamer(btn.dataset.name));
         });
       } catch (err) {
         console.error(err);
@@ -412,7 +427,7 @@
       }
     };
 
-    // CONTROL PANEL SECTION
+    /* ------------------ RECORDER SECTION ------------------ */
     const sendControlCommand = async (command) => {
       try {
         const res = await fetch("/api/control", {
@@ -421,16 +436,14 @@
           body: JSON.stringify({ command })
         });
         const data = await res.json();
-        showResponse(
-          `Command "${command}" executed: ${JSON.stringify(data)}`
-        );
+        showResponse(`Command "${command}" executed: ${JSON.stringify(data)}`);
       } catch (err) {
         console.error(err);
         showResponse(`Error executing command "${command}".`, true);
       }
     };
 
-    // FILE MANAGEMENT SECTION
+    /* ------------------ FILE MANAGEMENT ------------------ */
     const uploadFile = async () => {
       const fileInput = document.getElementById("importFile");
       const file = fileInput.files[0];
@@ -457,7 +470,7 @@
       window.location.href = "/api/export";
     };
 
-    // MONITOR SECTION
+    /* ------------------ MONITOR ------------------ */
     const updateLogs = async () => {
       try {
         const res = await fetch("/api/logs");
@@ -480,12 +493,11 @@
           const videoElement = document.createElement("div");
           videoElement.className = "video-item mb-3";
           videoElement.innerHTML = `
-                <h6>${obj.name}</h6>
-                <video controls width="100%" class="border rounded">
-                  <source src="${obj.url}" type="video/mp4">
-                  Your browser does not support the video tag.
-                </video>
-              `;
+            <h6>${obj.name}</h6>
+            <video controls width="100%" class="border rounded">
+              <source src="${obj.url}" type="video/mp4">
+              Your browser does not support the video tag.
+            </video>`;
           container.appendChild(videoElement);
         });
       } catch (err) {
@@ -495,58 +507,41 @@
     };
 
     let recorder_processes = null;
-    // Updates the Recorder Processes container in the UI
     const updateRecorders = () => {
       const container = document.getElementById("recorderProcessesContainer");
-      container.innerHTML = ""; // clear any existing content
-
-      // Check if botStatus and its processes exist and have items
+      container.innerHTML = "";
       if (recorder_processes && Array.isArray(recorder_processes.processes) && recorder_processes.processes.length > 0) {
-        console.log("Updated recorder processes:");
-        console.table(recorder_processes);
-
-        // Create an element for each process
-        recorder_processes.processes.forEach((process, index) => {
+        recorder_processes.processes.forEach((process) => {
           const processElement = document.createElement("div");
           processElement.className = "recorder-process";
           processElement.innerHTML = `<strong>${process.name}</strong> - ${process.isRecording ? "Recording" : "Not Recording"}`;
           container.appendChild(processElement);
         });
       } else {
-        console.warn("No active recorder processes found.");
         container.innerHTML = '<p>No active recorder processes found.</p>';
       }
     };
 
-    // STATUS INDICATOR
+    /* ------------------ STATUS INDICATOR ------------------ */
     const updateStatus = async () => {
       try {
         const res = await fetch("/api/status");
         const data = await res.json();
         const statusIndicator = document.getElementById("statusIndicator");
-
         if (!data.status) {
           data.status = "Not recording";
         }
-
-        // Check if botStatus exists and has content
         recorder_processes = Object.keys(data.botStatus).length ? data.botStatus : null;
-
-        console.log("Recorder processes updated:", recorder_processes);
-
         statusIndicator.innerText = "Status: " + data.status;
-        statusIndicator.style.backgroundColor =
-          data.status === "Running" ? "#3dbb24af" : "#fab1a0";
-
+        statusIndicator.style.backgroundColor = data.status === "Running" ? "#3dbb24af" : "#fab1a0";
         updateRecorders();
       } catch (err) {
-        console.error("Error fetching status from /api/status:", err);
+        console.error("Error fetching status:", err);
       }
     };
 
-    // USER MANAGEMENT SECTION
+    /* ------------------ USER MANAGEMENT ------------------ */
     let selectedUser = null;
-
     const populateUsers = async () => {
       try {
         const res = await fetch("/api/get-users");
@@ -555,12 +550,11 @@
         list.innerHTML = "";
         users.forEach((user) => {
           const li = document.createElement("li");
-          li.className =
-            "list-group-item d-flex justify-content-between align-items-center";
+          li.className = "list-group-item d-flex justify-content-between align-items-center";
           li.innerHTML = `<span>${user.name}</span>
-                                <div>
-                                  <button class="btn btn-sm btn-info edit-user" data-username="${user.name}">Edit</button>
-                                </div>`;
+            <div>
+              <button class="btn btn-sm btn-info edit-user" data-username="${user.name}">Edit</button>
+            </div>`;
           list.appendChild(li);
         });
         document.querySelectorAll(".edit-user").forEach((btn) => {
@@ -633,105 +627,71 @@
       }
     };
 
+    /* ------------------ CHaturbate / LIVE STREAM ------------------ */
     let liveStreamSrc = null;
-    document.getElementById("livestream-options").addEventListener("submit", function (event) {
-      event.preventDefault(); // Prevent form from reloading the page
-
-      const selectedValue = document.querySelector('input[name="livestream-option"]:checked');
-      const input = document.getElementById("chatStreamer");
-      const streamer = input.value.trim();
-      if (!streamer) {
-        showResponse("Please enter a streamer name.", true);
-        return;
-      }
-
-      // Use 'let' here so we can reassign liveSrc based on the selected option
-      let liveSrc = "";
-      console.log(selectedValue);
-      if (selectedValue.value === "chat") {
-        liveSrc = `https://cbxyz.com/in/?tour=9oGW&campaign=Ln9WI&track=embed&room=${streamer}&disable_sound=1&embed_video_only=0&target=_parent&mobileRedirect=auto&`;
-      } else if (selectedValue.value === "live") {
-        liveSrc = `https://cbxyz.com/in/?tour=9oGW&campaign=Ln9WI&track=embed&room=${streamer}&disable_sound=1&mobileRedirect=auto&embed_video_only=1`;
-      } else {
-        liveSrc = `https://cbxyz.com/in/?tour=Limj&campaign=Ln9WI&track=embed&signup_notice=1&b=${streamer}&disable_sound=1&mobileRedirect=never`;
-      }
-
-    
-      liveStreamSrc = liveSrc;
-      console.log(liveStreamSrc);
-      populateLiveStream();
-    });
-
     const populateLiveStream = () => {
       try {
-        const newSrc = liveStreamSrc;
         const container = document.getElementById("liveStreamCamera");
-
-        // Try to find an existing iframe in the container
         let iframe = container.querySelector("iframe");
-
         if (iframe) {
-          // Update the source if the iframe already exists
-          iframe.src = newSrc;
+          iframe.src = liveStreamSrc;
         } else {
-          // Create a new iframe if none exists
           iframe = document.createElement("iframe");
-          iframe.src = newSrc;
+          iframe.src = liveStreamSrc;
           iframe.height = "523px";
           iframe.width = "850px";
           iframe.frameBorder = "0";
           iframe.scrolling = "no";
-          iframe.className = "code"; // Corrected: use className instead of class
           container.appendChild(iframe);
         }
       } catch (err) {
         console.error(err);
-        showResponse("Error fetching livestream.", true);
+        showResponse("Error loading livestream.", true);
       }
     };
 
+    /* ------------------ INITIALIZATION ------------------ */
     document.addEventListener("DOMContentLoaded", () => {
-
+      // Streamers events
       document.getElementById("addStreamerButton").addEventListener("click", addStreamer);
-      document.getElementById("updateLiveStreamButton").addEventListener("click", populateLiveStream);
-
-      document.getElementById("startCommand").addEventListener("click", () =>
-        sendControlCommand("start")
-      );
-      document.getElementById("stopCommand").addEventListener("click", () =>
-        sendControlCommand("stop")
-      );
-      document.getElementById("restartCommand").addEventListener("click", () =>
-        sendControlCommand("restart")
-      );
+      // Recorder events
+      document.getElementById("startCommand").addEventListener("click", () => sendControlCommand("start"));
+      document.getElementById("stopCommand").addEventListener("click", () => sendControlCommand("stop"));
+      document.getElementById("restartCommand").addEventListener("click", () => sendControlCommand("restart"));
+      // File management events
       document.getElementById("uploadFileButton").addEventListener("click", uploadFile);
       document.getElementById("downloadFileButton").addEventListener("click", downloadFile);
-
-      // Add event listeners for user management
+      // User management events
       document.getElementById("addUserButton").addEventListener("click", addUser);
       document.getElementById("updateUserButton").addEventListener("click", updateUser);
+      // Live stream form event
+      document.getElementById("livestreamForm").addEventListener("submit", function (event) {
+        event.preventDefault();
+        const selectedValue = document.querySelector('input[name="livestream-option"]:checked').value;
+        const streamer = document.getElementById("chatStreamer").value.trim();
+        if (!streamer) {
+          showResponse("Please enter a streamer name.", true);
+          return;
+        }
+        if (selectedValue === "chat") {
+          liveStreamSrc = `https://cbxyz.com/in/?tour=9oGW&campaign=Ln9WI&track=embed&room=${streamer}&disable_sound=1&embed_video_only=0&target=_parent&mobileRedirect=auto&`;
+        } else if (selectedValue === "live") {
+          liveStreamSrc = `https://cbxyz.com/in/?tour=9oGW&campaign=Ln9WI&track=embed&room=${streamer}&disable_sound=1&mobileRedirect=auto&embed_video_only=1`;
+        } else {
+          liveStreamSrc = `https://cbxyz.com/in/?tour=Limj&campaign=Ln9WI&track=embed&signup_notice=1&b=${streamer}&disable_sound=1&mobileRedirect=never`;
+        }
+        populateLiveStream();
+      });
+
       updateStatus();
       populateStreamers();
       populateUsers();
       updateLogs();
       setInterval(updateLogs, 3000);
       setInterval(updateStatus, 5000);
-
-
-      document.querySelectorAll('#availableStreamers .list-group-item').forEach(item => {
-        item.addEventListener('click', () => {
-          const selectedStreamer = item.getAttribute('data-streamer');
-          document.getElementById("chatStreamer").value = selectedStreamer;
-          populateLiveStream();
-        });
-      });
+      document.getElementById("video-tab").addEventListener("click", populateVideos);
+      document.getElementById("recorderStatus-tab").addEventListener("click", updateRecorders);
     });
-
-
-    // Call populateVideos when switching to the Video tab  recorderStatus-tab
-    document.getElementById("video-tab").addEventListener("click", populateVideos);
-    document.getElementById("recorderStatus-tab").addEventListener("click", updateRecorders);
-    // document.getElementById("liveStreamCamera").addEventListener("click", populateLiveStream);
   </script>
 </body>
 
