@@ -79,12 +79,15 @@ This is un-tested on Windows and Mac, but golang is cross-compatible which means
 
 <p align="center">
   <img src="https://github.com/user-attachments/assets/35e4633b-702b-45f9-9075-a8522a6b334b" alt="Login page"/>
-  <img src="https://github.com/user-attachments/assets/cc3f013f-a530-4629-99d4-02b72a54599d" alt="Streamers tab"/>
-  <img src="https://github.com/user-attachments/assets/86b72aba-e3a8-424a-b094-8e23b66a233b" alt="Logs tab"/>
-  <img src="https://github.com/user-attachments/assets/7038689f-0c67-4ede-87aa-1d5a63a720c2" alt="Recorders tab"/>
-  <img src="https://github.com/user-attachments/assets/30bc2424-e3c6-49f7-8f97-b4025698e234" alt="Settings tab"/>
-  <img src="https://github.com/user-attachments/assets/7bc6df75-07ce-4cd9-9959-31522ee51882" alt="Livestream tab"/>
+
+  
+  <img src="https://github.com/user-attachments/assets/b9419caf-f2b9-4f4f-a8a0-ddd490bc9cef" alt="Control tab"/>
+  <img src="https://github.com/user-attachments/assets/fa5a9008-b21c-47ef-bb90-bbcb379053bc" alt="User settings tab"/>
+  <img src="https://github.com/user-attachments/assets/24744566-bc52-4e80-8504-90d63abb4903" alt="Streamers tab"/>
+  <img src="https://github.com/user-attachments/assets/74f7c222-4163-4dd9-9c06-c69044e7c845" alt="Livestream tab"/>
 </p>
+
+
 
 ## Other
 
