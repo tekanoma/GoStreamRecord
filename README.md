@@ -11,6 +11,7 @@ __API NOTE__: The api is basically un-tested after adding login credentials. The
 - Manage and add multiple users for webUI login
 - Add new streamers without restarting the recorder
 - View active recorders
+- Watch live streams directly in the web UI
   
 ## Usage
 
@@ -82,6 +83,7 @@ This is un-tested on Windows and Mac, but golang is cross-compatible which means
   <img src="https://github.com/user-attachments/assets/86b72aba-e3a8-424a-b094-8e23b66a233b" alt="Logs tab"/>
   <img src="https://github.com/user-attachments/assets/7038689f-0c67-4ede-87aa-1d5a63a720c2" alt="Recorders tab"/>
   <img src="https://github.com/user-attachments/assets/30bc2424-e3c6-49f7-8f97-b4025698e234" alt="Settings tab"/>
+  <img src="https://github.com/user-attachments/assets/7bc6df75-07ce-4cd9-9959-31522ee51882" alt="Livestream tab"/>
 </p>
 
 ## Other
