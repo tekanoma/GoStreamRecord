@@ -482,29 +482,75 @@
         console.error("Error fetching logs:", err);
       }
     };
-
     const populateVideos = async () => {
-      try {
-        const res = await fetch("/api/get-videos");
-        const data = await res.json();
-        const container = document.getElementById("videoFilesContainer");
-        container.innerHTML = "";
-        data.forEach((obj) => {
-          const videoElement = document.createElement("div");
-          videoElement.className = "video-item mb-3";
-          videoElement.innerHTML = `
-            <h6>${obj.name}</h6>
-            <video controls width="100%" class="border rounded">
+  try {
+    const res = await fetch("/api/get-videos");
+    const data = await res.json();
+    const container = document.getElementById("videoFilesContainer");
+    container.innerHTML = "";
+
+    const folders = {};
+
+    // Organize videos into folders
+    data.forEach((obj) => {
+      const parts = obj.url.split("/");
+      const folder = parts.length > 2 ? parts[2] : "Uncategorized"; // Ignore "videos" (index 1)
+
+      if (!folders[folder]) {
+        folders[folder] = [];
+      }
+      folders[folder].push(obj);
+    });
+
+    // Render folders and videos
+    Object.entries(folders).forEach(([folder, videos]) => {
+      const folderElement = document.createElement("div");
+      folderElement.className = "card mb-3 shadow-sm";
+
+      folderElement.innerHTML = `
+        <div class="card-header d-flex justify-content-between align-items-center" onclick="toggleFolder('${folder}')"
+          style="cursor: pointer; background: #f8f9fa; border-radius: 8px;">
+          <strong>${folder}</strong>
+          <span class="badge bg-primary">${videos.length} videos</span>
+        </div>
+        <div id="folder-${folder}" class="card-body folder-content" style="display: none; padding: 15px;"></div>
+      `;
+
+      container.appendChild(folderElement);
+
+      const folderContent = document.getElementById(`folder-${folder}`);
+      videos.forEach((obj) => {
+        const videoElement = document.createElement("div");
+        videoElement.className = "video-item mb-3";
+        videoElement.innerHTML = `
+          <div class="card p-2 border">
+            <h6 class="mb-2">${obj.name}</h6>
+            <video controls width="100%" class="border rounded shadow-sm">
               <source src="${obj.url}" type="video/mp4">
               Your browser does not support the video tag.
-            </video>`;
-          container.appendChild(videoElement);
-        });
-      } catch (err) {
-        console.error(err);
-        showResponse("Error fetching videos.", true);
-      }
-    };
+            </video>
+          </div>`;
+        folderContent.appendChild(videoElement);
+      });
+    });
+
+  } catch (err) {
+    console.error(err);
+    showResponse("Error fetching videos.", true);
+  }
+};
+
+// Toggle function to show/hide folder contents smoothly
+const toggleFolder = (folder) => {
+  const folderContent = document.getElementById(`folder-${folder}`);
+  if (folderContent.style.display === "none") {
+    folderContent.style.display = "block";
+    folderContent.style.animation = "fadeIn 0.3s ease-in-out";
+  } else {
+    folderContent.style.animation = "fadeOut 0.3s ease-in-out";
+    setTimeout(() => { folderContent.style.display = "none"; }, 300);
+  }
+};
 
     let recorder_processes = null;
     const updateRecorders = () => {
