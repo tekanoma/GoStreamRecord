@@ -3,7 +3,7 @@ This project offers a simple, self-hosted web UI for managing and recording stre
 
 __API NOTE__: The api is basically un-tested after adding login credentials. The plan is to use API key in the future for credentials via API. This will probably not be done before the initial release.
 ## Core Features:
-- Zero delay between streamers when checking online status. New method in use that is not restricted by rate-limit. (The recorder might be rate limited tho if it starts to record too many streamers at once. That part is more or less un-tested.)
+- Zero delay between streamers when checking online status. New method in use that is not restricted by rate-limit. (The recorder might be rate limited if it starts to record too many streamers at once. That part is more or less un-tested.)
 - Login with cookies for each client (prevents unsupervised access)
 - Start, restart, and stop recordings
 - Add/delete streamers, with import/export options
