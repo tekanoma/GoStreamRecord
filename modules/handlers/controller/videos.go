@@ -43,9 +43,9 @@ func GetVideos(w http.ResponseWriter, r *http.Request) {
 		videos = append(videos, Video{URL: "", Name: "", NoVideos: fmt.Sprintf("No videos available. Try adding some to '%s'", config.Settings.App.Videos_folder)})
 
 	}
-	pageSize := 10
-	start := (page - 1) * pageSize
-	end := start + pageSize
+
+	start := (page - 1) * 999
+	end := start + 999
 	if start >= len(videos) {
 		start = len(videos)
 	}
