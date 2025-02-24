@@ -6,7 +6,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"io"
 	"log"
 	"net/http"
 	"net/url"
@@ -141,8 +140,8 @@ func (b *bot) IsRoomPublic(username string) bool {
 // IsOnline checks if the streamer is online by sending a GET request.
 func (b *bot) IsOnline(username string) bool {
 	// Short delay before making the call.
-	time.Sleep(3 * time.Second)
-	urlStr := "https://chaturbate.com/api/chatvideocontext/" + username
+
+	urlStr := "https://jpeg.live.mmcdn.com/stream?room=" + username
 	resp, err := http.Get(urlStr)
 	if err != nil {
 		log.Printf("Error in GET request: %v", err)
@@ -150,18 +149,12 @@ func (b *bot) IsOnline(username string) bool {
 	}
 	defer resp.Body.Close()
 
-	var res struct {
-		Username    string `json:"broadcaster_username"`
-		CurrentShow string `json:"room_status"`
+	if resp.StatusCode != http.StatusOK { // Streamer is not online if response if not 200
+		return false
+
 	}
-	if err := json.NewDecoder(resp.Body).Decode(&res); err != nil {
-		body, _ := io.ReadAll(resp.Body)
-		if err := json.Unmarshal(body, &res); err != nil {
-			log.Println("Error recieving online status. Try restarting the app and/or increase the rate limit in config")
-			return false
-		}
-	}
-	return res.Username == username && res.CurrentShow == "public"
+
+	return true
 }
 
 // Run starts the main loop of the Bot.
@@ -206,23 +199,26 @@ func (b *bot) RecordLoop() {
 			// For each streamer in the config, start a recorder if one isn’t already running.
 			for _, streamer := range config.Streamers.StreamerList {
 
-				if b.isRecorderActive(streamer.Name) {
-					continue
-				}
-
-				// Check if a shutdown is in progress before starting a new recorder.
-				select {
-				case <-b.ctx.Done():
-					break
-				default:
-				}
-
 				wg.Add(1)
-				go b.runRecordLoop(&wg, streamer.Name)
-				// Respect rate limiting.
-				time.Sleep(time.Duration(config.Settings.App.RateLimit.Time) * time.Second)
+				go func() {
+
+					if b.isRecorderActive(streamer.Name) {
+						return
+					}
+
+					// Check if a shutdown is in progress before starting a new recorder.
+					select {
+					case <-b.ctx.Done():
+						break
+					default:
+					}
+
+					b.runRecordLoop(&wg, streamer.Name)
+					// Respect rate limiting.
+				}()
 
 			}
+			time.Sleep(time.Duration(config.Settings.App.RateLimit.Time) * time.Second)
 			if b.isFirstRun {
 				b.isFirstRun = false
 				fmt.Println(time.Duration(config.Settings.App.Loop_interval) * time.Minute)
