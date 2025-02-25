@@ -648,54 +648,89 @@
 }
 
 
-    const updateRecorders = () => {
-      const container = document.getElementById("recorderProcessesContainer");
-      container.innerHTML = "";
-      if (recorder_processes && Array.isArray(recorder_processes.processes) && recorder_processes.processes.length > 0) {
-        recorder_processes.processes.forEach((process) => {
-          const processElement = document.createElement("div");
-          processElement.className = "recorder-process";
-          processElement.innerHTML = `
-  <div class="process-info" style="display: flex; align-items: center; justify-content: space-between; padding: 10px; border: 1px solid #ccc; border-radius: 5px; margin-bottom: 10px; background-color: #f9f9f9;">
-    <div class="status-text" style="font-weight: bold; color: ${process.isRecording ? '#28a745' : '#dc3545'};">
-      ${process.name} - ${process.isRecording ? "Recording" : "Not Recording"}
-    </div>
-    <button class="stop-button btn btn-sm btn-danger" style="margin-left: 10px;">Stop</button>
-  </div>
-`;
+const checkSourceAvailability = async (streamer) => {
+  // Dummy function: Assume all sources are available
+  return true;
+};
 
+const updateRecorders = async () => {
+  const container = document.getElementById("recorderProcessesContainer");
+  container.innerHTML = "";
 
+  // Fetch all possible streamers
+  const res = await fetch("/api/get-streamers");
+  const streamers = await res.json();
 
-          // Add the stop button functionality
-          const stopButton = processElement.querySelector(".stop-button");
-          stopButton.addEventListener("click", () => {
-            fetch("api/stop-single-process", {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-              },
-              body: JSON.stringify({ streamer: process.name }),
-            })
-              .then((response) => {
-                if (!response.ok) {
-                  throw new Error("Failed to stop the process");
-                }
-                return response.json();
-              })
-              .then((data) => {
-                console.log("Process stopped:", data);
-              })
-              .catch((error) => {
-                console.error("Error stopping process:", error);
-              });
-          });
+  // Fetch currently active recorder processes
+  let activeProcesses = [];
+  if (recorder_processes && Array.isArray(recorder_processes.processes)) {
+    activeProcesses = recorder_processes.processes;
+  }
 
-          container.appendChild(processElement);
-        });
-      } else {
-        container.innerHTML = '<p>No active recorder processes found.</p>';
-      }
-    };
+  // Map active processes by name for quick lookup
+  const activeMap = new Map(activeProcesses.map((p) => [p.name, p]));
+
+  for (const streamer of streamers) {
+    const process = activeMap.get(streamer) || { name: streamer, isRecording: false };
+    
+    const isAvailable = await checkSourceAvailability(streamer);
+
+    const processElement = document.createElement("div");
+    processElement.className = "recorder-process";
+    processElement.innerHTML = `
+      <div class="process-info" style="display: flex; align-items: center; justify-content: space-between; padding: 10px; border: 1px solid #ccc; border-radius: 5px; margin-bottom: 10px; background-color: #f9f9f9;">
+        <div class="status-text" style="font-weight: bold; color: ${process.isRecording ? '#28a745' : '#dc3545'};">
+          ${process.name} - ${process.isRecording ? "Recording" : "Not Recording"}
+        </div>
+        <div>
+          <button class="start-button btn btn-sm btn-success" style="margin-left: 5px;" ${process.isRecording || !isAvailable ? "disabled" : ""}>Start</button>
+          <button class="stop-button btn btn-sm btn-danger" style="margin-left: 5px;" ${!process.isRecording ? "disabled" : ""}>Stop</button>
+          <button class="restart-button btn btn-sm btn-warning" style="margin-left: 5px;" ${!process.isRecording ? "disabled" : ""}>Restart</button>
+        </div>
+      </div>
+    `;
+
+    const startButton = processElement.querySelector(".start-button");
+    const stopButton = processElement.querySelector(".stop-button");
+    const restartButton = processElement.querySelector(".restart-button");
+
+    startButton.addEventListener("click", async () => {
+      fetch("/api/start-single-process", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ streamer: process.name }),
+      })
+      .then((res) => res.json())
+      .then(() => updateRecorders())
+      .catch((err) => console.error("Error starting process:", err));
+    });
+
+    stopButton.addEventListener("click", async () => {
+      fetch("/api/stop-single-process", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ streamer: process.name }),
+      })
+      .then((res) => res.json())
+      .then(() => updateRecorders())
+      .catch((err) => console.error("Error stopping process:", err));
+    });
+
+    restartButton.addEventListener("click", async () => {
+      fetch("/api/restart-single-process", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ streamer: process.name }),
+      })
+      .then((res) => res.json())
+      .then(() => updateRecorders())
+      .catch((err) => console.error("Error restarting process:", err));
+    });
+
+    container.appendChild(processElement);
+  }
+};
+
 
     /* ------------------ STATUS INDICATOR ------------------ */
     const updateStatus = async () => {
@@ -862,6 +897,7 @@
       updateLogs();
       setInterval(updateLogs, 3000);
       setInterval(updateStatus, 5000);
+      setInterval(checkSourceAvailability, 60000);
       document.getElementById("video-tab").addEventListener("click", populateVideos);
       document.getElementById("recorderStatus-tab").addEventListener("click", updateRecorders);
     });

@@ -154,14 +154,15 @@ func (b *bot) IsRoomPublic(username string) bool {
 	return res.Success && res.RoomStatus == "public"
 }
 
-// IsOnline checks if the streamer is online by sending a GET request.
+// IsOnline checks if the streamer is online by checking if a thumbnail is available from the stream.
 func (b *bot) IsOnline(username string) bool {
 	// Short delay before making the call.
 
+	//Check once if a thumbnail is available
 	urlStr := "https://jpeg.live.mmcdn.com/stream?room=" + username
 	resp, err := http.Get(urlStr)
 	if err != nil {
-		log.Printf("Error in GET request: %v", err)
+		log.Printf("Error in making request: %v", err)
 		return false
 	}
 	defer resp.Body.Close()
@@ -175,10 +176,15 @@ func (b *bot) IsOnline(username string) bool {
 }
 
 // Run starts the main loop of the Bot.
-// It reloads the configuration, checks running processes, and for each configured streamer
-// starts a recording if one isn’t already running.
-// Once the context is cancelled (via Stop), no new recordings are started.
-func (b *bot) RecordLoop() {
+// Reloads the configuration, checks running processesn for each streamer, starts a recorder if one isn’t already running.
+// It also checks for a stop signal and waits for active recordings to finish before stopping.
+// Streamer name is optional and can be used to start a single recorder.
+func (b *bot) RecordLoop(streamerName string) {
+	b.isFirstRun = true
+	is_single_run := false
+	if streamerName != "" {
+		is_single_run = true
+	}
 	// Write youtube-dl config.
 	if err := b.writeYoutubeDLConfig(); err != nil {
 		log.Println("Error writing youtube-dl config:", err)
@@ -210,7 +216,10 @@ func (b *bot) RecordLoop() {
 			b.checkProcesses()
 			// For each streamer in the config, start a recorder if one isn’t already running.
 			for _, streamer := range config.Streamers.StreamerList {
-
+				if is_single_run && streamer.Name != streamerName {
+					continue
+				}
+				// Start a new recorder if one isn’t already running.
 				wg.Add(1)
 				go func(wg *sync.WaitGroup) {
 					defer wg.Done()

@@ -76,8 +76,30 @@ func GetStreamers(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(list)
 }
 
-// Handles POST /api/stop-singleProcess.
-// It decodes a JSON payload with the selected option and returns a dummy response.
+func StartProcess(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		http.Error(w, "Only POST allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	type RequestData struct {
+		Streamer string `json:"streamer"`
+	}
+	var reqData RequestData
+	if err := json.NewDecoder(r.Body).Decode(&reqData); err != nil {
+		http.Error(w, "Invalid request payload", http.StatusBadRequest)
+		return
+	}
+	if reqData.Streamer == "" {
+		status.ResponseHandler(w, r, "Streamer name is required", nil)
+		return
+	}
+
+	status.ResponseHandler(w, r, "Stopping process for "+reqData.Streamer, nil)
+	bot.Bot.RecordLoop(reqData.Streamer)
+	status.ResponseHandler(w, r, "Stopped process for"+reqData.Streamer, nil)
+}
+
 func StopProcess(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		http.Error(w, "Only POST allowed", http.StatusMethodNotAllowed)

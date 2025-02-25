@@ -22,6 +22,7 @@ func Handle() {
 	http.HandleFunc("/api/remove-streamer", streamers.RemoveStreamer)
 	http.HandleFunc("/api/control", controller.ControlHandler)
 	http.HandleFunc("/api/stop-single-process", streamers.StopProcess)
+	http.HandleFunc("/api/start-single-process", streamers.StartProcess)
 	http.HandleFunc("/api/import", streamers.UploadHandler)
 	http.HandleFunc("/api/export", streamers.DownloadHandler)
 	http.HandleFunc("/api/status", web_status.StatusHandler)

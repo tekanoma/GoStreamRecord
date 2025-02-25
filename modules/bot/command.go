@@ -22,7 +22,7 @@ func (b *bot) Command(command string) {
 		b.status.IsRunning = true
 		b.isFirstRun = true
 		b.mux.Unlock()
-		go b.RecordLoop()
+		go b.RecordLoop("")
 	case "stop":
 		if !b.status.IsRunning {
 			log.Println("Bot is not running..")
