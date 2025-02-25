@@ -30,7 +30,7 @@ __API NOTE__: The api is basically un-tested after adding login credentials. The
 
 |Username|Password|
 |-|-|
-|`admin`| `password`|
+|`admin`|see [this](https://github.com/luna-nightbyte/Recordurbate-WebUI/tree/main?tab=readme-ov-file#reset-password)|
 
 ### Setup
 __important__: You will still need to have the `internal/settings` folder and it's content in the same folder structure when running this app. That means that you'll have to copy that along with any binary you build.
