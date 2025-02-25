@@ -4,7 +4,7 @@ This project offers a simple, self-hosted web UI for managing and recording stre
 __API NOTE__: The api is basically un-tested after adding login credentials. The plan is to use API key in the future for credentials via API. This will probably not be done before the initial release.
 ## Core Features
 ### Recorder:
-- Zero-delay streamer status checks (bypasses rate limits; recording rate limits still under testing).
+- Streamer status checks bypasses rate limits; recording rate limits still under testing.
 - Start, stop, and restart all recordings.
 - View active recorders in real-time (More data will be added)
 - Stop individual recordings as needed.
