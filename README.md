@@ -107,7 +107,7 @@ This is un-tested on Windows and Mac, but golang is cross-compatible which means
 
 ## Other
 
-### Todo, but not planned/prioritized 
+### Todo / Ideas
 - Log online-time of streamers and save to csv for graph plotting. Can help understand the work-hours of different streamers.
 - Select and delete videos
 - Option to login to the streaming site and use follower list instead of config?
@@ -121,6 +121,7 @@ This is un-tested on Windows and Mac, but golang is cross-compatible which means
   - set max lenght/size (could be optional to use one of either)
   - view current recording length
   - view current recording video
+- Better video view
 
 
 
