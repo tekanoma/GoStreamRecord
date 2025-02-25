@@ -13,7 +13,7 @@ __API NOTE__: The API is still open after adding adding login. The plan is to us
 - Streamer status checks bypasses rate limits; recording rate limits still under testing.
 - Start, stop, and restart all recordings.
 - View active recorders in real-time (More data will be added)
-- Stop individual recordings as needed.
+- Start, stop restart  individual recordings as needed.
 - Add or delete streamers dynamically (no need to restart the recorder).
 - Import/export streamer lists for easier management.
 
@@ -22,6 +22,7 @@ __API NOTE__: The API is still open after adding adding login. The plan is to us
 - Manage multiple user accounts.
 - Directly view logs and recorded videos through the WebUI.
 - Watch live streams directly from the WebUI.
+- Check streamer online status.
 ### Setup & Deployment:
 - Docker configuration and service examples for straightforward deployment.
 - Install [Golang](https://go.dev/doc/install) to run the source or build binary.
@@ -94,13 +95,18 @@ This is un-tested on Windows and Mac, but golang is cross-compatible which means
 
 
 <p align="center">
-  <img src="https://github.com/user-attachments/assets/35e4633b-702b-45f9-9075-a8522a6b334b" alt="Login page"/>
+  <img src="https://github.com/user-attachments/assets/edf30517-de6a-4f91-9ab4-89f9c91d7779" alt="Login page"/>
 
+
+  <img src="https://github.com/user-attachments/assets/5d939bc0-778b-42c8-a453-eb30c13e95e2" alt="Video tab"/>
   
-  <img src="https://github.com/user-attachments/assets/b9419caf-f2b9-4f4f-a8a0-ddd490bc9cef" alt="Control tab"/>
-  <img src="https://github.com/user-attachments/assets/fa5a9008-b21c-47ef-bb90-bbcb379053bc" alt="User settings tab"/>
-  <img src="https://github.com/user-attachments/assets/24744566-bc52-4e80-8504-90d63abb4903" alt="Streamers tab"/>
-  <img src="https://github.com/user-attachments/assets/74f7c222-4163-4dd9-9c06-c69044e7c845" alt="Livestream tab"/>
+  <img src="https://github.com/user-attachments/assets/0ce5b2c1-e7f3-47bb-96e9-1532915dd5e4" alt="individual tab"/>
+  Online status with a little bug at the time of uploading this.
+
+  <img src="https://github.com/user-attachments/assets/7736fac5-5ce8-4634-8179-6ea2cf03969b" alt="User settings tab"/>
+  
+  <img src="https://github.com/user-attachments/assets/ced11119-8e74-4c15-8aff-6c31242f8fe5" alt="Streamers tab"/>
+  <img src="https://github.com/user-attachments/assets/edc136e5-0238-463e-b8f3-d4b1b7e74687" alt="Livestream tab"/>
 </p>
 
 
