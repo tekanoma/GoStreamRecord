@@ -6,7 +6,7 @@ I started this project as my own Recordurbate V2 with webUI because i had some "
 
 All of my example commands will be in linux. But its very few, and most if not all are the same on windows/mac.
 
-__API NOTE__: The api is basically un-tested after adding login credentials. The plan is to use API secret key in the future for credentials via API. 
+__API NOTE__: The API is still open after adding adding login credentials. The plan is to use browser cookies and optinally API secret key in the future for credentials via API.
 
 ## Core Features
 ### Recorder:
