@@ -2,18 +2,23 @@
 This project offers a simple, self-hosted web UI for managing and recording streams.
 
 __API NOTE__: The api is basically un-tested after adding login credentials. The plan is to use API key in the future for credentials via API. This will probably not be done before the initial release.
-## Core Features:
-- Zero delay between streamers when checking online status. New method in use that is not restricted by rate-limit. (The recorder might be rate limited if it starts to record too many streamers at once. That part is more or less un-tested.)
-- Login with cookies for each client (prevents unsupervised access)
-- Start, restart, and stop recordings
-- Add/delete streamers, with import/export options
-- View logs and recorded videos directly in the web UI
-- Docker and service examples for easier setup
-- Manage and add multiple users for webUI login
-- Add new streamers without restarting the recorder
-- View active recorders
-- Watch live streams directly in the web UI
-  
+## Core Features
+### Recorder:
+- Zero-delay streamer status checks (bypasses rate limits; recording rate limits still under testing).
+- Start, stop, and restart all recordings.
+- View active recorders in real-time (More data will be added)
+- Stop individual recordings as needed.
+- Add or delete streamers dynamically (no need to restart the recorder).
+- Import/export streamer lists for easier management.
+
+### WebUI:
+- Secure login using cookies for each client (prevents unauthorized access).
+- Manage multiple user accounts.
+- Directly view logs and recorded videos through the WebUI.
+- Watch live streams directly from the WebUI.
+### Setup & Deployment:
+- Docker configuration and service examples for straightforward deployment. Or install [Golang](https://go.dev/doc/install) and build a binary yourself ;)
+- Scalable design to handle multiple streamers without restarting services.
 ## Usage
 
 |Username|Password|
