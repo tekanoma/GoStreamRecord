@@ -103,19 +103,19 @@ _Online status with a small bug at the time of uploading this.._
 
 ### Todo / Ideas
 - Log online-time of streamers and save to csv for graph plotting. Can help understand the work-hours of different streamers.
-- Select and delete videos
-- Option to login to the streaming site and use follower list instead of config?
+- ~~Select and delete videos~~
+- Option to login to the streaming site and use follower list instead of config? (Unsure)
 - Option for max video length (and size?)
 - ~~headless mode without webui~~ (Abandoned because i will not create all the logic for handling the various arguments myself. Others can create a PR if they want to.)
 - Move frontend to Vue
   - Btter for organizing components being re-used
 - Build a default docker image
 - Individual recorders in UI
-  - Start/Restart individual recorders (in progress)
+  - ~~Start/Restart individual recorders (in progress)~~
   - set max lenght/size (could be optional to use one of either)
   - view current recording length
   - view current recording video
-- Better video view
+- ~~Better video view~~
 
 
 ### Disclaimer 
