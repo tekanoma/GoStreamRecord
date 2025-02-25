@@ -1,6 +1,6 @@
 # API Reference 
 
-Note: This has not been updated after login was added. Some endpoints might be wrong/missing.
+__Note__: I have have not updated this after login was added. Some endpoints might be wrong/missing.
 
 ## Endpoints
 | Endpoint               | Method | Description |
