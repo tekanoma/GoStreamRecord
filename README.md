@@ -4,6 +4,8 @@
 
 I started this project as my own Recordurbate V2 with webUI because i had some "issues" like long [restart time](https://github.com/oliverjrose99/Recordurbate/issues/77), [not all users are found](https://github.com/oliverjrose99/Recordurbate/issues/76), [status about recorders](https://github.com/oliverjrose99/Recordurbate/issues/75) (Still in developmen). And others that you'll see further down this page.
 
+All of my example commands will be in linux. But its very few, and most if not all are the same on windows/mac.
+
 __API NOTE__: The api is basically un-tested after adding login credentials. The plan is to use API secret key in the future for credentials via API. 
 
 ## Core Features
@@ -31,12 +33,16 @@ __API NOTE__: The api is basically un-tested after adding login credentials. The
 |`admin`| `password`|
 
 ### Setup
-- Copy [`.env.example`](https://github.com/luna-nightbyte/Recordurbate-WebUI/blob/main/.env.example) to `.env` and add your own session key. 
-    - Can be generated with: `head -c 32 /dev/urandom | base64`
+__important__: You will still need to have the `internal/settings` folder and it's content in the same folder structure when running this app. That means that you'll have to copy that along with any binary you build.
+
+- Download this repo and open a terminal in this folder. Ask ChatGPT how to find the folder path and how to move into it via cli if you dont know.
+
+- Copy [`.env.example`](https://github.com/luna-nightbyte/Recordurbate-WebUI/blob/main/.env.example) to `.env` and add your own session key. (se the one below as long as the app is not exposed outside your local network__IF__ you dont know how to create one. _hint: just ask chatGPT_). 
+    - Can be generated with this command on linux.: `head -c 32 /dev/urandom | base64`
       I.e:
       ```bash
       user@user:~/Recordurbate$ head -c 32 /dev/urandom | base64
-      # Output:
+      # Output
       Fl60B6sTqAUARyDiC6GIor8AIu6QXLF2RMvWK1Wz3eE=
       ```
 
