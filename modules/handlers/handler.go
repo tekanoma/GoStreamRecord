@@ -27,6 +27,7 @@ func Handle() {
 	http.HandleFunc("/api/status", web_status.StatusHandler)
 	http.HandleFunc("/api/get-videos", controller.GetVideos)
 	http.HandleFunc("/api/logs", controller.HandleLogs)
+	http.HandleFunc("/api/delete-videos", controller.DeleteVideos)
 
 	http.HandleFunc("/api/get-users", users.GetUsers)
 	http.HandleFunc("/api/add-user", users.AddUser)

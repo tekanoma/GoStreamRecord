@@ -137,9 +137,9 @@
             aria-controls="settingsSection" aria-selected="false">
             Settings
           </a>
-          <a class="nav-link" id="v-pills-chaturbate-tab" data-bs-toggle="pill" href="#chaturbateSection" role="tab"
-            aria-controls="chaturbateSection" aria-selected="false">
-            Chaturbate
+          <a class="nav-link" id="v-pills-LiveStream-tab" data-bs-toggle="pill" href="#LiveStreamSection" role="tab"
+            aria-controls="LiveStreamSection" aria-selected="false">
+            LiveStream
           </a>
         </nav>
       </aside>
@@ -304,8 +304,8 @@
 
 
 
-        <!-- Chaturbate Section -->
-        <section class="tab-pane fade" id="chaturbateSection" role="tabpanel" aria-labelledby="v-pills-chaturbate-tab">
+        <!-- LiveStream Section -->
+        <section class="tab-pane fade" id="LiveStreamSection" role="tabpanel" aria-labelledby="v-pills-LiveStream-tab">
           <div class="card">
             <div class="card-header">Live Stream Settings</div>
             <div class="card-body">
@@ -355,6 +355,13 @@
   <!-- Bootstrap JS bundle -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
   <script>
+
+    // Variables
+    let recorder_processes = null;
+    let liveStreamSrc = null;
+    let selectedUser = null;
+    let videoFiles = null;
+    let spinnerListRunning = []
     // Helper function to display transient messages
     const showResponse = (message, isError = false) => {
       const responseArea = document.getElementById("responseArea");
@@ -482,32 +489,49 @@
         console.error("Error fetching logs:", err);
       }
     };
+
     const populateVideos = async () => {
       try {
         const res = await fetch("/api/get-videos");
         const data = await res.json();
-        const container = document.getElementById("videoFilesContainer");
-        container.innerHTML = "";
-
         const folders = {};
 
         // Organize videos into folders
         data.forEach((obj) => {
           const parts = obj.url.split("/");
           const folder = parts.length > 2 ? parts[2] : "Uncategorized"; // Ignore "videos" (index 1)
-
           if (!folders[folder]) {
             folders[folder] = [];
           }
           folders[folder].push(obj);
         });
+        videoFiles = folders;
 
-        // Render folders and videos
-        Object.entries(folders).forEach(([folder, videos]) => {
-          const folderElement = document.createElement("div");
-          folderElement.className = "card mb-3 shadow-sm";
+        renderVideos( folders);
+      } catch (err) {
+        console.error(err);
+        showResponse("Error fetching videos.", true);
+      }
+    };
 
-          folderElement.innerHTML = `
+    const renderVideos = (folders) => {
+      
+      const container = document.getElementById("videoFilesContainer");
+        container.innerHTML = "";
+        const deleteBtn = document.createElement("button");
+        deleteBtn.id = "deleteSelectedBtn";
+        deleteBtn.className = "btn btn-danger mb-3";
+        deleteBtn.textContent = "Delete Selected Videos";
+        deleteBtn.addEventListener("click", deleteSelectedVideos);
+
+        container.prepend(deleteBtn); // Adds the button at the top
+    
+    // Render folders and videos
+    Object.entries(folders).forEach(([folder, videos]) => {
+      const folderElement = document.createElement("div");
+      folderElement.className = "card mb-3 shadow-sm";
+
+      folderElement.innerHTML = `
         <div class="card-header d-flex justify-content-between align-items-center" onclick="toggleFolder('${folder}')"
           style="cursor: pointer; background: #f8f9fa; border-radius: 8px;">
           <strong>${folder}</strong>
@@ -516,51 +540,122 @@
         <div id="folder-${folder}" class="card-body folder-content" style="display: none; padding: 15px;"></div>
       `;
 
-          container.appendChild(folderElement);
+      container.appendChild(folderElement);
 
-          const folderContent = document.getElementById(`folder-${folder}`);
-          videos.forEach((obj) => {
-            const videoElement = document.createElement("div");
-            videoElement.className = "video-item mb-3";
-            videoElement.innerHTML = `
-          <div class="card p-2 border">
-            <h6 class="mb-2">${obj.name}</h6>
-            <video controls width="100%" class="border rounded shadow-sm">
-              <source src="${obj.url}" type="video/mp4">
-              Your browser does not support the video tag.
-            </video>
-          </div>`;
-            folderContent.appendChild(videoElement);
-          });
+      const folderContent = folderElement.querySelector(".folder-content");
+      // Set grid layout properties (but leave display as 'none' by default)
+      folderContent.style.gridTemplateColumns = "repeat(auto-fill, minmax(200px, 1fr))";
+      folderContent.style.gap = "15px";
+
+      videos.forEach((obj) => {
+        const videoElement = document.createElement("div");
+        videoElement.className = "video-item card p-2 border";
+        videoElement.style.position = "relative";
+        videoElement.innerHTML = `
+          <!-- Checkbox for selecting video -->
+          <div class="form-check" style="position: absolute; top: 5px; right: 5px; z-index: 10;">
+            <input class="form-check-input video-checkbox" type="checkbox" value="${obj.url}" id="chk-${obj.url}">
+          </div>
+          <!-- Video title (truncated if too long) -->
+          <h6 class="mb-2 text-truncate" title="${obj.name}">${obj.name}</h6>
+          <!-- Smaller video preview -->
+          <video controls preload="metadata" width="100%" height="120" class="border rounded shadow-sm">
+            <source src="${obj.url}" type="video/mp4">
+            Your browser does not support the video tag.
+          </video>
+        `;
+        folderContent.appendChild(videoElement);
+      });
+    });
+    };
+
+    const deleteSelectedVideos = async () => {
+      const selectedCheckboxes = document.querySelectorAll('.video-checkbox:checked');
+      if (selectedCheckboxes.length === 0) {
+        showResponse("No videos selected!");
+        return;
+      }
+      // Collect selected video URLs (or unique IDs if available)
+      const urls = Array.from(selectedCheckboxes).map((checkbox) => checkbox.value);
+      try {
+        const res = await fetch("/api/delete-videos", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ videos: urls }),
         });
 
+        // Remove deleted videos from the list
+        videoFiles = array.filter(videoFile => videoFile.url !== urls);
+
+        const result = await res.json();
+        console.log(result);
+        if (result.success) {
+          showResponse("Videos deleted successfully.", false);
+          populateVideos(); // refresh list
+        }
       } catch (err) {
         console.error(err);
-        showResponse("Error fetching videos.", true);
+        showResponse("Error deleting videos.",true);
       }
     };
 
     // Toggle function to show/hide folder contents smoothly
-    const toggleFolder = (folder) => {
+    function toggleFolder(folder) {
+  const folderContent = document.getElementById(`folder-${folder}`);
+  // Get the header element (assuming the structure remains constant)
+  const folderHeader = folderContent.previousElementSibling;
+  
+  if (spinnerListRunning.includes(folder)) {
+    console.log
+    return;
+  }
+  spinnerListRunning.push(folder);
+  // If the folder is being expanded:
+  if (folderContent.style.display === "none") {
+    // Add a temporary active class for visual feedback (you can style this in CSS)
+    folderHeader.classList.add('active');
+
+    // Create and append a spinner element
+    const spinner = document.createElement('span');
+    spinner.className = 'spinner-border spinner-border-sm ms-2'; // Using Bootstrap spinner classes
+    spinner.setAttribute('role', 'status');
+    spinner.setAttribute('aria-hidden', 'true');
+    folderHeader.appendChild(spinner);
+
+    // Simulate a delay for rendering (replace this with your actual rendering logic)
+    setTimeout(() => {
+      // Remove the spinner and active indication
+      spinner.remove();
+      folderHeader.classList.remove('active');
+      
       const folderContent = document.getElementById(`folder-${folder}`);
-      if (folderContent.style.display === "none") {
-        folderContent.style.display = "block";
+      if (folderContent.style.display === "none" || folderContent.style.display === "") {
+        // Open folder: switch display to grid for a compact layout
+        folderContent.style.display = "grid";
         folderContent.style.animation = "fadeIn 0.3s ease-in-out";
       } else {
+        // Close folder with fade out animation
         folderContent.style.animation = "fadeOut 0.3s ease-in-out";
         setTimeout(() => { folderContent.style.display = "none"; }, 300);
       }
-    };
+    }, 500); // Adjust the delay as needed
+  } else {
+    // If collapsing, simply hide the content
+    folderContent.style.display = "none";
+  }
 
-    let recorder_processes = null;
+  spinnerListRunning = spinnerListRunning.filter((item) => item !== folder);
+}
+
+
     const updateRecorders = () => {
       const container = document.getElementById("recorderProcessesContainer");
       container.innerHTML = "";
       if (recorder_processes && Array.isArray(recorder_processes.processes) && recorder_processes.processes.length > 0) {
         recorder_processes.processes.forEach((process) => {
           const processElement = document.createElement("div");
-processElement.className = "recorder-process";
-processElement.innerHTML = `
+          processElement.className = "recorder-process";
+          processElement.innerHTML = `
   <div class="process-info" style="display: flex; align-items: center; justify-content: space-between; padding: 10px; border: 1px solid #ccc; border-radius: 5px; margin-bottom: 10px; background-color: #f9f9f9;">
     <div class="status-text" style="font-weight: bold; color: ${process.isRecording ? '#28a745' : '#dc3545'};">
       ${process.name} - ${process.isRecording ? "Recording" : "Not Recording"}
@@ -621,7 +716,6 @@ processElement.innerHTML = `
     };
 
     /* ------------------ USER MANAGEMENT ------------------ */
-    let selectedUser = null;
     const populateUsers = async () => {
       try {
         const res = await fetch("/api/get-users");
@@ -707,8 +801,7 @@ processElement.innerHTML = `
       }
     };
 
-    /* ------------------ CHaturbate / LIVE STREAM ------------------ */
-    let liveStreamSrc = null;
+    /* ------------------ LIVE STREAM ------------------ */
     const populateLiveStream = () => {
       try {
         const container = document.getElementById("liveStreamCamera");

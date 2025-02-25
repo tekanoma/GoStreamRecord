@@ -3,12 +3,15 @@ package controller
 import (
 	"GoRecordurbate/modules/config"
 	"GoRecordurbate/modules/file"
+	"GoRecordurbate/modules/handlers/status"
 	"encoding/json"
 	"fmt"
+	"log"
 	"net/http"
 	"os"
 	"path/filepath"
 	"strconv"
+	"strings"
 )
 
 type Video struct {
@@ -57,4 +60,64 @@ func GetVideos(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(paginatedVideos)
+}
+
+// DeleteVideosRequest represents the expected JSON payload.
+type DeleteVideosRequest struct {
+	Videos []string `json:"videos"`
+}
+
+// DeleteVideosResponse is the structure of our JSON response.
+type DeleteVideosResponse struct {
+	Success bool   `json:"success"`
+	Message string `json:"message,omitempty"`
+}
+
+// DeleteVideosHandler handles requests to delete videos.
+func DeleteVideos(w http.ResponseWriter, r *http.Request) {
+	// Only allow POST requests.
+	if r.Method != http.MethodPost {
+		http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	// Parse the JSON body.
+	var req DeleteVideosRequest
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		http.Error(w, "Bad Request: "+err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	// Validate that videos were provided.
+	if len(req.Videos) == 0 {
+		resp := DeleteVideosResponse{
+			Success: false,
+			Message: "No videos provided",
+		}
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(resp)
+		return
+	}
+
+	// Process deletion of each video.
+	video_erros := 0
+	for _, video := range req.Videos {
+		video_path := filepath.Join(config.Settings.App.Videos_folder, strings.Replace(video, "/videos/", "", 1))
+		fmt.Println("Deleting video:", video_path)
+		err := os.Remove(video_path)
+		if err != nil {
+			video_erros++
+			log.Println("error deleting video: ", err)
+			status.ResponseHandler(w, r, "Error deleting video"+video, nil)
+			continue
+		}
+	}
+
+	resp := DeleteVideosResponse{
+		Success: video_erros == 0,
+		Message: fmt.Sprintf("Deleted %d videos", len(req.Videos)-video_erros),
+	}
+	status.ResponseHandler(w, r, "Videos deleted", resp)
+
 }
