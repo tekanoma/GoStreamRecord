@@ -43,5 +43,4 @@ func (b *bot) Command(command string) {
 		log.Println("Nothing to do..")
 	}
 
-	log.Println(command, b)
 }
