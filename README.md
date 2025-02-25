@@ -96,21 +96,15 @@ This is un-tested on Windows and Mac, but golang is cross-compatible which means
 
 <p align="center">
   <img src="https://github.com/user-attachments/assets/edf30517-de6a-4f91-9ab4-89f9c91d7779" alt="Login page"/>
-
-
   <img src="https://github.com/user-attachments/assets/5d939bc0-778b-42c8-a453-eb30c13e95e2" alt="Video tab"/>
-  
   <img src="https://github.com/user-attachments/assets/0ce5b2c1-e7f3-47bb-96e9-1532915dd5e4" alt="individual tab"/>
-  Online status with a little bug at the time of uploading this.
-
   <img src="https://github.com/user-attachments/assets/7736fac5-5ce8-4634-8179-6ea2cf03969b" alt="User settings tab"/>
   
   <img src="https://github.com/user-attachments/assets/ced11119-8e74-4c15-8aff-6c31242f8fe5" alt="Streamers tab"/>
   <img src="https://github.com/user-attachments/assets/edc136e5-0238-463e-b8f3-d4b1b7e74687" alt="Livestream tab"/>
 </p>
 
-
-
+_Online status with a small bug at the time of uploading this.._
 ## Other
 
 ### Todo / Ideas
