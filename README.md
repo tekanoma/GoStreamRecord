@@ -1,7 +1,11 @@
 # GoRecordurbate WebUI
-This project offers a simple, self-hosted web UI for managing and recording streams.
 
-__API NOTE__: The api is basically un-tested after adding login credentials. The plan is to use API key in the future for credentials via API. This will probably not be done before the initial release.
+## Introduction 
+
+I started this project as my own Recordurbate V2 with webUI because i had some "issues" like long [restart time](https://github.com/oliverjrose99/Recordurbate/issues/77), [not all users are found](https://github.com/oliverjrose99/Recordurbate/issues/76), [status about recorders](https://github.com/oliverjrose99/Recordurbate/issues/75) (Still in developmen). And others that you'll see further down this page.
+
+__API NOTE__: The api is basically un-tested after adding login credentials. The plan is to use API secret key in the future for credentials via API. 
+
 ## Core Features
 ### Recorder:
 - Streamer status checks bypasses rate limits; recording rate limits still under testing.
