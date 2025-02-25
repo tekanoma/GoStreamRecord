@@ -2,7 +2,7 @@
 
 ## Introduction 
 
-I started this project as my own [Recordurbate](https://github.com/oliverjrose99/Recordurbate) V2 with webUI because i had some "issues" like long [restart time](https://github.com/oliverjrose99/Recordurbate/issues/77), [not all users are found](https://github.com/oliverjrose99/Recordurbate/issues/76), [status about recorders](https://github.com/oliverjrose99/Recordurbate/issues/75) (Still in developmen). And others that you'll see further down this page.
+I started this project as my own version of [Recordurbate](https://github.com/oliverjrose99/Recordurbate) because i had some "issues" the others also have mentioned like [long restart time](https://github.com/oliverjrose99/Recordurbate/issues/77), [not all users are found](https://github.com/oliverjrose99/Recordurbate/issues/76), [status about recorders](https://github.com/oliverjrose99/Recordurbate/issues/75) (Still in developmen). And others that you'll see further down this page. 
 
 All of my example commands will be in linux. But its very few, and most if not all are the same on windows/mac.
 
