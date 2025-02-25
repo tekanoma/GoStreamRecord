@@ -79,6 +79,7 @@ func main() {
 		if !userFound {
 			log.Println("No matching username found.")
 			fmt.Println("No matching username found.")
+			return 
 		}
 		config.Update(file.Users_json_path, config.Users)
 		log.Println("Password updated for", username)
