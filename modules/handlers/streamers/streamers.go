@@ -76,6 +76,11 @@ func GetStreamers(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(list)
 }
 
+func RestartProcess(w http.ResponseWriter, r *http.Request) {
+	StopProcess(w, r)
+	StartProcess(w, r)
+}
+
 func StartProcess(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		http.Error(w, "Only POST allowed", http.StatusMethodNotAllowed)
