@@ -5,6 +5,7 @@ import (
 	"GoRecordurbate/modules/config"
 	"GoRecordurbate/modules/handlers/status"
 	"encoding/json"
+	"fmt"
 	"net/http"
 )
 
@@ -103,6 +104,29 @@ func StartProcess(w http.ResponseWriter, r *http.Request) {
 	status.ResponseHandler(w, r, "Stopping process for "+reqData.Streamer, nil)
 	bot.Bot.RecordLoop(reqData.Streamer)
 	status.ResponseHandler(w, r, "Stopped process for"+reqData.Streamer, nil)
+}
+
+func CheckOnlineStatus(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		http.Error(w, "Only POST allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	type RequestData struct {
+		Streamer string `json:"streamer"`
+	}
+	var reqData RequestData
+	if err := json.NewDecoder(r.Body).Decode(&reqData); err != nil {
+		fmt.Println(err)
+		http.Error(w, "Invalid request payload", http.StatusBadRequest)
+		return
+	}
+	if reqData.Streamer == "" {
+		status.ResponseHandler(w, r, "Streamer name is required", nil)
+		return
+	}
+	msg := bot.Bot.IsOnline(reqData.Streamer)
+	status.ResponseHandler(w, r, fmt.Sprintf("%v", msg), nil)
 }
 
 func StopProcess(w http.ResponseWriter, r *http.Request) {

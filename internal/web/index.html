@@ -131,7 +131,7 @@
 
           <a class="nav-link active" id="v-pills-recorder-tab" data-bs-toggle="pill" href="#recorderSection" role="tab"
             aria-controls="recorderSection" aria-selected="true">
-            Recorder
+            Bot
           </a>
           <a class="nav-link" id="v-pills-settings-tab" data-bs-toggle="pill" href="#settingsSection" role="tab"
             aria-controls="settingsSection" aria-selected="false">
@@ -175,7 +175,7 @@
                   </li>
                   <li class="nav-item" role="presentation">
                     <button class="nav-link" id="recorderStatus-tab" data-bs-toggle="tab"
-                      data-bs-target="#activeRecordersSection" type="button" role="tab">Recorders</button>
+                      data-bs-target="#activeRecordersSection" type="button" role="tab">Individual bots</button>
                   </li>
                 </ul>
                 <div class="tab-content mt-3">
@@ -362,6 +362,7 @@
     let selectedUser = null;
     let videoFiles = null;
     let spinnerListRunning = []
+    let activeProcesses = [];
     // Helper function to display transient messages
     const showResponse = (message, isError = false) => {
       const responseArea = document.getElementById("responseArea");
@@ -588,7 +589,6 @@
         videoFiles = array.filter(videoFile => videoFile.url !== urls);
 
         const result = await res.json();
-        console.log(result);
         if (result.success) {
           showResponse("Videos deleted successfully.", false);
           populateVideos(); // refresh list
@@ -606,7 +606,6 @@
   const folderHeader = folderContent.previousElementSibling;
   
   if (spinnerListRunning.includes(folder)) {
-    console.log
     return;
   }
   spinnerListRunning.push(folder);
@@ -647,11 +646,22 @@
   spinnerListRunning = spinnerListRunning.filter((item) => item !== folder);
 }
 
+function checkSourceAvailability(streamer) {
+  return fetch("/api/get-online-status", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ streamer: streamer }),
+  })
+    .then((res) => res.json())
+    .then((data) => {
+      return data.message === "true"; // Ensures it returns a boolean
+    })
+    .catch((err) => {
+      console.error("Error starting process:", err);
+      return false; // Return false in case of an error
+    });
+}
 
-const checkSourceAvailability = async (streamer) => {
-  // Dummy function: Assume all sources are available
-  return true;
-};
 
 const updateRecorders = async () => {
   const container = document.getElementById("recorderProcessesContainer");
@@ -662,7 +672,6 @@ const updateRecorders = async () => {
   const streamers = await res.json();
 
   // Fetch currently active recorder processes
-  let activeProcesses = [];
   if (recorder_processes && Array.isArray(recorder_processes.processes)) {
     activeProcesses = recorder_processes.processes;
   }
@@ -672,7 +681,8 @@ const updateRecorders = async () => {
 
   for (const streamer of streamers) {
     const process = activeMap.get(streamer) || { name: streamer, isRecording: false };
-    
+
+    // Check if the live is available
     const isAvailable = await checkSourceAvailability(streamer);
 
     const processElement = document.createElement("div");
@@ -681,6 +691,9 @@ const updateRecorders = async () => {
       <div class="process-info" style="display: flex; align-items: center; justify-content: space-between; padding: 10px; border: 1px solid #ccc; border-radius: 5px; margin-bottom: 10px; background-color: #f9f9f9;">
         <div class="status-text" style="font-weight: bold; color: ${process.isRecording ? '#28a745' : '#dc3545'};">
           ${process.name} - ${process.isRecording ? "Recording" : "Not Recording"}
+          ${isAvailable ? "Online" : "Not Online"}
+        </div><div class="status-text" style="font-weight: bold; color: ${isAvailable ? '#28a745' : '#dc3545'};">
+          ${isAvailable ? "Online" : "Not Online"}
         </div>
         <div>
           <button class="start-button btn btn-sm btn-success" style="margin-left: 5px;" ${process.isRecording || !isAvailable ? "disabled" : ""}>Start</button>
@@ -891,13 +904,11 @@ const updateRecorders = async () => {
         populateLiveStream();
       });
 
-      updateStatus();
       populateStreamers();
       populateUsers();
       updateLogs();
       setInterval(updateLogs, 3000);
       setInterval(updateStatus, 5000);
-      setInterval(checkSourceAvailability, 60000);
       document.getElementById("video-tab").addEventListener("click", populateVideos);
       document.getElementById("recorderStatus-tab").addEventListener("click", updateRecorders);
     });

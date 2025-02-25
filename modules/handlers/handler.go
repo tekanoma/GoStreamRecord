@@ -24,6 +24,7 @@ func Handle() {
 	http.HandleFunc("/api/stop-single-process", streamers.StopProcess)
 	http.HandleFunc("/api/start-single-process", streamers.StartProcess)
 	http.HandleFunc("/api/restart-single-process", streamers.RestartProcess)
+	http.HandleFunc("/api/get-online-status", streamers.CheckOnline)
 	http.HandleFunc("/api/import", streamers.UploadHandler)
 	http.HandleFunc("/api/export", streamers.DownloadHandler)
 	http.HandleFunc("/api/status", web_status.StatusHandler)
