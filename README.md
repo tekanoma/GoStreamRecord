@@ -6,7 +6,7 @@ I started this project as my own Recordurbate V2 with webUI because i had some "
 
 All of my example commands will be in linux. But its very few, and most if not all are the same on windows/mac.
 
-__API NOTE__: The API is still open after adding adding login credentials. The plan is to use browser cookies and optinally API secret key in the future for credentials via API.
+__API NOTE__: The API is still open after adding adding login. The plan is to use browser cookies and optinally API secret key in the future for credentials via API. But every API endpoint will be reachable through a simple __curl__ command for now. This is not really any issue for anyone who only plan to use this inside their home network. But __Do NOT__ expose the port for this app on your router!! 
 
 ## Core Features
 ### Recorder:
