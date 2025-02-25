@@ -1,11 +1,5 @@
 # GoRecordurbate WebUI
 
-## Introduction 
-
-I started this project as my own version of [Recordurbate](https://github.com/oliverjrose99/Recordurbate) because i had some "issues" the others also have mentioned like [long restart time](https://github.com/oliverjrose99/Recordurbate/issues/77), [not all users are found](https://github.com/oliverjrose99/Recordurbate/issues/76), [status about recorders](https://github.com/oliverjrose99/Recordurbate/issues/75) (Still in developmen). And others that you'll see further down this page. 
-
-All of my example commands will be in linux. But its very few, and most if not all are the same on windows/mac.
-
 __API NOTE__: The API is still open after adding adding login. The plan is to use browser cookies and optinally API secret key in the future for credentials via API. But every API endpoint will be reachable through a simple __curl__ command for now. This is not really any issue for anyone who only plan to use this inside their home network. But __Do NOT__ expose the port for this app on your router!! 
 
 ## Core Features
@@ -124,8 +118,8 @@ _Online status with a small bug at the time of uploading this.._
 - Better video view
 
 
-
-
+### Disclaimer 
+Unauthorized resale, redistribution, or sharing of recorded content that you do not own or have explicit permission to distribute is strictly prohibited. Users are solely responsible for ensuring compliance with all applicable copyright and privacy laws. The creator of this recorder assumes no liability for any misuse or legal consequences arising from user actions.
 
 ## Thanks
 
