@@ -1,6 +1,7 @@
 package streamers
 
 import (
+	"GoRecordurbate/modules/bot"
 	"GoRecordurbate/modules/config"
 	"GoRecordurbate/modules/handlers/status"
 	"encoding/json"
@@ -73,4 +74,25 @@ func GetStreamers(w http.ResponseWriter, r *http.Request) {
 		list = append(list, s.Name)
 	}
 	json.NewEncoder(w).Encode(list)
+}
+
+// Handles POST /api/stop-singleProcess.
+// It decodes a JSON payload with the selected option and returns a dummy response.
+func StopProcess(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		http.Error(w, "Only POST allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	type RequestData struct {
+		Streamer string `json:"streamer"`
+	}
+	var reqData RequestData
+	if err := json.NewDecoder(r.Body).Decode(&reqData); err != nil {
+		http.Error(w, "Invalid request payload", http.StatusBadRequest)
+		return
+	}
+	status.ResponseHandler(w, r, "Stopping process for "+reqData.Streamer, nil)
+	bot.Bot.StopProcess(reqData.Streamer)
+	status.ResponseHandler(w, r, "Stopped process for"+reqData.Streamer, nil)
 }

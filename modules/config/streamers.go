@@ -36,7 +36,7 @@ func appendStreamer(newList []string) {
 		exist := false
 		for _, streamer := range Streamers.StreamerList {
 			if line == streamer.Name {
-				fmt.Printf("%s has already been added", streamer)
+				log.Printf("%s has already been added", streamer)
 				exist = true
 				break
 			}
@@ -71,14 +71,4 @@ func RemoveStreamer(streamerName string) string {
 	log.Printf("%s has been deleted", streamerName)
 	return fmt.Sprintf("%s has been deleted", streamerName)
 
-}
-
-// TODO: Send to frontend webUI
-func (s *Streamer) ListStreamers() {
-	fmt.Println("Streamers in recording list:")
-	log.Println("Streamers in recording list:")
-	for _, streamer := range Streamers.StreamerList {
-		fmt.Printf("- %s", streamer)
-		log.Printf("- %s", streamer)
-	}
 }

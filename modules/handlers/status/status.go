@@ -39,3 +39,13 @@ func StatusHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(recorder)
 }
+
+func ResponseHandler(w http.ResponseWriter, r *http.Request, message string, data interface{}) {
+	resp := Response{
+		Status:  "success",
+		Message: message,
+		Data:    data,
+	}
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(resp)
+}

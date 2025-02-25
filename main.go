@@ -6,6 +6,7 @@ import (
 	"GoRecordurbate/modules/file"
 	"GoRecordurbate/modules/handlers"
 	"GoRecordurbate/modules/handlers/cookies"
+	"GoRecordurbate/modules/handlers/login"
 	"context"
 	_ "embed"
 	"fmt"
@@ -42,6 +43,50 @@ func init() {
 }
 
 func main() {
+	if len(os.Args) > 1 {
+		if os.Args[1] != "reset-pwd" {
+			fmt.Println("Usage: ./GoRecordurbate reset-pwd <username> <new-password>")
+			fmt.Println("Otherwise run the server without any arguments.")
+			return
+		}
+
+		if len(os.Args) <= 2 {
+			fmt.Println("No username provided.")
+			fmt.Println("Usage: ./GoRecordurbate reset-pwd <username> <new-password>")
+			fmt.Println("Otherwise run the server without any arguments.")
+			return
+		}
+
+		username := os.Args[2]
+		if len(os.Args) <= 3 {
+			fmt.Println("No new password provided.")
+			fmt.Println("Usage: ./GoRecordurbate reset-pwd <username> <new-password>")
+			fmt.Println("Otherwise run the server without any arguments.")
+			return
+		}
+
+		newPassword := os.Args[3]
+		userFound := false
+
+		for i, u := range config.Users.Users {
+			if u.Name == username {
+				config.Users.Users[i].Key = string(login.HashedPassword(newPassword))
+				userFound = true
+				break
+			}
+		}
+
+		if !userFound {
+			log.Println("No matching username found.")
+			fmt.Println("No matching username found.")
+		}
+		config.Update(file.Users_json_path, config.Users)
+		log.Println("Password updated for", username)
+		fmt.Println("Password updated for", username)
+		return // Exit after resetting password
+
+	}
+
 	//http.Handle("/", fs)
 	handlers.Handle()
 	server := &http.Server{
@@ -64,7 +109,7 @@ func main() {
 	// Wait for a termination signal
 	<-stop
 	log.Println("Shutting down server...")
-	bot.Bot.Stop()
+	bot.Bot.StopBot("")
 	// Create a context with a timeout for graceful shutdown
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
