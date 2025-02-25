@@ -17,7 +17,8 @@ __API NOTE__: The api is basically un-tested after adding login credentials. The
 - Directly view logs and recorded videos through the WebUI.
 - Watch live streams directly from the WebUI.
 ### Setup & Deployment:
-- Docker configuration and service examples for straightforward deployment. Or install [Golang](https://go.dev/doc/install) and build a binary yourself ;)
+- Docker configuration and service examples for straightforward deployment.
+- Install [Golang](https://go.dev/doc/install) to build binary.
 - Scalable design to handle multiple streamers without restarting services.
 ## Usage
 
