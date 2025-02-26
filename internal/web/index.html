@@ -155,9 +155,9 @@
             <div class="card mb-4">
               <div class="card-header">Control Panel</div>
               <div class="card-body text-center">
-                <button type="button" class="btn btn-success me-3" id="startCommand">Start all recordings</button>
-                <button type="button" class="btn btn-dark me-3" id="stopCommand">Stop all recordings</button>
-                <button type="button" class="btn btn-secondary" id="restartCommand">Restart all recordings</button>
+                <button type="button" class="btn btn-success me-3" id="startAllCommand">Start all recordings</button>
+                <button type="button" class="btn btn-dark me-3" id="stopAllCommand">Stop all recordings</button>
+                <button type="button" class="btn btn-secondary" id="restartAllCommand">Restart all recordings</button>
               </div>
             </div>
             <!-- Monitor Card with Nested Tabs -->
@@ -436,15 +436,16 @@
     };
 
     /* ------------------ RECORDER SECTION ------------------ */
-    const sendControlCommand = async (command) => {
+    const sendCommand = async (command, name) => {
       try {
         const res = await fetch("/api/control", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ command })
+          body: JSON.stringify({ command, name })
         });
         const data = await res.json();
-        showResponse(`Command "${command}" executed: ${JSON.stringify(data)}`);
+        showResponse(`Sent : ${JSON.stringify(data)}`);
+
       } catch (err) {
         console.error(err);
         showResponse(`Error executing command "${command}".`, true);
@@ -485,7 +486,7 @@
         const data = await res.json();
         const logTerminal = document.getElementById("logTerminal");
         logTerminal.innerText = data.join("\n");
-        logTerminal.scrollTop = logTerminal.scrollHeight;
+        // logTerminal.scrollTop = logTerminal.scrollHeight;
       } catch (err) {
         console.error("Error fetching logs:", err);
       }
@@ -508,7 +509,7 @@
         });
         videoFiles = folders;
 
-        renderVideos( folders);
+        renderVideos(folders);
       } catch (err) {
         console.error(err);
         showResponse("Error fetching videos.", true);
@@ -516,23 +517,23 @@
     };
 
     const renderVideos = (folders) => {
-      
+
       const container = document.getElementById("videoFilesContainer");
-        container.innerHTML = "";
-        const deleteBtn = document.createElement("button");
-        deleteBtn.id = "deleteSelectedBtn";
-        deleteBtn.className = "btn btn-danger mb-3";
-        deleteBtn.textContent = "Delete Selected Videos";
-        deleteBtn.addEventListener("click", deleteSelectedVideos);
+      container.innerHTML = "";
+      const deleteBtn = document.createElement("button");
+      deleteBtn.id = "deleteSelectedBtn";
+      deleteBtn.className = "btn btn-danger mb-3";
+      deleteBtn.textContent = "Delete Selected Videos";
+      deleteBtn.addEventListener("click", deleteSelectedVideos);
 
-        container.prepend(deleteBtn); // Adds the button at the top
-    
-    // Render folders and videos
-    Object.entries(folders).forEach(([folder, videos]) => {
-      const folderElement = document.createElement("div");
-      folderElement.className = "card mb-3 shadow-sm";
+      container.prepend(deleteBtn); // Adds the button at the top
 
-      folderElement.innerHTML = `
+      // Render folders and videos
+      Object.entries(folders).forEach(([folder, videos]) => {
+        const folderElement = document.createElement("div");
+        folderElement.className = "card mb-3 shadow-sm";
+
+        folderElement.innerHTML = `
         <div class="card-header d-flex justify-content-between align-items-center" onclick="toggleFolder('${folder}')"
           style="cursor: pointer; background: #f8f9fa; border-radius: 8px;">
           <strong>${folder}</strong>
@@ -541,18 +542,18 @@
         <div id="folder-${folder}" class="card-body folder-content" style="display: none; padding: 15px;"></div>
       `;
 
-      container.appendChild(folderElement);
+        container.appendChild(folderElement);
 
-      const folderContent = folderElement.querySelector(".folder-content");
-      // Set grid layout properties (but leave display as 'none' by default)
-      folderContent.style.gridTemplateColumns = "repeat(auto-fill, minmax(200px, 1fr))";
-      folderContent.style.gap = "15px";
+        const folderContent = folderElement.querySelector(".folder-content");
+        // Set grid layout properties (but leave display as 'none' by default)
+        folderContent.style.gridTemplateColumns = "repeat(auto-fill, minmax(200px, 1fr))";
+        folderContent.style.gap = "15px";
 
-      videos.forEach((obj) => {
-        const videoElement = document.createElement("div");
-        videoElement.className = "video-item card p-2 border";
-        videoElement.style.position = "relative";
-        videoElement.innerHTML = `
+        videos.forEach((obj) => {
+          const videoElement = document.createElement("div");
+          videoElement.className = "video-item card p-2 border";
+          videoElement.style.position = "relative";
+          videoElement.innerHTML = `
           <!-- Checkbox for selecting video -->
           <div class="form-check" style="position: absolute; top: 5px; right: 5px; z-index: 10;">
             <input class="form-check-input video-checkbox" type="checkbox" value="${obj.url}" id="chk-${obj.url}">
@@ -565,9 +566,9 @@
             Your browser does not support the video tag.
           </video>
         `;
-        folderContent.appendChild(videoElement);
+          folderContent.appendChild(videoElement);
+        });
       });
-    });
     };
 
     const deleteSelectedVideos = async () => {
@@ -599,148 +600,119 @@
 
     // Toggle function to show/hide folder contents smoothly
     function toggleFolder(folder) {
-  const folderContent = document.getElementById(`folder-${folder}`);
-  // Get the header element (assuming the structure remains constant)
-  const folderHeader = folderContent.previousElementSibling;
-  
-  if (spinnerListRunning.includes(folder)) {
-    return;
-  }
-  spinnerListRunning.push(folder);
-  // If the folder is being expanded:
-  if (folderContent.style.display === "none") {
-    // Add a temporary active class for visual feedback (you can style this in CSS)
-    folderHeader.classList.add('active');
-
-    // Create and append a spinner element
-    const spinner = document.createElement('span');
-    spinner.className = 'spinner-border spinner-border-sm ms-2'; // Using Bootstrap spinner classes
-    spinner.setAttribute('role', 'status');
-    spinner.setAttribute('aria-hidden', 'true');
-    folderHeader.appendChild(spinner);
-
-    // Simulate a delay for rendering (replace this with your actual rendering logic)
-    setTimeout(() => {
-      // Remove the spinner and active indication
-      spinner.remove();
-      folderHeader.classList.remove('active');
-      
       const folderContent = document.getElementById(`folder-${folder}`);
-      if (folderContent.style.display === "none" || folderContent.style.display === "") {
-        // Open folder: switch display to grid for a compact layout
-        folderContent.style.display = "grid";
-        folderContent.style.animation = "fadeIn 0.3s ease-in-out";
-      } else {
-        // Close folder with fade out animation
-        folderContent.style.animation = "fadeOut 0.3s ease-in-out";
-        setTimeout(() => { folderContent.style.display = "none"; }, 300);
+      // Get the header element (assuming the structure remains constant)
+      const folderHeader = folderContent.previousElementSibling;
+
+      if (spinnerListRunning.includes(folder)) {
+        return;
       }
-    }, 500); // Adjust the delay as needed
-  } else {
-    // If collapsing, simply hide the content
-    folderContent.style.display = "none";
-  }
+      spinnerListRunning.push(folder);
+      // If the folder is being expanded:
+      if (folderContent.style.display === "none") {
+        // Add a temporary active class for visual feedback (you can style this in CSS)
+        folderHeader.classList.add('active');
 
-  spinnerListRunning = spinnerListRunning.filter((item) => item !== folder);
-}
+        // Create and append a spinner element
+        const spinner = document.createElement('span');
+        spinner.className = 'spinner-border spinner-border-sm ms-2'; // Using Bootstrap spinner classes
+        spinner.setAttribute('role', 'status');
+        spinner.setAttribute('aria-hidden', 'true');
+        folderHeader.appendChild(spinner);
 
-function checkSourceAvailability(streamer) {
-  return fetch("/api/get-online-status", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ streamer: streamer }),
-  })
-    .then((res) => res.json())
-    .then((data) => {
-      return data.message === "true"; // Ensures it returns a boolean
-    })
-    .catch((err) => {
-      console.error("Error starting process:", err);
-      return false; // Return false in case of an error
-    });
-}
+        // Simulate a delay for rendering (replace this with your actual rendering logic)
+        setTimeout(() => {
+          // Remove the spinner and active indication
+          spinner.remove();
+          folderHeader.classList.remove('active');
 
+          const folderContent = document.getElementById(`folder-${folder}`);
+          if (folderContent.style.display === "none" || folderContent.style.display === "") {
+            // Open folder: switch display to grid for a compact layout
+            folderContent.style.display = "grid";
+            folderContent.style.animation = "fadeIn 0.3s ease-in-out";
+          } else {
+            // Close folder with fade out animation
+            folderContent.style.animation = "fadeOut 0.3s ease-in-out";
+            setTimeout(() => { folderContent.style.display = "none"; }, 300);
+          }
+        }, 500); // Adjust the delay as needed
+      } else {
+        // If collapsing, simply hide the content
+        folderContent.style.display = "none";
+      }
 
-const updateRecorders = async () => {
-  const container = document.getElementById("recorderProcessesContainer");
-  container.innerHTML = "";
+      spinnerListRunning = spinnerListRunning.filter((item) => item !== folder);
+    }
 
-  // Fetch all possible streamers
-  const res = await fetch("/api/get-streamers");
-  const streamers = await res.json();
-
-  // Fetch currently active recorder processes
-  if (recorder_processes && Array.isArray(recorder_processes.processes)) {
-    activeProcesses = recorder_processes.processes;
-  }
-
-  // Map active processes by name for quick lookup
-  const activeMap = new Map(activeProcesses.map((p) => [p.name, p]));
-
-  for (const streamer of streamers) {
-    const process = activeMap.get(streamer) || { name: streamer, isRecording: false };
-
-    // Check if the live is available
-    const isAvailable = await checkSourceAvailability(streamer);
-
-    const processElement = document.createElement("div");
-    processElement.className = "recorder-process";
-    processElement.innerHTML = `
-      <div class="process-info" style="display: flex; align-items: center; justify-content: space-between; padding: 10px; border: 1px solid #ccc; border-radius: 5px; margin-bottom: 10px; background-color: #f9f9f9;">
-        <div class="status-text" style="font-weight: bold; color: ${process.isRecording ? '#28a745' : '#dc3545'};">
-          ${process.name} - ${process.isRecording ? "Recording" : "Not Recording"}
-          ${isAvailable ? "Online" : "Not Online"}
-        </div><div class="status-text" style="font-weight: bold; color: ${isAvailable ? '#28a745' : '#dc3545'};">
-          ${isAvailable ? "Online" : "Not Online"}
-        </div>
-        <div>
-          <button class="start-button btn btn-sm btn-success" style="margin-left: 5px;" ${process.isRecording || !isAvailable ? "disabled" : ""}>Start</button>
-          <button class="stop-button btn btn-sm btn-danger" style="margin-left: 5px;" ${!process.isRecording ? "disabled" : ""}>Stop</button>
-          <button class="restart-button btn btn-sm btn-warning" style="margin-left: 5px;" ${!process.isRecording ? "disabled" : ""}>Restart</button>
-        </div>
-      </div>
-    `;
-
-    const startButton = processElement.querySelector(".start-button");
-    const stopButton = processElement.querySelector(".stop-button");
-    const restartButton = processElement.querySelector(".restart-button");
-
-    startButton.addEventListener("click", async () => {
-      fetch("/api/start-single-process", {
+    function checkSourceAvailability(streamer) {
+      return fetch("/api/get-online-status", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ streamer: process.name }),
+        body: JSON.stringify({ streamer: streamer }),
       })
-      .then((res) => res.json())
-      .then(() => updateRecorders())
-      .catch((err) => console.error("Error starting process:", err));
-    });
+        .then((res) => res.json())
+        .then((data) => {
+          return data.message === "true"; // Ensures it returns a boolean
+        })
+        .catch((err) => {
+          console.error("Error starting process:", err);
+          return false; // Return false in case of an error
+        });
+    }
 
-    stopButton.addEventListener("click", async () => {
-      fetch("/api/stop-single-process", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ streamer: process.name }),
-      })
-      .then((res) => res.json())
-      .then(() => updateRecorders())
-      .catch((err) => console.error("Error stopping process:", err));
-    });
 
-    restartButton.addEventListener("click", async () => {
-      fetch("/api/restart-single-process", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ streamer: process.name }),
-      })
-      .then((res) => res.json())
-      .then(() => updateRecorders())
-      .catch((err) => console.error("Error restarting process:", err));
-    });
+    const updateRecorders = async () => {
+      const container = document.getElementById("recorderProcessesContainer");
+      container.innerHTML = "";
 
-    container.appendChild(processElement);
-  }
-};
+      // Fetch all possible streamers
+      const res = await fetch("/api/get-streamers");
+      const streamers = await res.json();
+
+      // Fetch currently active recorder processes
+      if (recorder_processes && Array.isArray(recorder_processes.processes)) {
+        activeProcesses = recorder_processes.processes;
+      }
+
+      // Map active processes by name for quick lookup
+      const activeMap = new Map(activeProcesses.map((p) => [p.name, p]));
+
+      for (const streamer of streamers) {
+        const process = activeMap.get(streamer) || { name: streamer, isRecording: false };
+
+        // Check if the live is available
+        const isAvailable = await checkSourceAvailability(streamer);
+
+        const processElement = document.createElement("div");
+        processElement.className = "recorder-process";
+        processElement.innerHTML = `
+<div class="process-info" style="display: flex; align-items: center; justify-content: space-between; padding: 14px; border: 1px solid #ddd; border-radius: 12px; margin-bottom: 10px; background-color: #fafafa;">
+  <div class="status-text" style="font-weight: bold; color: ${process.isRecording ? '#2ecc71' : '#e74c3c'};">
+   ${process.isRecording ? "Recording" : "Not Recording"}
+  </div>
+  <div class="status-text" style="font-weight: bold; color: ${isAvailable ? '#2ecc71' : '#e74c3c'};">
+     ${process.name} - ${isAvailable ? "Online" : "Not Online"}
+  </div>
+  <div>
+    <button class="start-button" style="padding: 8px 14px; background-color: #2ecc71; border: none; border-radius: 20px; color: #fff;" ${process.isRecording || !isAvailable ? "disabled" : ""}>Start</button>
+    <button class="stop-button" style="padding: 8px 14px; background-color: #e74c3c; border: none; border-radius: 20px; color: #fff; margin-left: 5px;" ${!process.isRecording ? "disabled" : ""}>Stop</button>
+    <button class="restart-button" style="padding: 8px 14px; background-color: #f1c40f; border: none; border-radius: 20px; color: #fff; margin-left: 5px;" ${!process.isRecording ? "disabled" : ""}>Restart</button>
+  </div>
+</div>`;
+
+        const startButton = processElement.querySelector(".start-button");
+        const stopButton = processElement.querySelector(".stop-button");
+        const restartButton = processElement.querySelector(".restart-button");
+
+        startButton.addEventListener("click", () => sendCommand("start",process.name));
+        stopButton.addEventListener("click", () => sendCommand("stop",process.name));
+        restartButton.addEventListener("click", () => sendCommand("restart",process.name));
+
+
+        container.appendChild(processElement);
+      }
+    };
 
 
     /* ------------------ STATUS INDICATOR ------------------ */
@@ -755,7 +727,7 @@ const updateRecorders = async () => {
         recorder_processes = Object.keys(data.botStatus).length ? data.botStatus : null;
         statusIndicator.innerText = "Status: " + data.status;
         statusIndicator.style.backgroundColor = data.status === "Running" ? "#3dbb24af" : "#fab1a0";
-        updateRecorders();
+        //updateRecorders();
       } catch (err) {
         console.error("Error fetching status:", err);
       }
@@ -869,14 +841,15 @@ const updateRecorders = async () => {
       }
     };
 
+
     /* ------------------ INITIALIZATION ------------------ */
     document.addEventListener("DOMContentLoaded", () => {
       // Streamers events
       document.getElementById("addStreamerButton").addEventListener("click", addStreamer);
       // Recorder events
-      document.getElementById("startCommand").addEventListener("click", () => sendControlCommand("start"));
-      document.getElementById("stopCommand").addEventListener("click", () => sendControlCommand("stop"));
-      document.getElementById("restartCommand").addEventListener("click", () => sendControlCommand("restart"));
+      document.getElementById("startAllCommand").addEventListener("click", () => sendCommand("start",""));
+      document.getElementById("stopAllCommand").addEventListener("click", () => sendCommand("stop",""));
+      document.getElementById("restartAllCommand").addEventListener("click", () => sendCommand("restart",""));
       // File management events
       document.getElementById("uploadFileButton").addEventListener("click", uploadFile);
       document.getElementById("downloadFileButton").addEventListener("click", downloadFile);
