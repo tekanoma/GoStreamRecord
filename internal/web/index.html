@@ -360,7 +360,7 @@
     let recorder_processes = null;
     let liveStreamSrc = null;
     let selectedUser = null;
-    let videoFiles = null;
+    let videoFiles = [];
     let spinnerListRunning = []
     let activeProcesses = [];
     // Helper function to display transient messages
@@ -586,16 +586,14 @@
         });
 
         // Remove deleted videos from the list
-        videoFiles = array.filter(videoFile => videoFile.url !== urls);
-
         const result = await res.json();
-        if (result.success) {
-          showResponse("Videos deleted successfully.", false);
+        if (result.data.success) {
+          showResponse(result.data.message, !result.data.success);
           populateVideos(); // refresh list
         }
       } catch (err) {
         console.error(err);
-        showResponse("Error deleting videos.",true);
+        showResponse(result.data.message, result.data.success);
       }
     };
 
