@@ -486,7 +486,7 @@
         const data = await res.json();
         const logTerminal = document.getElementById("logTerminal");
         logTerminal.innerText = data.join("\n");
-        // logTerminal.scrollTop = logTerminal.scrollHeight;
+        logTerminal.scrollTop = logTerminal.scrollHeight;
       } catch (err) {
         console.error("Error fetching logs:", err);
       }
