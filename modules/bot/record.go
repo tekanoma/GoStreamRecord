@@ -12,12 +12,6 @@ import (
 // runRecordLoop starts a recording for the given streamer (if online) and waits for the process to finish.
 func (b *bot) runRecordLoop(streamerName string) {
 
-	// If the bot is stopping, do not check online status.
-	select {
-	case <-b.stopRecording:
-		return
-	default:
-	}
 
 	log.Printf("[bot]: Checking %s room status...", streamerName)
 	if !b.IsOnline(streamerName) {

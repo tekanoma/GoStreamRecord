@@ -37,7 +37,7 @@ type bot struct {
 	isFirstRun bool
 	logger     *log.Logger
 	Interface
-	stopRecording chan bool
+	stopProcessName chan string
 	// ctx is used to signal shutdown.
 	ctx    context.Context
 	cancel context.CancelFunc
@@ -61,12 +61,12 @@ func NewBot(logger *log.Logger) *bot {
 		IsRunning: false,
 	}
 	b := &bot{
-		stopRecording: make(chan bool),
-		logger:        logger,
-		ctx:           ctx,
-		cancel:        cancel,
-		status:        s,
-		isFirstRun:    true,
+		stopProcessName: make(chan string),
+		logger:          logger,
+		ctx:             ctx,
+		cancel:          cancel,
+		status:          s,
+		isFirstRun:      true,
 	}
 
 	// Register to catch SIGINT and SIGTERM and trigger Stop.
@@ -75,13 +75,16 @@ func NewBot(logger *log.Logger) *bot {
 	go func() {
 		s := <-sigs
 		logger.Printf("Caught signal %v, stopping", s)
-		b.StopBot("")
+		b.Stop("")
 	}()
 	return b
 }
 
 func (b *bot) Status() BotStatus {
 	return b.status
+}
+func (b *bot) Stop(processName string) {
+	b.stopProcessName <- processName
 }
 
 func (b *bot) AppendStreamer(name string) {
@@ -180,6 +183,7 @@ func (b *bot) IsOnline(username string) bool {
 // It also checks for a stop signal and waits for active recordings to finish before stopping.
 // Streamer name is optional and can be used to start a single recorder.
 func (b *bot) RecordLoop(streamerName string) {
+	b.status.IsRunning = true
 	b.isFirstRun = true
 	is_single_run := false
 	if streamerName != "" {
@@ -199,13 +203,16 @@ func (b *bot) RecordLoop(streamerName string) {
 	// Main loop.
 	for {
 		select {
-		case <-b.stopRecording:
+		case name := <-b.stopProcessName:
+
 			log.Println("stop signal received! Waiting for active recordings to finish.")
-			b.stopActiveProcesses("")
+			b.stopActiveProcesses(name)
 			wg.Wait()
 			log.Println("Stopped!")
-			b.status.IsRunning = false
-			return
+			if is_single_run && name == streamerName || b.ListRecorders() == nil {
+				b.status.IsRunning = false
+				return
+			}
 		case <-ticker.C:
 			// Optionally reload config.
 			if config.Settings.AutoReload {

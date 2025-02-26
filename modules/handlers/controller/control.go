@@ -18,6 +18,7 @@ func ControlHandler(w http.ResponseWriter, r *http.Request) {
 
 	type RequestData struct {
 		Command string `json:"command"`
+		Name    string `json:"name"`
 	}
 	var reqData RequestData
 	if err := json.NewDecoder(r.Body).Decode(&reqData); err != nil {
@@ -25,7 +26,7 @@ func ControlHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	bot.Bot.Command(reqData.Command)
+	go bot.Bot.Command(reqData.Command, reqData.Name)
 	resp := web_status.Response{
 		Message: fmt.Sprintf("Control command '%s' executed", reqData.Command),
 	}
