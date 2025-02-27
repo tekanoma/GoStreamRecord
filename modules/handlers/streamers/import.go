@@ -2,6 +2,7 @@ package streamers
 
 import (
 	"GoRecordurbate/modules/config"
+	"GoRecordurbate/modules/handlers/cookies"
 	web_status "GoRecordurbate/modules/handlers/status"
 	"encoding/json"
 	"fmt"
@@ -14,6 +15,10 @@ import (
 // Handles POST /api/upload.
 // It reads an uploaded file and returns a dummy success response.
 func UploadHandler(w http.ResponseWriter, r *http.Request) {
+	if !cookies.Session.IsLoggedIn(w, r) {
+		http.Redirect(w, r, "/login", http.StatusFound)
+		return
+	}
 	if r.Method != http.MethodPost {
 		http.Error(w, "Only POST allowed", http.StatusMethodNotAllowed)
 		return

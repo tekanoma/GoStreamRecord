@@ -4,6 +4,7 @@ import (
 	"GoRecordurbate/modules/bot"
 	"GoRecordurbate/modules/config"
 	"GoRecordurbate/modules/file"
+	"GoRecordurbate/modules/handlers/cookies"
 	"encoding/json"
 	"net/http"
 )
@@ -17,6 +18,10 @@ type Response struct {
 }
 
 func StatusHandler(w http.ResponseWriter, r *http.Request) {
+	if !cookies.Session.IsLoggedIn(w, r) {
+		http.Redirect(w, r, "/login", http.StatusFound)
+		return
+	}
 	if r.Method != http.MethodGet {
 		http.Error(w, "Only GET allowed", http.StatusMethodNotAllowed)
 		return

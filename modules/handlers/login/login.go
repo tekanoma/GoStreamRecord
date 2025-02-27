@@ -52,6 +52,5 @@ func PostLogin(w http.ResponseWriter, r *http.Request) {
 		//http.Error(w, "Could not save session", http.StatusInternalServerError)
 		return
 	}
-
 	http.Redirect(w, r, "/", http.StatusFound)
 }

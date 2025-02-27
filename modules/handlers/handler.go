@@ -54,17 +54,12 @@ func Handle() {
 	})
 
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		session, err := cookies.Session.Store().Get(r, "session")
-		if err != nil {
-			http.Error(w, "Session error", http.StatusInternalServerError)
-			return
-		}
-		if auth, ok := session.Values["authenticated"].(bool); !ok || !auth {
-			http.Redirect(w, r, "/login", http.StatusFound)
-			//http.HandleFunc("/login", handlers.GetLogin)
-
-		} else {
+		if cookies.Session.IsLoggedIn(w, r) {
 			GetIndex(w, r)
+			return
+		} else {
+			http.Redirect(w, r, "/login", http.StatusFound)
+			return
 		}
 	})
 }
