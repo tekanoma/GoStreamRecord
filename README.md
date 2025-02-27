@@ -1,7 +1,6 @@
 # GoRecordurbate WebUI
 
-__API NOTE__: The API is still open after adding adding login. The plan is to use browser cookies and optinally API secret key in the future for credentials via API. But every API endpoint will be reachable through a simple __curl__ command for now. This is not really any issue for anyone who only plan to use this inside their home network. But __Do NOT__ expose the port for this app on your router!! 
-
+__API NOTE__: The API is still in early development. I've added checks for login/API, but i would not recommend exposing the port for this app on your router as of now. 
 ## Core Features
 ### Recorder:
 - Streamer status checks bypasses rate limits; recording rate limits still under testing.
