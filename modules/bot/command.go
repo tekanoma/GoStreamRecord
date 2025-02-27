@@ -46,7 +46,7 @@ func (b *bot) Command(command string, name string) {
 			// Stop all
 
 			if name == "" || s.Name == name {
-				fmt.Println("Stopping:", name)
+				log.Println("Stopping:", name)
 				wg_was_added = true
 				wg.Add(1)
 				go b.Stop(s.Name)
