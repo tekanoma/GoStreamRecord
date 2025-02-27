@@ -387,8 +387,8 @@
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ data: name })
         });
-        const data = await res.json();
-        showResponse("Streamer added: " + JSON.stringify(data));
+        const data = await res.json(); 
+        showResponse(data.message, !data.status);
         input.value = "";
         populateStreamers();
       } catch (err) {
@@ -427,7 +427,7 @@
           body: JSON.stringify({ selected: name })
         });
         const data = await res.json();
-        showResponse("Streamer removed: " + JSON.stringify(data));
+        showResponse(data.message, !data.success);
         populateStreamers();
       } catch (err) {
         console.error(err);
@@ -442,11 +442,11 @@
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ command, name })
-        });
+        });   
         const data = await res.json();
-        showResponse(`Sent : ${JSON.stringify(data)}`);
+        showResponse(data.message, !data.success);
 
-      } catch (err) {
+      } catch (err) { 
         console.error(err);
         showResponse(`Error executing command "${command}".`, true);
       }
@@ -468,7 +468,8 @@
           body: formData
         });
         const data = await res.json();
-        showResponse("File uploaded: " + JSON.stringify(data));
+        showResponse(data.message, !data.success);
+//         showResponse("File uploaded: " + JSON.stringify(data));
       } catch (err) {
         console.error(err);
         showResponse("Error uploading file.", true);
@@ -486,7 +487,7 @@
         const data = await res.json();
         const logTerminal = document.getElementById("logTerminal");
         logTerminal.innerText = data.join("\n");
-        // logTerminal.scrollTop = logTerminal.scrollHeight;
+        logTerminal.scrollTop = logTerminal.scrollHeight;
       } catch (err) {
         console.error("Error fetching logs:", err);
       }
@@ -780,7 +781,7 @@
           body: JSON.stringify({ username, password })
         });
         const data = await res.json();
-        showResponse("User added: " + JSON.stringify(data));
+        showResponse(data.message, !data.success);
         document.getElementById("addUserName").value = "";
         document.getElementById("addUserPassword").value = "";
         populateUsers();
@@ -808,7 +809,7 @@
           body: JSON.stringify({ oldUsername: selectedUser, newUsername, newPassword })
         });
         const data = await res.json();
-        showResponse("User updated: " + JSON.stringify(data));
+        showResponse(data.message, data.success);
         selectedUser = null;
         document.getElementById("updateUserName").value = "";
         document.getElementById("updateUserPassword").value = "";
