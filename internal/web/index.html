@@ -148,7 +148,7 @@
 
       <!-- Main Content Area -->
       <main class="col-md-9">
-      
+
         <div class="tab-content" id="v-pills-tabContent">
           <!-- Recorder Section -->
           <section class="tab-pane fade show active" id="recorderSection" role="tabpanel"
@@ -162,7 +162,7 @@
                 <button type="button" class="btn btn-secondary" id="restartAllCommand">Restart all recordings</button>
               </div>
             </div>
-            
+
             <!-- Monitor Card with Nested Tabs -->
             <div class="card">
               <div class="card-header">Details</div>
@@ -287,101 +287,100 @@
 
 
 
+                  </div>
 
-                    <div class="tab-pane fade" id="recorderManagementSection" role="tabpanel">
+                  <div class="tab-pane fade" id="recorderManagementSection" role="tabpanel">
 
-                      <div class="card-header">Streamers</div>
+                    <div class="card-header">Streamers</div>
+                    <div class="card-body">
+                      <form id="streamerForm" class="mb-3">
+                        <label for="streamerInput" class="form-label">Add a New Streamer:</label>
+                        <div class="input-group">
+                          <input type="text" id="streamerInput" class="form-control" placeholder="Streamer name"
+                            required />
+                          <button type="button" class="btn btn-primary" id="addStreamerButton">Add</button>
+                        </div>
+                      </form>
+                      <article class="mb-4">
+                        <div class="card-header">Current Streamers</div>
+                        <ul class="list-group" id="streamersList">
+                          <!-- Dynamically populated -->
+                        </ul>
+
+                      </article>
+                    </div>
+
+                    <!-- Import/Export Card -->
+                    <div class="card">
+                      <div class="card-header">Import/Export</div>
                       <div class="card-body">
-                        <form id="streamerForm" class="mb-3">
-                          <label for="streamerInput" class="form-label">Add a New Streamer:</label>
-                          <div class="input-group">
-                            <input type="text" id="streamerInput" class="form-control" placeholder="Streamer name"
-                              required />
-                            <button type="button" class="btn btn-primary" id="addStreamerButton">Add</button>
-                          </div>
-                        </form>
-                        <article class="mb-4">
-                          <div class="card-header">Current Streamers</div>
-                          <ul class="list-group" id="streamersList">
-                            <!-- Dynamically populated -->
-                          </ul>
-
-                        </article>
-                      </div>
-
-                      <!-- Import/Export Card -->
-                      <div class="card">
-                        <div class="card-header">Import/Export</div>
-                        <div class="card-body">
-                          <div class="mb-4">
-                            <label for="importFile" class="form-label">Import File:</label>
-                            <input type="file" id="importFile" class="form-control mb-2" />
-                            <button type="button" class="btn btn-secondary" id="uploadFileButton">Upload</button>
-                          </div>
-                          <div>
-                            <label class="form-label">Export File:</label><br />
-                            <button type="button" class="btn btn-secondary" id="downloadFileButton">Download</button>
-                          </div>
+                        <div class="mb-4">
+                          <label for="importFile" class="form-label">Import File:</label>
+                          <input type="file" id="importFile" class="form-control mb-2" />
+                          <button type="button" class="btn btn-secondary" id="uploadFileButton">Upload</button>
+                        </div>
+                        <div>
+                          <label class="form-label">Export File:</label><br />
+                          <button type="button" class="btn btn-secondary" id="downloadFileButton">Download</button>
                         </div>
                       </div>
                     </div>
                   </div>
                 </div>
-
               </div>
 
-
             </div>
-          </section>
 
 
-
-
-          <!-- LiveStream Section -->
-          <section class="tab-pane fade" id="LiveStreamSection" role="tabpanel"
-            aria-labelledby="v-pills-LiveStream-tab">
-            <div class="card">
-              <div class="card-header">Live Stream Settings</div>
-              <div class="card-body">
-                <form id="livestreamForm" class="mb-3">
-                  <div class="mb-3">
-                    <label for="chatStreamer" class="form-label">Streamer Name:</label>
-                    <input type="text" id="chatStreamer" class="form-control" placeholder="Streamer name" required />
-                  </div>
-                  <div class="mb-3">
-                    <div class="form-check form-check-inline">
-                      <input class="form-check-input" type="radio" name="livestream-option" id="optionChat"
-                        value="chat">
-                      <label class="form-check-label" for="optionChat">Show chat</label>
-                    </div>
-                    <div class="form-check form-check-inline">
-                      <input class="form-check-input" type="radio" name="livestream-option" id="optionLive" value="live"
-                        checked>
-                      <label class="form-check-label" for="optionLive">Live only</label>
-                    </div>
-                    <div class="form-check form-check-inline">
-                      <input class="form-check-input" type="radio" name="livestream-option" id="optionInteractive"
-                        value="interactive">
-                      <label class="form-check-label" for="optionInteractive">Interactive</label>
-                    </div>
-                  </div>
-                  <button type="submit" class="btn btn-primary">Apply</button>
-                </form>
-                <hr />
-
-                <article class="mb-4">
-                  <div class="card-header">Live Stream</div>
-                  <ul id="liveStreamCamera">
-                    <!-- Dynamically populated -->
-                  </ul>
-
-                </article>
-              </div>
-            </div>
-          </section>
         </div>
-      </main>
+        </section>
+
+
+
+
+        <!-- LiveStream Section -->
+        <section class="tab-pane fade" id="LiveStreamSection" role="tabpanel" aria-labelledby="v-pills-LiveStream-tab">
+          <div class="card">
+            <div class="card-header">Live Stream Settings</div>
+            <div class="card-body">
+              <form id="livestreamForm" class="mb-3">
+                <div class="mb-3">
+                  <label for="chatStreamer" class="form-label">Streamer Name:</label>
+                  <input type="text" id="chatStreamer" class="form-control" placeholder="Streamer name" required />
+                </div>
+                <div class="mb-3">
+                  <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="radio" name="livestream-option" id="optionChat" value="chat">
+                    <label class="form-check-label" for="optionChat">Show chat</label>
+                  </div>
+                  <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="radio" name="livestream-option" id="optionLive" value="live"
+                      checked>
+                    <label class="form-check-label" for="optionLive">Live only</label>
+                  </div>
+                  <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="radio" name="livestream-option" id="optionInteractive"
+                      value="interactive">
+                    <label class="form-check-label" for="optionInteractive">Interactive</label>
+                  </div>
+                </div>
+                <button type="submit" class="btn btn-primary">Apply</button>
+              </form>
+              <hr />
+
+              <article class="mb-4">
+                <div class="card-header">Live Stream</div>
+                <ul id="liveStreamCamera">
+                  <!-- Dynamically populated -->
+                </ul>
+
+              </article>
+            </div>
+          </div>
+        </section>
     </div>
+    </main>
+  </div>
   </div>
 
   <!-- Response area for transient messages -->
@@ -433,50 +432,50 @@
       });
 
     });
-      const fetchApiKey = async () => {
-        try {
-          const response = await fetch(`/api/keys`, {
-            method: "GET",
-            headers: {
-              "Content-Type": "application/json"
-            }
-          });
-
-          if (!response.ok) {
-            throw new Error("Failed to retrieve API keys.");
+    const fetchApiKey = async () => {
+      try {
+        const response = await fetch(`/api/keys`, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json"
           }
+        });
 
-          const data = await response.json();
-
-          // Log or handle API keys (display them in the UI, for instance)
-          data.forEach((key) => {
-            // Example: Display key on the page (or handle it as needed)
-            addAPIKeyToList(key.name,"*************")
-          });
-        } catch (error) {
-          console.error("Error fetching API key:", error);
-          alert("Error fetching API key.");
+        if (!response.ok) {
+          throw new Error("Failed to retrieve API keys.");
         }
-      };
-      function displayApiKey(key) {
-        // Remove existing API key div if present
-        const existingDiv = document.getElementById("api-key-display");
-        if (existingDiv) existingDiv.remove();
 
-        // Create new div
-        const keyDiv = document.createElement("div");
-        keyDiv.id = "api-key-display";
-        keyDiv.style.position = "fixed";
-        keyDiv.style.top = "20px";
-        keyDiv.style.left = "20px";
-        keyDiv.style.background = "#fff";
-        keyDiv.style.padding = "10px";
-        keyDiv.style.border = "1px solid #ccc";
-        keyDiv.style.boxShadow = "0px 0px 10px rgba(0, 0, 0, 0.1)";
-        keyDiv.style.zIndex = "1000";
-        keyDiv.style.fontFamily = "monospace";
+        const data = await response.json();
 
-        keyDiv.innerHTML = `
+        // Log or handle API keys (display them in the UI, for instance)
+        data.forEach((key) => {
+          // Example: Display key on the page (or handle it as needed)
+          addAPIKeyToList(key.name, "*************")
+        });
+      } catch (error) {
+        console.error("Error fetching API key:", error);
+        alert("Error fetching API key.");
+      }
+    };
+    function displayApiKey(key) {
+      // Remove existing API key div if present
+      const existingDiv = document.getElementById("api-key-display");
+      if (existingDiv) existingDiv.remove();
+
+      // Create new div
+      const keyDiv = document.createElement("div");
+      keyDiv.id = "api-key-display";
+      keyDiv.style.position = "fixed";
+      keyDiv.style.top = "20px";
+      keyDiv.style.left = "20px";
+      keyDiv.style.background = "#fff";
+      keyDiv.style.padding = "10px";
+      keyDiv.style.border = "1px solid #ccc";
+      keyDiv.style.boxShadow = "0px 0px 10px rgba(0, 0, 0, 0.1)";
+      keyDiv.style.zIndex = "1000";
+      keyDiv.style.fontFamily = "monospace";
+
+      keyDiv.innerHTML = `
       <p><strong>Your API Key:</strong></p>
 <div style="display: flex; flex-direction: column; gap: 10px;">
     <input type="text" value="${key}" id="api-key-input" readonly 
@@ -488,55 +487,55 @@
 </div>
 `;
 
-        document.body.appendChild(keyDiv);
+      document.body.appendChild(keyDiv);
 
-        // Copy to clipboard functionality
-        document.getElementById("copy-api-key").addEventListener("click", function () {
-          const input = document.getElementById("api-key-input");
-          input.select();
-          document.execCommand("copy");
-          this.innerText = "Copied!";
-          setTimeout(() => (this.innerText = "Copy"), 2000);
-        });
+      // Copy to clipboard functionality
+      document.getElementById("copy-api-key").addEventListener("click", function () {
+        const input = document.getElementById("api-key-input");
+        input.select();
+        document.execCommand("copy");
+        this.innerText = "Copied!";
+        setTimeout(() => (this.innerText = "Copy"), 2000);
+      });
 
-        // Remove the div after 30 seconds
-        setTimeout(() => keyDiv.remove(), 30000);
-      };
+      // Remove the div after 30 seconds
+      setTimeout(() => keyDiv.remove(), 30000);
+    };
 
-      function showError(message) {
-        const errorDiv = document.createElement("div");
-        errorDiv.innerText = message;
-        errorDiv.style.position = "fixed";
-        errorDiv.style.bottom = "20px";
-        errorDiv.style.right = "20px";
-        errorDiv.style.background = "#ff4d4d";
-        errorDiv.style.color = "#fff";
-        errorDiv.style.padding = "10px";
-        errorDiv.style.borderRadius = "5px";
-        errorDiv.style.zIndex = "1000";
+    function showError(message) {
+      const errorDiv = document.createElement("div");
+      errorDiv.innerText = message;
+      errorDiv.style.position = "fixed";
+      errorDiv.style.bottom = "20px";
+      errorDiv.style.right = "20px";
+      errorDiv.style.background = "#ff4d4d";
+      errorDiv.style.color = "#fff";
+      errorDiv.style.padding = "10px";
+      errorDiv.style.borderRadius = "5px";
+      errorDiv.style.zIndex = "1000";
 
-        document.body.appendChild(errorDiv);
-        setTimeout(() => errorDiv.remove(), 5000);
-      };
+      document.body.appendChild(errorDiv);
+      setTimeout(() => errorDiv.remove(), 5000);
+    };
 
 
-      function addAPIKeyToList(name, key) {
-        const li = document.createElement("li");
-        li.className = "list-group-item d-flex justify-content-between align-items-center";
-        li.innerHTML = `
+    function addAPIKeyToList(name, key) {
+      const li = document.createElement("li");
+      li.className = "list-group-item d-flex justify-content-between align-items-center";
+      li.innerHTML = `
             <span>${name}</span>
             <button class="btn btn-danger btn-sm delete-key">Delete</button>
         `;
 
-        li.querySelector(".delete-key").addEventListener("click", async function () {
-          if (confirm(`Are you sure you want to delete '${name}'?`)) {
-            // TODO:Make an API call to delete the key (not implemented yet)
-            li.remove();
-          }
-        });
+      li.querySelector(".delete-key").addEventListener("click", async function () {
+        if (confirm(`Are you sure you want to delete '${name}'?`)) {
+          // TODO:Make an API call to delete the key (not implemented yet)
+          li.remove();
+        }
+      });
 
-        apiKeyList.appendChild(li);
-      }
+      apiKeyList.appendChild(li);
+    }
 
     /* ------------------ STREAMERS SECTION ------------------ */
     const addStreamer = async () => {
