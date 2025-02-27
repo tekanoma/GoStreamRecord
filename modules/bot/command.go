@@ -27,24 +27,38 @@ func (b *bot) Command(command string, name string) {
 		b.mux.Unlock()
 		b.RecordLoop(name)
 	case "stop":
-		if !b.status.IsRunning {
+		is_running := false
+		for _, s := range b.ListRecorders() {
+			if name == s.Name {
+				is_running = true
+
+				break
+			}
+		}
+		if !is_running && len(b.ListRecorders()) == 0 {
 			log.Println("Bot is not running..")
 			break
 		}
 		log.Println("Stopping bot")
 		var wg sync.WaitGroup
+		wg_was_added := false
 		for _, s := range b.ListRecorders() {
 			// Stop all
-			if name == "" {
+
+			if name == "" || s.Name == name {
+				fmt.Println("Stopping:", name)
+				wg_was_added = true
 				wg.Add(1)
 				go b.Stop(s.Name)
 				// Stop single
-			} else if s.Name == name {
-				wg.Add(1)
-				go b.Stop(s.Name)
+			} else {
+				fmt.Println("Not stopping..")
 			}
 		}
-		wg.Wait()
+		if wg_was_added {
+
+			wg.Wait()
+		}
 	case "restart":
 		log.Println("Restarting bot")
 		if b.status.IsRunning {
