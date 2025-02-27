@@ -52,7 +52,7 @@ func (b *bot) Command(command string, name string) {
 				go b.Stop(s.Name)
 				// Stop single
 			} else {
-				fmt.Println("Not stopping..")
+				log.Println("Not stopping..")
 			}
 		}
 		if wg_was_added {
