@@ -63,6 +63,7 @@ func UploadHandler(w http.ResponseWriter, r *http.Request) {
 		config.AddStreamer(line)
 	}
 	resp := web_status.Response{
+		Status:  "success",
 		Message: fmt.Sprintf("Added %d new streamers!", len(newStreamers)),
 	}
 	w.Header().Set("Content-Type", "application/json")

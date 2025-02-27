@@ -28,7 +28,8 @@ func ControlHandler(w http.ResponseWriter, r *http.Request) {
 
 	go bot.Bot.Command(reqData.Command, reqData.Name)
 	resp := web_status.Response{
-		Message: fmt.Sprintf("Control command '%s' executed", reqData.Command),
+		Message: fmt.Sprintf("Exected command '%s'", reqData.Command),
+		Status:  "success",
 	}
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(resp)
