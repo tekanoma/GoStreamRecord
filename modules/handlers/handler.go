@@ -28,6 +28,8 @@ func Handle() {
 	http.HandleFunc("/api/get-videos", controller.GetVideos)
 	http.HandleFunc("/api/logs", controller.HandleLogs)
 	http.HandleFunc("/api/delete-videos", controller.DeleteVideos)
+	http.HandleFunc("/api/generate-api-key", cookies.GenAPIKeyHandler)
+	http.HandleFunc("/api/keys", cookies.GetAPIkeys)
 
 	http.HandleFunc("/api/get-users", users.GetUsers)
 	http.HandleFunc("/api/add-user", users.AddUser)

@@ -3,6 +3,7 @@ package controller
 import (
 	"GoRecordurbate/modules/config"
 	"GoRecordurbate/modules/file"
+	"GoRecordurbate/modules/handlers/cookies"
 	"GoRecordurbate/modules/handlers/status"
 	"encoding/json"
 	"fmt"
@@ -21,6 +22,10 @@ type Video struct {
 }
 
 func GetVideos(w http.ResponseWriter, r *http.Request) {
+	if !cookies.Session.IsLoggedIn(w, r) {
+		http.Redirect(w, r, "/login", http.StatusFound)
+		return
+	}
 	videos := []Video{}
 
 	page, err := strconv.Atoi(r.URL.Query().Get("page"))
@@ -75,6 +80,10 @@ type DeleteVideosResponse struct {
 
 // DeleteVideosHandler handles requests to delete videos.
 func DeleteVideos(w http.ResponseWriter, r *http.Request) {
+	if !cookies.Session.IsLoggedIn(w, r) {
+		http.Redirect(w, r, "/login", http.StatusFound)
+		return
+	}
 	// Only allow POST requests.
 	if r.Method != http.MethodPost {
 		http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
