@@ -388,7 +388,7 @@
           body: JSON.stringify({ data: name })
         });
         const data = await res.json(); 
-        showResponse(data.message, !data.status);
+        showResponse(data.message, false);
         input.value = "";
         populateStreamers();
       } catch (err) {
@@ -427,7 +427,7 @@
           body: JSON.stringify({ selected: name })
         });
         const data = await res.json();
-        showResponse(data.message, !data.success);
+        showResponse(data.message,false);
         populateStreamers();
       } catch (err) {
         console.error(err);
@@ -444,7 +444,7 @@
           body: JSON.stringify({ command, name })
         });   
         const data = await res.json();
-        showResponse(data.message, !data.success);
+        showResponse(data.message, false);
 
       } catch (err) { 
         console.error(err);
@@ -468,7 +468,7 @@
           body: formData
         });
         const data = await res.json();
-        showResponse(data.message, !data.success);
+        showResponse(data.message, false);
 //         showResponse("File uploaded: " + JSON.stringify(data));
       } catch (err) {
         console.error(err);
@@ -590,7 +590,7 @@
         // Remove deleted videos from the list
         const result = await res.json();
         if (result.data.success) {
-          showResponse(result.data.message, !result.data.success);
+          showResponse(result.data.message, false);
           populateVideos(); // refresh list
         }
       } catch (err) {
@@ -657,7 +657,7 @@
           return data.message === "true"; // Ensures it returns a boolean
         })
         .catch((err) => {
-          console.error("Error starting process:", err);
+          showResponse("Error starting process: "+ err, true);
           return false; // Return false in case of an error
         });
     }
@@ -781,7 +781,7 @@
           body: JSON.stringify({ username, password })
         });
         const data = await res.json();
-        showResponse(data.message, !data.success);
+        showResponse(data.message, false);
         document.getElementById("addUserName").value = "";
         document.getElementById("addUserPassword").value = "";
         populateUsers();
@@ -809,7 +809,7 @@
           body: JSON.stringify({ oldUsername: selectedUser, newUsername, newPassword })
         });
         const data = await res.json();
-        showResponse(data.message, data.success);
+        showResponse(data.message, false);
         selectedUser = null;
         document.getElementById("updateUserName").value = "";
         document.getElementById("updateUserPassword").value = "";
