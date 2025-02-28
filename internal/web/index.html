@@ -477,6 +477,7 @@
 
       keyDiv.innerHTML = `
       <p><strong>Your API Key:</strong></p>
+<p><strong>This will only be shown once!</strong></p>
 <div style="display: flex; flex-direction: column; gap: 10px;">
     <input type="text" value="${key}" id="api-key-input" readonly 
         style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px; box-sizing: border-box; background-color: #f9f9f9;">
@@ -484,7 +485,12 @@
         style="padding: 8px 16px; background-color: #4CAF50; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 14px; transition: background-color 0.3s;">
         Copy
     </button>
+    <button id="close-api-key" 
+        style="padding: 8px 16px; background-color: #f44336; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 14px; transition: background-color 0.3s;">
+        Close
+    </button>
 </div>
+
 `;
 
       document.body.appendChild(keyDiv);
@@ -498,6 +504,9 @@
         setTimeout(() => (this.innerText = "Copy"), 2000);
       });
 
+      document.getElementById('close-api-key').addEventListener('click', function() {
+        this.parentElement.parentElement.remove(); // Removes the API key display
+    });
       // Remove the div after 30 seconds
       setTimeout(() => keyDiv.remove(), 30000);
     };
@@ -1071,6 +1080,7 @@
       document.getElementById("video-tab").addEventListener("click", populateVideos);
       document.getElementById("recorderStatus-tab").addEventListener("click", updateRecorders);
     });
+
   </script>
 </body>
 
