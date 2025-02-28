@@ -112,3 +112,52 @@ func HashAPIKey(apiKey string) (string, error) {
 func VerifyAPIKey(hashedKey, apiKey string) bool {
 	return bcrypt.CompareHashAndPassword([]byte(hashedKey), []byte(apiKey)) == nil
 }
+
+func DeleteAPIKeyHandler(w http.ResponseWriter, r *http.Request) {
+	if !Session.IsLoggedIn(w, r) {
+		http.Redirect(w, r, "/login", http.StatusFound)
+		return
+	}
+
+	var secrets file.API_secrets
+	var new_secrets file.API_secrets
+
+	type data struct {
+		Name string `json:"new"`
+	}
+	type request struct {
+		Data data `json:"data"`
+	}
+	var reqData request
+	if err := json.NewDecoder(r.Body).Decode(&reqData); err != nil {
+		http.Error(w, "Invalid request payload", http.StatusBadRequest)
+		return
+	}
+
+	err := file.ReadJson(file.API_keys_file, &secrets)
+	if err != nil {
+		fmt.Println(err)
+		http.Error(w, "Error getting existing keys..", http.StatusBadRequest)
+		return
+	}
+
+	session, err := Session.Store().Get(r, "session")
+	username := session.Values["user"].(string)
+	for _, k := range secrets.Keys {
+		if k.Name == reqData.Data.Name && k.User == username {
+			continue
+		}
+		new_secrets.Keys = append(new_secrets.Keys, k)
+	}
+
+	err = file.WriteJson(file.API_keys_file, new_secrets)
+	if err != nil {
+		fmt.Println(err)
+		http.Error(w, "error saving new key..", http.StatusBadRequest)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	response := api_response{Status: true, Message: "Deleted api key.", Key: "nil"}
+	json.NewEncoder(w).Encode(response)
+}

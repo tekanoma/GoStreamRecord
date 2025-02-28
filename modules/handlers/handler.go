@@ -30,6 +30,7 @@ func Handle() {
 	http.HandleFunc("/api/logs", controller.HandleLogs)
 	http.HandleFunc("/api/delete-videos", controller.DeleteVideos)
 	http.HandleFunc("/api/generate-api-key", cookies.GenAPIKeyHandler)
+	http.HandleFunc("/api/delete-api-key", cookies.DeleteAPIKeyHandler)
 	http.HandleFunc("/api/keys", cookies.GetAPIkeys)
 
 	http.HandleFunc("/api/get-users", users.GetUsers)
@@ -114,8 +115,8 @@ func HealthCheckHandler(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
-
 	if err := json.NewEncoder(w).Encode(response); err != nil {
 		http.Error(w, "Error encoding JSON", http.StatusInternalServerError)
 	}
+
 }
