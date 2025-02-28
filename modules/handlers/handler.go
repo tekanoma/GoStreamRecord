@@ -103,6 +103,10 @@ type HealthResponse struct {
 
 // HealthCheckHandler is the HTTP handler for the health check endpoint.
 func HealthCheckHandler(w http.ResponseWriter, r *http.Request) {
+	if !cookies.Session.IsLoggedIn(w, r) {
+		http.Redirect(w, r, "/login", http.StatusFound)
+		return
+	}
 	response := HealthResponse{
 		Status:  "ok",
 		Message: "Service is up and running",
