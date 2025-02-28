@@ -16,7 +16,7 @@ func main() {
 	flag.Parse()
 
 	// Construct the URL for the health endpoint.
-	url := fmt.Sprintf("http://%s:%d/api/v1/health", *ip, *port)
+	url := fmt.Sprintf("http://%s:%d/api/health", *ip, *port)
 	log.Printf("Sending request to %s", url)
 
 	// Create a new GET request.
