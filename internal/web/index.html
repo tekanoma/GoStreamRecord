@@ -826,32 +826,53 @@
         });
     }
 
-
     const updateRecorders = async () => {
-      const container = document.getElementById("recorderProcessesContainer");
-      container.innerHTML = "";
+  const container = document.getElementById("recorderProcessesContainer");
 
-      // Fetch all possible streamers
-      const res = await fetch("/api/get-streamers");
-      const streamers = await res.json();
+  // Fetch all possible streamers
+  const res = await fetch("/api/get-streamers");
+  const streamers = await res.json();
 
-      // Fetch currently active recorder processes
-      if (recorder_processes && Array.isArray(recorder_processes.processes)) {
-        activeProcesses = recorder_processes.processes;
-      }
+  // Fetch currently active recorder processes
+  let activeProcesses = [];
+  if (recorder_processes && Array.isArray(recorder_processes.processes)) {
+    activeProcesses = recorder_processes.processes;
+  }
 
-      // Map active processes by name for quick lookup
-      const activeMap = new Map(activeProcesses.map((p) => [p.name, p]));
+  // Map active processes by name for quick lookup
+  const activeMap = new Map(activeProcesses.map((p) => [p.name, p]));
 
-      for (const streamer of streamers) {
-        const process = activeMap.get(streamer) || { name: streamer, isRecording: false };
+  // Get current elements in DOM for tracking duplicates
+  const existingElements = new Map();
+  container.querySelectorAll(".recorder-process").forEach((el) => {
+    const name = el.dataset.name;
+    if (name) existingElements.set(name, el);
+  });
 
-        // Check if the live is available
-        const isAvailable = await checkSourceAvailability(streamer);
+  for (const streamer of streamers) {
+    const process = activeMap.get(streamer) || { name: streamer, isRecording: false };
+    const isAvailable = await checkSourceAvailability(streamer);
 
-        const processElement = document.createElement("div");
-        processElement.className = "recorder-process";
-        processElement.innerHTML = `
+    if (existingElements.has(process.name)) {
+      // Update existing element
+      const processElement = existingElements.get(process.name);
+      processElement.querySelector(".status-text").innerHTML = process.isRecording
+        ? "Recording"
+        : "Not Recording";
+
+      processElement.querySelector(".status-text:nth-child(2)").innerHTML = `
+        ${process.name} - ${isAvailable ? "Online" : "Not Online"}`;
+
+      // Enable/Disable buttons accordingly
+      processElement.querySelector(".start-button").disabled = process.isRecording || !isAvailable;
+      processElement.querySelector(".stop-button").disabled = !process.isRecording;
+      processElement.querySelector(".restart-button").disabled = !process.isRecording;
+    } else {
+      // Create new element if not in DOM
+      const processElement = document.createElement("div");
+      processElement.className = "recorder-process";
+      processElement.dataset.name = process.name; // Store name for quick reference
+      processElement.innerHTML = `
 <div class="process-info" style="display: flex; align-items: center; justify-content: space-between; padding: 14px; border: 1px solid #ddd; border-radius: 12px; margin-bottom: 10px; background-color: #fafafa;">
   <div class="status-text" style="font-weight: bold; color: ${process.isRecording ? '#2ecc71' : '#e74c3c'};">
    ${process.isRecording ? "Recording" : "Not Recording"}
@@ -866,18 +887,18 @@
   </div>
 </div>`;
 
-        const startButton = processElement.querySelector(".start-button");
-        const stopButton = processElement.querySelector(".stop-button");
-        const restartButton = processElement.querySelector(".restart-button");
+      const startButton = processElement.querySelector(".start-button");
+      const stopButton = processElement.querySelector(".stop-button");
+      const restartButton = processElement.querySelector(".restart-button");
 
-        startButton.addEventListener("click", () => sendCommand("start", process.name));
-        stopButton.addEventListener("click", () => sendCommand("stop", process.name));
-        restartButton.addEventListener("click", () => sendCommand("restart", process.name));
+      startButton.addEventListener("click", () => sendCommand("start", process.name));
+      stopButton.addEventListener("click", () => sendCommand("stop", process.name));
+      restartButton.addEventListener("click", () => sendCommand("restart", process.name));
 
-
-        container.appendChild(processElement);
-      }
-    };
+      container.appendChild(processElement);
+    }
+  }
+};
 
 
     /* ------------------ STATUS INDICATOR ------------------ */
