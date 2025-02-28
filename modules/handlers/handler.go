@@ -34,6 +34,7 @@ func Handle() {
 	http.HandleFunc("/api/get-users", users.GetUsers)
 	http.HandleFunc("/api/add-user", users.AddUser)
 	http.HandleFunc("/api/update-user", users.UpdateUsers)
+	http.HandleFunc("/api/health", HealthCheckHandler)
 
 	if cookies.UserStore == nil {
 		cookies.UserStore = make(map[string]string)
@@ -90,5 +91,26 @@ func GetLogin(w http.ResponseWriter, r *http.Request) {
 	loginTemplate := Template{W: w, Tmpl: tmpl}
 	if err := loginTemplate.Execute(nil); err != nil {
 		http.Error(w, "Server error", http.StatusInternalServerError)
+	}
+}
+
+// HealthResponse represents the JSON structure for health responses.
+type HealthResponse struct {
+	Status  string `json:"status"`
+	Message string `json:"message,omitempty"`
+}
+
+// HealthCheckHandler is the HTTP handler for the health check endpoint.
+func HealthCheckHandler(w http.ResponseWriter, r *http.Request) {
+	response := HealthResponse{
+		Status:  "ok",
+		Message: "Service is up and running",
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+
+	if err := json.NewEncoder(w).Encode(response); err != nil {
+		http.Error(w, "Error encoding JSON", http.StatusInternalServerError)
 	}
 }
