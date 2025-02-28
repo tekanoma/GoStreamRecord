@@ -538,7 +538,18 @@
 
       li.querySelector(".delete-key").addEventListener("click", async function () {
         if (confirm(`Are you sure you want to delete '${name}'?`)) {
-          // TODO:Make an API call to delete the key (not implemented yet)
+          try {
+        const res = await fetch("/api/delete-api-key", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ data: { new: name } })
+        });
+        const data = await res.json();
+        showResponse(data.message, false);
+      } catch (err) {
+        console.error(err);
+        showResponse("Error deleting api key.", true);
+      }
           li.remove();
         }
       });
