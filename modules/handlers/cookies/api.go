@@ -1,17 +1,14 @@
 package cookies
 
 import (
+	"GoRecordurbate/modules/db"
 	"GoRecordurbate/modules/file"
-	"crypto/rand"
-	"encoding/hex"
 	"encoding/json"
 	"fmt"
 	"net/http"
-
-	"golang.org/x/crypto/bcrypt"
 )
 
-// Response is a generic response structure for our API endpoints.
+// API key generation response
 type api_response struct {
 	Status  bool   `json:"status"`
 	Message string `json:"message"`
@@ -23,32 +20,27 @@ func GenAPIKeyHandler(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, "/login", http.StatusFound)
 		return
 	}
-	key, err := GenerateAPIKey(32)
-	if err != nil {
-		fmt.Println(err)
-		http.Error(w, "Unable generate api keys..", http.StatusBadRequest)
-		return
-	}
 
-	hashedKey, err := HashAPIKey(key)
-	var secrets file.API_secrets
-	session, err := Session.Store().Get(r, "session")
-	secret := secrets.NewKey()
-	secret.User = session.Values["user"].(string)
-	if secret.User == "" {
-		http.Error(w, "Unable generate api keys..", http.StatusForbidden)
-		return
-	}
-	secret.Key = hashedKey
-	secret.Name = r.URL.Query().Get("name")
-	err = file.ReadJson(file.API_keys_file, &secrets)
+	err := db.API.Load()
 	if err != nil {
 		fmt.Println(err)
 		http.Error(w, "Error getting existing keys..", http.StatusBadRequest)
 		return
 	}
-	for _, k := range secrets.Keys {
-		if k.Name == secret.Name {
+
+	session, err := Session.Store().Get(r, "session")
+	new_api_config := db.API.NewKey()
+	new_api_config.User = session.Values["user"].(string)
+
+	if new_api_config.User == "" {
+		http.Error(w, "Unable generate api keys..", http.StatusForbidden)
+		return
+	}
+
+	new_api_config.Name = r.URL.Query().Get("name")
+
+	for _, k := range db.API.Keys {
+		if k.Name == new_api_config.Name {
 			if err != nil {
 				fmt.Println(err)
 				http.Error(w, "Named key already exists!", http.StatusConflict)
@@ -56,8 +48,19 @@ func GenAPIKeyHandler(w http.ResponseWriter, r *http.Request) {
 			}
 		}
 	}
-	secrets.Keys = append(secrets.Keys, secret)
-	err = file.WriteJson(file.API_keys_file, secrets)
+
+	key, err := new_api_config.GenerateAPIKey(32)
+	if err != nil {
+		fmt.Println(err)
+		http.Error(w, "Unable generate api keys..", http.StatusBadRequest)
+		return
+	}
+	hashedKey, err := new_api_config.HashAPIKey(key)
+
+	new_api_config.Key = hashedKey
+
+	db.API.Keys = append(db.API.Keys, new_api_config)
+	err = file.WriteJson(file.API_keys_file, db.API)
 	if err != nil {
 		fmt.Println(err)
 		http.Error(w, "error saving new key..", http.StatusBadRequest)
@@ -74,9 +77,9 @@ func GetAPIkeys(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var secrets file.API_secrets
-	err := file.ReadJson(file.API_keys_file, &secrets)
+	err := db.API.Load()
 	if err != nil {
+		fmt.Println(err)
 		http.Error(w, "Error retrieving API keys: "+err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -85,7 +88,7 @@ func GetAPIkeys(w http.ResponseWriter, r *http.Request) {
 		Name string `json:"name"` // The field should start with an uppercase letter
 	}
 	var apiList []data
-	for _, k := range secrets.Keys {
+	for _, k := range db.API.Keys {
 		apiList = append(apiList, data{Name: k.Name})
 	}
 
@@ -94,33 +97,13 @@ func GetAPIkeys(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(apiList)
 }
 
-// GenerateAPIKey creates a secure random API key
-func GenerateAPIKey(length int) (string, error) {
-	bytes := make([]byte, length)
-	_, err := rand.Read(bytes)
-	if err != nil {
-		return "", err
-	}
-	return hex.EncodeToString(bytes), nil
-}
-
-func HashAPIKey(apiKey string) (string, error) {
-	hash, err := bcrypt.GenerateFromPassword([]byte(apiKey), bcrypt.DefaultCost)
-	return string(hash), err
-}
-
-func VerifyAPIKey(hashedKey, apiKey string) bool {
-	return bcrypt.CompareHashAndPassword([]byte(hashedKey), []byte(apiKey)) == nil
-}
-
 func DeleteAPIKeyHandler(w http.ResponseWriter, r *http.Request) {
 	if !Session.IsLoggedIn(w, r) {
 		http.Redirect(w, r, "/login", http.StatusFound)
 		return
 	}
 
-	var secrets file.API_secrets
-	var new_secrets file.API_secrets
+	var tmp_secrets db.API_secrets
 
 	type data struct {
 		Name string `json:"new"`
@@ -129,12 +112,13 @@ func DeleteAPIKeyHandler(w http.ResponseWriter, r *http.Request) {
 		Data data `json:"data"`
 	}
 	var reqData request
+
 	if err := json.NewDecoder(r.Body).Decode(&reqData); err != nil {
 		http.Error(w, "Invalid request payload", http.StatusBadRequest)
 		return
 	}
 
-	err := file.ReadJson(file.API_keys_file, &secrets)
+	err := db.API.Load()
 	if err != nil {
 		fmt.Println(err)
 		http.Error(w, "Error getting existing keys..", http.StatusBadRequest)
@@ -143,14 +127,17 @@ func DeleteAPIKeyHandler(w http.ResponseWriter, r *http.Request) {
 
 	session, err := Session.Store().Get(r, "session")
 	username := session.Values["user"].(string)
-	for _, k := range secrets.Keys {
+
+	for _, k := range db.API.Keys {
 		if k.Name == reqData.Data.Name && k.User == username {
 			continue
 		}
-		new_secrets.Keys = append(new_secrets.Keys, k)
+		tmp_secrets.Keys = append(tmp_secrets.Keys, k)
 	}
 
-	err = file.WriteJson(file.API_keys_file, new_secrets)
+	db.API.Keys = tmp_secrets.Keys
+
+	err = file.WriteJson(file.API_keys_file, db.API)
 	if err != nil {
 		fmt.Println(err)
 		http.Error(w, "error saving new key..", http.StatusBadRequest)

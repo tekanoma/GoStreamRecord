@@ -1,7 +1,7 @@
 package cookies
 
 import (
-	"GoRecordurbate/modules/file"
+	"GoRecordurbate/modules/db"
 	"fmt"
 	"net/http"
 	"sync"
@@ -75,14 +75,13 @@ func (s *session) IsLoggedIn(w http.ResponseWriter, r *http.Request) bool {
 // isValidAPIKey compares the provided API key against the preloaded valid keys.
 func (s *session) isValidAPIKey(providedKey string) bool {
 	if len(s.apiKeys) == 0 {
-
-		var secrets file.API_secrets
-		err := file.ReadJson(file.API_keys_file, &secrets)
+		err := db.API.Load()
 		if err != nil {
 			fmt.Println(err)
 			return false
 		}
-		for _, k := range secrets.Keys {
+		for _, k := range db.API.Keys {
+
 			exist := false
 			for _, existingKey := range s.apiKeys {
 				if existingKey == k.Key {
@@ -97,7 +96,7 @@ func (s *session) isValidAPIKey(providedKey string) bool {
 		}
 	}
 	for _, key := range s.apiKeys {
-		if VerifyAPIKey(key, providedKey) {
+		if db.VerifyAPIKey(key, providedKey) {
 			return true
 		}
 	}

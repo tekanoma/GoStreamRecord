@@ -17,6 +17,7 @@ func ReadJson(filename string, v interface{}) error {
 
 	decoder := json.NewDecoder(file)
 	if err := decoder.Decode(v); err != nil {
+		fmt.Println(err)
 		return fmt.Errorf("failed to decode JSON: %w", err)
 	}
 	return nil

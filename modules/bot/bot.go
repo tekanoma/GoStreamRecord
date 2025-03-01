@@ -1,7 +1,7 @@
 package bot
 
 import (
-	"GoRecordurbate/modules/config"
+	"GoRecordurbate/modules/db"
 	"GoRecordurbate/modules/file"
 	"context"
 	"encoding/json"
@@ -125,8 +125,8 @@ func (b *bot) StopBot(streamerName string) {
 
 // IsRoomPublic checks if a given room is public by sending a POST request.
 func (b *bot) IsRoomPublic(username string) bool {
-	// Wait for the configured rate limit.
-	time.Sleep(time.Duration(config.Settings.App.RateLimit.Time) * time.Second)
+	// Wait for the dbured rate limit.
+	time.Sleep(time.Duration(db.Settings.App.RateLimit.Time) * time.Second)
 	urlStr := "https://chaturbate.com/get_edge_hls_url_ajax/"
 	data := url.Values{}
 	data.Set("room_slug", username)
@@ -179,7 +179,7 @@ func (b *bot) IsOnline(username string) bool {
 }
 
 // Run starts the main loop of the Bot.
-// Reloads the configuration, checks running processesn for each streamer, starts a recorder if one isn’t already running.
+// Reloads the dburation, checks running processesn for each streamer, starts a recorder if one isn’t already running.
 // It also checks for a stop signal and waits for active recordings to finish before stopping.
 // Streamer name is optional and can be used to start a single recorder.
 func (b *bot) RecordLoop(streamerName string) {
@@ -189,9 +189,9 @@ func (b *bot) RecordLoop(streamerName string) {
 	if streamerName != "" {
 		is_single_run = true
 	}
-	// Write youtube-dl config.
-	if err := b.writeYoutubeDLConfig(); err != nil {
-		log.Println("Error writing youtube-dl config:", err)
+	// Write youtube-dl db.
+	if err := b.writeYoutubeDLdb(); err != nil {
+		log.Println("Error writing youtube-dl db:", err)
 		return
 	}
 
@@ -214,15 +214,15 @@ func (b *bot) RecordLoop(streamerName string) {
 				return
 			}
 		case <-ticker.C:
-			// Optionally reload config.
-			if config.Settings.AutoReload {
-				config.Reload(file.Config_json_path, &config.Settings)
+			// Optionally reload db.
+			if db.Settings.AutoReload {
+				db.Reload(file.Config_json_path, &db.Settings)
 			}
 
 			// Remove finished processes.
 			b.checkProcesses()
-			// For each streamer in the config, start a recorder if one isn’t already running.
-			for _, streamer := range config.Streamers.StreamerList {
+			// For each streamer in the db, start a recorder if one isn’t already running.
+			for _, streamer := range db.Streamers.StreamerList {
 				if is_single_run && streamer.Name != streamerName {
 					continue
 				}
@@ -246,10 +246,10 @@ func (b *bot) RecordLoop(streamerName string) {
 				}(&wg)
 
 			}
-			time.Sleep(time.Duration(config.Settings.App.RateLimit.Time) * time.Second)
+			time.Sleep(time.Duration(db.Settings.App.RateLimit.Time) * time.Second)
 			if b.isFirstRun {
 				b.isFirstRun = false
-				ticker.Reset(time.Duration(config.Settings.App.Loop_interval) * time.Minute)
+				ticker.Reset(time.Duration(db.Settings.App.Loop_interval) * time.Minute)
 
 			}
 		}
@@ -322,8 +322,8 @@ func stopProcess(wg *sync.WaitGroup, rec StreamerStatus) {
 	}
 }
 
-// writeYoutubeDLConfig writes the youtube-dl configuration file.
-func (b *bot) writeYoutubeDLConfig() error {
+// writeYoutubeDLdb writes the youtube-dl dburation file.
+func (b *bot) writeYoutubeDLdb() error {
 	// Ensure we start with an empty file.
 	f, err := os.Create(file.YoutubeDL_configPath)
 	if err != nil {
@@ -331,8 +331,8 @@ func (b *bot) writeYoutubeDLConfig() error {
 	}
 	defer f.Close()
 
-	folder := config.Settings.App.Videos_folder
-	configLine := fmt.Sprintf("-o \"%s", folder) + "/%(id)s/%(title)s.%(ext)s\""
-	_, err = f.Write([]byte(configLine))
+	folder := db.Settings.App.Videos_folder
+	dbLine := fmt.Sprintf("-o \"%s", folder) + "/%(id)s/%(title)s.%(ext)s\""
+	_, err = f.Write([]byte(dbLine))
 	return err
 }

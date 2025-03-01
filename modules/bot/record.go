@@ -1,7 +1,7 @@
 package bot
 
 import (
-	"GoRecordurbate/modules/config"
+	"GoRecordurbate/modules/db"
 	"GoRecordurbate/modules/file"
 	"fmt"
 	"log"
@@ -12,7 +12,6 @@ import (
 // runRecordLoop starts a recording for the given streamer (if online) and waits for the process to finish.
 func (b *bot) runRecordLoop(streamerName string) {
 
-
 	log.Printf("[bot]: Checking %s room status...", streamerName)
 	if !b.IsOnline(streamerName) {
 		log.Printf("[bot]: Streamer %s is not online.", streamerName)
@@ -20,7 +19,7 @@ func (b *bot) runRecordLoop(streamerName string) {
 	}
 
 	log.Printf("[bot]: Starting recording for %s", streamerName)
-	args := strings.Fields(config.Settings.YoutubeDL.Binary)
+	args := strings.Fields(db.Settings.YoutubeDL.Binary)
 	recordURL := fmt.Sprintf("https://chaturbate.com/%s/", streamerName)
 	args = append(args, recordURL, "--config-location", file.YoutubeDL_configPath)
 	cmd := exec.Command(args[0], args[1:]...)
@@ -41,7 +40,7 @@ func (b *bot) runRecordLoop(streamerName string) {
 	b.mux.Unlock()
 
 	// Wait for the command to finish.
-	cmd.Wait()
+	b.status.Processes[len(b.status.Processes)-1].Cmd.Wait()
 	log.Printf("[bot]: Recording for %s finished", streamerName)
 
 	// Remove this process from our list.

@@ -1,7 +1,7 @@
 package streamers
 
 import (
-	"GoRecordurbate/modules/config"
+	"GoRecordurbate/modules/db"
 	"GoRecordurbate/modules/handlers/cookies"
 	"net/http"
 )
@@ -21,7 +21,7 @@ func DownloadHandler(w http.ResponseWriter, r *http.Request) {
 	// Dummy file content
 	fileContent := ""
 
-	for _, s := range config.Streamers.StreamerList {
+	for _, s := range db.Streamers.StreamerList {
 		fileContent = fileContent + s.Name + "\n"
 	}
 	w.Header().Set("Content-Type", "application/octet-stream")

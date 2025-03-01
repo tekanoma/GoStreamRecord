@@ -1,7 +1,7 @@
 package streamers
 
 import (
-	"GoRecordurbate/modules/config"
+	"GoRecordurbate/modules/db"
 	"GoRecordurbate/modules/handlers/cookies"
 	web_status "GoRecordurbate/modules/handlers/status"
 	"encoding/json"
@@ -51,7 +51,7 @@ func UploadHandler(w http.ResponseWriter, r *http.Request) {
 	newStreamers := []string{}
 	for _, line := range strings.Split(string(fileContent), "\n") {
 		exist := false
-		for _, s := range config.Streamers.StreamerList {
+		for _, s := range db.Streamers.StreamerList {
 			if line == s.Name {
 				exist = true
 			}
@@ -65,7 +65,7 @@ func UploadHandler(w http.ResponseWriter, r *http.Request) {
 		if len(line) == 0 {
 			continue
 		}
-		config.AddStreamer(line)
+		db.AddStreamer(line)
 	}
 	resp := web_status.Response{
 		Status:  "success",

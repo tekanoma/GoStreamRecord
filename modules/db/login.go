@@ -1,4 +1,4 @@
-package config
+package db
 
 type Logins struct {
 	Users []Login

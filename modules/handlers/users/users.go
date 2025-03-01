@@ -1,7 +1,7 @@
 package users
 
 import (
-	"GoRecordurbate/modules/config"
+	"GoRecordurbate/modules/db"
 	"GoRecordurbate/modules/file"
 	"GoRecordurbate/modules/handlers/cookies"
 	"GoRecordurbate/modules/handlers/login"
@@ -22,7 +22,7 @@ func GetUsers(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "application/json")
 
-	json.NewEncoder(w).Encode(config.Users.Users)
+	json.NewEncoder(w).Encode(db.Users.Users)
 }
 
 func UpdateUsers(w http.ResponseWriter, r *http.Request) {
@@ -46,22 +46,22 @@ func UpdateUsers(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	modified := false
-	for i, user := range config.Users.Users {
+	for i, user := range db.Users.Users {
 		if user.Name == reqData.OldUsername {
-			config.Users.Users[i].Name = reqData.NewUsername
-			config.Users.Users[i].Key = string(login.HashedPassword(reqData.NewPassword))
+			db.Users.Users[i].Name = reqData.NewUsername
+			db.Users.Users[i].Key = string(login.HashedPassword(reqData.NewPassword))
 			modified = true
 			break
 		}
 	}
 	if modified {
-		config.Update(file.Users_json_path, config.Users)
+		db.Update(file.Users_json_path, db.Users)
 	}
 
 	resp := status.Response{
 		Message: "User modified!",
 	}
-	for _, u := range config.Users.Users {
+	for _, u := range db.Users.Users {
 		cookies.UserStore[u.Name] = u.Key
 	}
 	w.Header().Set("Content-Type", "application/json")
@@ -88,7 +88,7 @@ func AddUser(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Invalid request payload", http.StatusBadRequest)
 		return
 	}
-	for _, user := range config.Users.Users {
+	for _, user := range db.Users.Users {
 		if user.Name == reqData.Username {
 			resp := status.Response{
 				Message: "User already exists!",
@@ -99,13 +99,13 @@ func AddUser(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	config.Users.Users = append(config.Users.Users, config.Login{Name: reqData.Username, Key: string(login.HashedPassword(reqData.Password))})
-	config.Update(file.Users_json_path, config.Users)
+	db.Users.Users = append(db.Users.Users, db.Login{Name: reqData.Username, Key: string(login.HashedPassword(reqData.Password))})
+	db.Update(file.Users_json_path, db.Users)
 
 	resp := status.Response{
 		Message: reqData.Username + " added!",
 	}
-	for _, u := range config.Users.Users {
+	for _, u := range db.Users.Users {
 		cookies.UserStore[u.Name] = u.Key
 	}
 	w.Header().Set("Content-Type", "application/json")

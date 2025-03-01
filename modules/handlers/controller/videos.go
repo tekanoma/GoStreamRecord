@@ -1,7 +1,7 @@
 package controller
 
 import (
-	"GoRecordurbate/modules/config"
+	"GoRecordurbate/modules/db"
 	"GoRecordurbate/modules/file"
 	"GoRecordurbate/modules/handlers/cookies"
 	"GoRecordurbate/modules/handlers/status"
@@ -33,7 +33,7 @@ func GetVideos(w http.ResponseWriter, r *http.Request) {
 		page = 1
 	}
 
-	err = filepath.Walk(config.Settings.App.Videos_folder, func(path string, info os.FileInfo, err error) error {
+	err = filepath.Walk(db.Settings.App.Videos_folder, func(path string, info os.FileInfo, err error) error {
 		if err != nil {
 			return err
 		}
@@ -48,7 +48,7 @@ func GetVideos(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if len(videos) == 0 {
-		videos = append(videos, Video{URL: "", Name: "", NoVideos: fmt.Sprintf("No videos available. Try adding some to '%s'", config.Settings.App.Videos_folder)})
+		videos = append(videos, Video{URL: "", Name: "", NoVideos: fmt.Sprintf("No videos available. Try adding some to '%s'", db.Settings.App.Videos_folder)})
 
 	}
 
@@ -112,7 +112,7 @@ func DeleteVideos(w http.ResponseWriter, r *http.Request) {
 	// Process deletion of each video.
 	video_erros := 0
 	for _, video := range req.Videos {
-		video_path := filepath.Join(config.Settings.App.Videos_folder, strings.Replace(video, "/videos/", "", 1))
+		video_path := filepath.Join(db.Settings.App.Videos_folder, strings.Replace(video, "/videos/", "", 1))
 		fmt.Println("Deleting video:", video_path)
 		err := os.Remove(video_path)
 		if err != nil {

@@ -2,7 +2,7 @@ package status
 
 import (
 	"GoRecordurbate/modules/bot"
-	"GoRecordurbate/modules/config"
+	"GoRecordurbate/modules/db"
 	"GoRecordurbate/modules/file"
 	"GoRecordurbate/modules/handlers/cookies"
 	"encoding/json"
@@ -28,8 +28,8 @@ func StatusHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var recorder Response
-	config.Reload(file.Config_json_path, &config.Streamers)
-	// Assuming config.Settings.App.Streamers is accessible
+	db.Reload(file.API_keys_file, &db.Streamers)
+	// Assuming db.Settings.App.Streamers is accessible
 	for _, s := range bot.Bot.ListRecorders() {
 		if s.IsRecording {
 			recorder.Status = "Running"

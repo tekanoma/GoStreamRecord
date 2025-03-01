@@ -2,7 +2,7 @@ package streamers
 
 import (
 	"GoRecordurbate/modules/bot"
-	"GoRecordurbate/modules/config"
+	"GoRecordurbate/modules/db"
 	"GoRecordurbate/modules/handlers/cookies"
 	"GoRecordurbate/modules/handlers/status"
 	"encoding/json"
@@ -32,7 +32,7 @@ func AddStreamer(w http.ResponseWriter, r *http.Request) {
 	}
 
 	resp := status.Response{
-		Message: config.AddStreamer(reqData.Data),
+		Message: db.AddStreamer(reqData.Data),
 		Data:    reqData.Data,
 	}
 
@@ -62,7 +62,7 @@ func RemoveStreamer(w http.ResponseWriter, r *http.Request) {
 	}
 
 	resp := status.Response{
-		Message: config.RemoveStreamer(reqData.Selected),
+		Message: db.RemoveStreamer(reqData.Selected),
 		Data:    reqData.Selected,
 	}
 
@@ -84,7 +84,7 @@ func GetStreamers(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
 	list := []string{}
-	for _, s := range config.Streamers.StreamerList {
+	for _, s := range db.Streamers.StreamerList {
 		list = append(list, s.Name)
 	}
 	json.NewEncoder(w).Encode(list)
