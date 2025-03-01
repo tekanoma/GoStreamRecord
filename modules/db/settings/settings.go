@@ -1,10 +1,10 @@
-package db
+package settings
 
 import (
 	"sync"
 )
 
-type settings struct {
+type Settings struct {
 	App        app       `json:"app"`
 	YoutubeDL  youtubeDL `json:"youtube-dl"`
 	AutoReload bool      `json:"auto_reload_config"`

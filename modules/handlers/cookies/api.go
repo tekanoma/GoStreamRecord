@@ -2,6 +2,7 @@ package cookies
 
 import (
 	"GoRecordurbate/modules/db"
+	dbapi "GoRecordurbate/modules/db/api"
 	"GoRecordurbate/modules/file"
 	"encoding/json"
 	"fmt"
@@ -21,7 +22,7 @@ func GenAPIKeyHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err := db.API.Load()
+	err := db.Config.APIKeys.Load()
 	if err != nil {
 		fmt.Println(err)
 		http.Error(w, "Error getting existing keys..", http.StatusBadRequest)
@@ -29,7 +30,7 @@ func GenAPIKeyHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	session, err := Session.Store().Get(r, "session")
-	new_api_config := db.API.NewKey()
+	new_api_config := db.Config.APIKeys.NewKey()
 	new_api_config.User = session.Values["user"].(string)
 
 	if new_api_config.User == "" {
@@ -39,7 +40,7 @@ func GenAPIKeyHandler(w http.ResponseWriter, r *http.Request) {
 
 	new_api_config.Name = r.URL.Query().Get("name")
 
-	for _, k := range db.API.Keys {
+	for _, k := range db.Config.APIKeys.Keys {
 		if k.Name == new_api_config.Name {
 			if err != nil {
 				fmt.Println(err)
@@ -59,8 +60,8 @@ func GenAPIKeyHandler(w http.ResponseWriter, r *http.Request) {
 
 	new_api_config.Key = hashedKey
 
-	db.API.Keys = append(db.API.Keys, new_api_config)
-	err = file.WriteJson(file.API_keys_file, db.API)
+	db.Config.APIKeys.Keys = append(db.Config.APIKeys.Keys, new_api_config)
+	err = file.WriteJson(file.API_keys_file, db.Config.APIKeys)
 	if err != nil {
 		fmt.Println(err)
 		http.Error(w, "error saving new key..", http.StatusBadRequest)
@@ -77,7 +78,7 @@ func GetAPIkeys(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err := db.API.Load()
+	err := db.Config.APIKeys.Load()
 	if err != nil {
 		fmt.Println(err)
 		http.Error(w, "Error retrieving API keys: "+err.Error(), http.StatusInternalServerError)
@@ -88,7 +89,7 @@ func GetAPIkeys(w http.ResponseWriter, r *http.Request) {
 		Name string `json:"name"` // The field should start with an uppercase letter
 	}
 	var apiList []data
-	for _, k := range db.API.Keys {
+	for _, k := range db.Config.APIKeys.Keys {
 		apiList = append(apiList, data{Name: k.Name})
 	}
 
@@ -103,7 +104,7 @@ func DeleteAPIKeyHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var tmp_secrets db.API_secrets
+	var tmp_secrets dbapi.API_secrets
 
 	type data struct {
 		Name string `json:"new"`
@@ -118,7 +119,7 @@ func DeleteAPIKeyHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err := db.API.Load()
+	err := db.Config.APIKeys.Load()
 	if err != nil {
 		fmt.Println(err)
 		http.Error(w, "Error getting existing keys..", http.StatusBadRequest)
@@ -128,16 +129,16 @@ func DeleteAPIKeyHandler(w http.ResponseWriter, r *http.Request) {
 	session, err := Session.Store().Get(r, "session")
 	username := session.Values["user"].(string)
 
-	for _, k := range db.API.Keys {
+	for _, k := range db.Config.APIKeys.Keys {
 		if k.Name == reqData.Data.Name && k.User == username {
 			continue
 		}
 		tmp_secrets.Keys = append(tmp_secrets.Keys, k)
 	}
 
-	db.API.Keys = tmp_secrets.Keys
+	db.Config.APIKeys.Keys = tmp_secrets.Keys
 
-	err = file.WriteJson(file.API_keys_file, db.API)
+	err = file.WriteJson(file.API_keys_file, db.Config.APIKeys)
 	if err != nil {
 		fmt.Println(err)
 		http.Error(w, "error saving new key..", http.StatusBadRequest)

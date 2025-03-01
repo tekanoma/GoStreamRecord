@@ -68,9 +68,9 @@ func main() {
 		newPassword := os.Args[3]
 		userFound := false
 
-		for i, u := range db.Users.Users {
+		for i, u := range db.Config.Users.Users {
 			if u.Name == username {
-				db.Users.Users[i].Key = string(login.HashedPassword(newPassword))
+				db.Config.Users.Users[i].Key = string(login.HashedPassword(newPassword))
 				userFound = true
 				break
 			}
@@ -81,7 +81,7 @@ func main() {
 			fmt.Println("No matching username found.")
 			return
 		}
-		db.Update(file.Users_json_path, db.Users)
+		db.Config.Update(file.Users_json_path, db.Config.Users)
 		log.Println("Password updated for", username)
 		fmt.Println("Password updated for", username)
 		return // Exit after resetting password
@@ -91,7 +91,7 @@ func main() {
 	//http.Handle("/", fs)
 	handlers.Handle()
 	server := &http.Server{
-		Addr: fmt.Sprintf(":%d", db.Settings.App.Port),
+		Addr: fmt.Sprintf(":%d", db.Config.Settings.App.Port),
 	}
 
 	// Channel to listen for termination signals
@@ -100,8 +100,8 @@ func main() {
 
 	// Run the server in a separate goroutine
 	go func() {
-		log.Printf("Server starting on http://127.0.0.1:%d", db.Settings.App.Port)
-		fmt.Printf("Server starting on http://127.0.0.1:%d\n", db.Settings.App.Port)
+		log.Printf("Server starting on http://127.0.0.1:%d", db.Config.Settings.App.Port)
+		fmt.Printf("Server starting on http://127.0.0.1:%d\n", db.Config.Settings.App.Port)
 		if err := server.ListenAndServe(); err != http.ErrServerClosed {
 			log.Fatalf("Server failed: %v", err)
 		}

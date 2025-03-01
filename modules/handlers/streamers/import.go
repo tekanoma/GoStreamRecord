@@ -48,28 +48,17 @@ func UploadHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Error reading file", http.StatusInternalServerError)
 		return
 	}
-	newStreamers := []string{}
+	counter := 0
 	for _, line := range strings.Split(string(fileContent), "\n") {
-		exist := false
-		for _, s := range db.Streamers.StreamerList {
-			if line == s.Name {
-				exist = true
-			}
-		}
-		if exist {
+		if db.Config.Streamers.Exist(line) {
 			continue
 		}
-		newStreamers = append(newStreamers, line)
-	}
-	for _, line := range newStreamers {
-		if len(line) == 0 {
-			continue
-		}
-		db.AddStreamer(line)
+		counter++
+		db.Config.AddStreamer(line)
 	}
 	resp := web_status.Response{
 		Status:  "success",
-		Message: fmt.Sprintf("Added %d new streamers!", len(newStreamers)),
+		Message: fmt.Sprintf("Added %d new streamers!", counter),
 	}
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(resp)

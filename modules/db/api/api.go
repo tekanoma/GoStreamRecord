@@ -1,4 +1,4 @@
-package db
+package dbapi
 
 import (
 	"GoRecordurbate/modules/file"
@@ -17,8 +17,6 @@ type api struct {
 	Name string `json:name`
 	Key  string `json:secret`
 }
-
-var API API_secrets
 
 func (a *API_secrets) Load() error {
 	return file.ReadJson(file.API_keys_file, &a)

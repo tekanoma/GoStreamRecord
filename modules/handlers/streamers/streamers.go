@@ -32,7 +32,7 @@ func AddStreamer(w http.ResponseWriter, r *http.Request) {
 	}
 
 	resp := status.Response{
-		Message: db.AddStreamer(reqData.Data),
+		Message: db.Config.AddStreamer(reqData.Data),
 		Data:    reqData.Data,
 	}
 
@@ -62,7 +62,7 @@ func RemoveStreamer(w http.ResponseWriter, r *http.Request) {
 	}
 
 	resp := status.Response{
-		Message: db.RemoveStreamer(reqData.Selected),
+		Message: db.Config.RemoveStreamer(reqData.Selected),
 		Data:    reqData.Selected,
 	}
 
@@ -84,7 +84,7 @@ func GetStreamers(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
 	list := []string{}
-	for _, s := range db.Streamers.StreamerList {
+	for _, s := range db.Config.Streamers.Streamers {
 		list = append(list, s.Name)
 	}
 	json.NewEncoder(w).Encode(list)

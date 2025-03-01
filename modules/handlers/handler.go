@@ -16,7 +16,7 @@ import (
 func Handle() {
 	// API endpoints
 
-	http.Handle("/videos/", http.StripPrefix("/videos/", http.FileServer(http.Dir(db.Settings.App.Videos_folder))))
+	http.Handle("/videos/", http.StripPrefix("/videos/", http.FileServer(http.Dir(db.Config.Settings.App.Videos_folder))))
 
 	http.HandleFunc("/api/add-streamer", streamers.AddStreamer)
 	http.HandleFunc("/api/get-streamers", streamers.GetStreamers)
@@ -42,7 +42,7 @@ func Handle() {
 		cookies.UserStore = make(map[string]string)
 	}
 
-	for _, u := range db.Users.Users {
+	for _, u := range db.Config.Users.Users {
 		cookies.UserStore[u.Name] = u.Key
 	}
 	//	fs := http.FileServer(http.Dir(filepath.Dir(file.Index_path)))

@@ -2,6 +2,7 @@ package cookies
 
 import (
 	"GoRecordurbate/modules/db"
+	dbapi "GoRecordurbate/modules/db/api"
 	"fmt"
 	"net/http"
 	"sync"
@@ -75,12 +76,12 @@ func (s *session) IsLoggedIn(w http.ResponseWriter, r *http.Request) bool {
 // isValidAPIKey compares the provided API key against the preloaded valid keys.
 func (s *session) isValidAPIKey(providedKey string) bool {
 	if len(s.apiKeys) == 0 {
-		err := db.API.Load()
+		err := db.Config.APIKeys.Load()
 		if err != nil {
 			fmt.Println(err)
 			return false
 		}
-		for _, k := range db.API.Keys {
+		for _, k := range db.Config.APIKeys.Keys {
 
 			exist := false
 			for _, existingKey := range s.apiKeys {
@@ -96,7 +97,7 @@ func (s *session) isValidAPIKey(providedKey string) bool {
 		}
 	}
 	for _, key := range s.apiKeys {
-		if db.VerifyAPIKey(key, providedKey) {
+		if dbapi.VerifyAPIKey(key, providedKey) {
 			return true
 		}
 	}

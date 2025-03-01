@@ -126,7 +126,7 @@ func (b *bot) StopBot(streamerName string) {
 // IsRoomPublic checks if a given room is public by sending a POST request.
 func (b *bot) IsRoomPublic(username string) bool {
 	// Wait for the dbured rate limit.
-	time.Sleep(time.Duration(db.Settings.App.RateLimit.Time) * time.Second)
+	time.Sleep(time.Duration(db.Config.Settings.App.RateLimit.Time) * time.Second)
 	urlStr := "https://chaturbate.com/get_edge_hls_url_ajax/"
 	data := url.Values{}
 	data.Set("room_slug", username)
@@ -215,14 +215,14 @@ func (b *bot) RecordLoop(streamerName string) {
 			}
 		case <-ticker.C:
 			// Optionally reload db.
-			if db.Settings.AutoReload {
-				db.Reload(file.Config_json_path, &db.Settings)
+			if db.Config.Settings.AutoReload {
+				db.Config.Reload(file.Config_json_path, &db.Config.Settings)
 			}
 
 			// Remove finished processes.
 			b.checkProcesses()
 			// For each streamer in the db, start a recorder if one isn’t already running.
-			for _, streamer := range db.Streamers.StreamerList {
+			for _, streamer := range db.Config.Streamers.Streamers {
 				if is_single_run && streamer.Name != streamerName {
 					continue
 				}
@@ -246,10 +246,10 @@ func (b *bot) RecordLoop(streamerName string) {
 				}(&wg)
 
 			}
-			time.Sleep(time.Duration(db.Settings.App.RateLimit.Time) * time.Second)
+			time.Sleep(time.Duration(db.Config.Settings.App.RateLimit.Time) * time.Second)
 			if b.isFirstRun {
 				b.isFirstRun = false
-				ticker.Reset(time.Duration(db.Settings.App.Loop_interval) * time.Minute)
+				ticker.Reset(time.Duration(db.Config.Settings.App.Loop_interval) * time.Minute)
 
 			}
 		}
@@ -331,7 +331,7 @@ func (b *bot) writeYoutubeDLdb() error {
 	}
 	defer f.Close()
 
-	folder := db.Settings.App.Videos_folder
+	folder := db.Config.Settings.App.Videos_folder
 	dbLine := fmt.Sprintf("-o \"%s", folder) + "/%(id)s/%(title)s.%(ext)s\""
 	_, err = f.Write([]byte(dbLine))
 	return err

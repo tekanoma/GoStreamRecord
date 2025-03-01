@@ -19,7 +19,7 @@ func (b *bot) runRecordLoop(streamerName string) {
 	}
 
 	log.Printf("[bot]: Starting recording for %s", streamerName)
-	args := strings.Fields(db.Settings.YoutubeDL.Binary)
+	args := strings.Fields(db.Config.Settings.YoutubeDL.Binary)
 	recordURL := fmt.Sprintf("https://chaturbate.com/%s/", streamerName)
 	args = append(args, recordURL, "--config-location", file.YoutubeDL_configPath)
 	cmd := exec.Command(args[0], args[1:]...)

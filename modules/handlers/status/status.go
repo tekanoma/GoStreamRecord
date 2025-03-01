@@ -28,7 +28,7 @@ func StatusHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var recorder Response
-	db.Reload(file.API_keys_file, &db.Streamers)
+	db.Config.Reload(file.API_keys_file, &db.Config.Streamers)
 	// Assuming db.Settings.App.Streamers is accessible
 	for _, s := range bot.Bot.ListRecorders() {
 		if s.IsRecording {
