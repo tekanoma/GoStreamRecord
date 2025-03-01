@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"path/filepath"
 	"runtime"
 )
 
@@ -15,14 +16,28 @@ var (
 type logWriter struct{}
 
 func (w logWriter) Write(p []byte) (n int, err error) {
-	_, _, line, ok := runtime.Caller(3) // Adjust stack depth to get the actual caller
+	_, file, line, ok := runtime.Caller(3) // Adjust stack depth to get the actual caller
 	if !ok {
-		//	file = "???"
+		file = "???"
 		line = 0
+	} else {
+		file = trimPath(file) // Convert absolute to relative path
 	}
 
-	formattedMsg := fmt.Sprintf("[%d]: %s", line, p)
+	formattedMsg := fmt.Sprintf("[%s:%d] %s", file, line, p)
 	return logFile.Write([]byte(formattedMsg))
+}
+
+func trimPath(fullPath string) string {
+	wd, err := os.Getwd() // Get working directory
+	if err != nil {
+		return fullPath // Return absolute path if error occurs
+	}
+	relPath, err := filepath.Rel(wd, fullPath)
+	if err != nil {
+		return fullPath // Return absolute path if relative conversion fails
+	}
+	return relPath
 }
 
 func InitLog(logPath string) {
