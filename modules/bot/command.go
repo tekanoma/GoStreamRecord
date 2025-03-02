@@ -1,10 +1,11 @@
 package bot
 
 import (
+	"context"
 	"log"
 	"strings"
 	"sync"
-	"time"
+	"syscall"
 )
 
 func (b *bot) Command(command string, name string) {
@@ -14,62 +15,124 @@ func (b *bot) Command(command string, name string) {
 	}
 	switch strings.ToLower(command) {
 	case "start":
-		for _, s := range b.ListRecorders() {
-			if name == s.Name {
+		// If the bot was previously stopped, reinitialize the context.
+		if b.ctx.Err() != nil {
+			b.ctx, b.cancel = context.WithCancel(context.Background())
+		}
+
+		for i, s := range b.status {
+			if name == s.Name && s.Cmd != nil {
 				log.Println("Bot already running..")
 				return
+			} else if s.Cmd == nil {
+				if err := s.Cmd.Process.Signal(syscall.Signal(0)); err != nil {
+					log.Printf("Process for %s has stopped", s.Name)
+					b.status = append(b.status[:i], b.status[i+1:]...)
+					i--
+				}
 			}
 		}
 		log.Println("Starting bot")
-		b.mux.Lock()
-		b.status.IsRunning = true
-		b.isFirstRun = true
-		b.mux.Unlock()
-		b.RecordLoop(name)
+		go b.RecordLoop(name)
 	case "stop":
-		is_running := false
-		for _, s := range b.ListRecorders() {
-			if name == s.Name {
-				is_running = true
+		is_running := len(b.status) != 0
 
-				break
-			}
-		}
-		if !is_running && len(b.ListRecorders()) == 0 {
-			log.Println("Bot is not running..")
+		if !is_running && len(b.status) == 0 {
+			log.Println("[bot] Stopped recording for")
 			break
 		}
 		log.Println("Stopping bot")
 		var wg sync.WaitGroup
-		wg_was_added := false
-		for _, s := range b.ListRecorders() {
-			// Stop all
-
+		// Iterate over a copy of the status slice to avoid closure capture issues.
+		for i, s := range b.status {
+			// Stop only the specified process (or all if name is empty).
 			if name == "" || s.Name == name {
-				log.Println("Stopping:", name)
-				wg_was_added = true
+				b.status[i].WasRestart = true
+				b.stopProcessIfRunning(b.status[i])
+				sName := s.Name
 				wg.Add(1)
-				go b.Stop(s.Name)
-				// Stop single
+				go func(n string) {
+					defer wg.Done()
+					b.StopProcess(n)
+				}(sName)
 			} else {
 				log.Println("Not stopping..")
 			}
 		}
-		if wg_was_added {
+		wg.Wait()
 
-			wg.Wait()
-		}
+		b.checkProcesses()
 	case "restart":
 		log.Println("Restarting bot")
-		if b.status.IsRunning {
-			b.Command("stop", name)
+		recorders := []string{}
+		// Before restarting, reinitialize the context so RecordLoop doesn't exit immediately.
+		b.ctx, b.cancel = context.WithCancel(context.Background())
+
+		if name != "" {
+			// Stop a single process.
+			process := getProcess(name, b)
+
+			b.Command("stop", process.Name)
+			recorders = append(recorders, name)
+
+		} else {
+			var wg sync.WaitGroup
+			// Stop all running recorders.
+			// Create a copy of b.status to avoid data races when stopping processes.
+			b.mux.Lock()
+			statusCopy := make([]BotStatus, len(b.status))
+			copy(statusCopy, b.status)
+			b.mux.Unlock()
+			for _, s := range statusCopy {
+				b.mux.Lock()
+
+				// Mark that the process is being restarted.
+				// (Assuming b.status is the source of truth; you might also update the copy)
+				for i, rec := range b.status {
+					if rec.Name == s.Name {
+						b.status[i].WasRestart = true
+						b.stopProcessIfRunning(b.status[i])
+						break
+					}
+				}
+				b.mux.Unlock()
+				wg.Add(1)
+				recorders = append(recorders, s.Name)
+				go func(n string) {
+					b.Command("stop", n)
+					log.Println("Stopped", n)
+					wg.Done()
+				}(s.Name)
+			}
+			wg.Wait()
 		}
-		for len(b.status.Processes) != 0 {
-			time.Sleep(1 * time.Second)
+
+		// Start all recorders that were stopped.
+		for _, recName := range recorders {
+			go b.RecordLoop(recName)
 		}
-		b.Command("start", name)
 	default:
 		log.Println("Nothing to do..")
 	}
+}
 
+func (b *bot) stopProcessIfRunning(bs BotStatus) {
+
+	for i, s := range b.status {
+		if bs.Cmd != nil && s.Name == bs.Name {
+			b.status[i].StopStatus = true
+			if err := s.Cmd.Process.Signal(syscall.Signal(0)); err != nil {
+				i--
+			}
+			b.status = append(b.status[:i], b.status[i+1:]...)
+			break
+		}
+		if s.Cmd == nil && s.Name == bs.Name {
+			b.status[i].StopStatus = true
+			b.status = append(b.status[:i], b.status[i+1:]...)
+			break
+		}
+	}
+
+	log.Printf("Process for %s has stopped", bs.Name)
 }

@@ -5,6 +5,7 @@ import (
 	"GoRecordurbate/modules/db"
 	"GoRecordurbate/modules/handlers/cookies"
 	"GoRecordurbate/modules/handlers/status"
+	"GoRecordurbate/modules/web/provider"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -114,7 +115,7 @@ func CheckOnlineStatus(w http.ResponseWriter, r *http.Request) {
 		status.ResponseHandler(w, r, "Streamer name is required", nil)
 		return
 	}
-	msg := bot.Bot.IsOnline(reqData.Streamer)
+	msg := provider.Web.IsOnline(reqData.Streamer)
 	status.ResponseHandler(w, r, fmt.Sprintf("%v", msg), nil)
 }
 
@@ -133,6 +134,6 @@ func StopProcess(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	status.ResponseHandler(w, r, "Stopping process for "+reqData.Streamer, nil)
-	bot.Bot.Stop(reqData.Streamer)
+	bot.Bot.StopProcess(reqData.Streamer)
 	status.ResponseHandler(w, r, "Stopped process for"+reqData.Streamer, nil)
 }

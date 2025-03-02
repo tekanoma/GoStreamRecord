@@ -24,7 +24,7 @@ func (w logWriter) Write(p []byte) (n int, err error) {
 		file = trimPath(file) // Convert absolute to relative path
 	}
 
-	formattedMsg := fmt.Sprintf("[%s:%d] %s", file, line, p)
+	formattedMsg := fmt.Sprintf("\"./%s\":[%d] %s", file, line, p)
 	return logFile.Write([]byte(formattedMsg))
 }
 

@@ -30,7 +30,7 @@ func ControlHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Invalid request payload", http.StatusBadRequest)
 		return
 	}
-
+	
 	go bot.Bot.Command(reqData.Command, reqData.Name)
 	resp := web_status.Response{
 		Message: fmt.Sprintf("Exected command '%s'", reqData.Command),
