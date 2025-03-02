@@ -1,1 +1,1 @@
-# API docs will be update here in the future
+# API docs will be updated here in the future
