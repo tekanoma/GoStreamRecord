@@ -2,42 +2,60 @@ package status
 
 import (
 	"GoRecordurbate/modules/bot"
-	"GoRecordurbate/modules/config"
+	"GoRecordurbate/modules/db"
 	"GoRecordurbate/modules/file"
+	"GoRecordurbate/modules/handlers/cookies"
 	"encoding/json"
 	"net/http"
 )
 
 // Response is a generic response structure for our API endpoints.
 type Response struct {
-	Status    string        `json:"status"`
-	Message   string        `json:"message"`
-	Data      interface{}   `json:"data,omitempty"`
-	BotStatus bot.BotStatus `json:"botStatus"`
+	Status    string          `json:"status"`
+	Message   string          `json:"message,omitempty"`
+	Data      interface{}     `json:"data,omitempty"`
+	BotStatus []bot.BotStatus `json:"botStatus"`
 }
 
 func StatusHandler(w http.ResponseWriter, r *http.Request) {
+	if !cookies.Session.IsLoggedIn(w, r) {
+		http.Redirect(w, r, "/login", http.StatusFound)
+		return
+	}
 	if r.Method != http.MethodGet {
 		http.Error(w, "Only GET allowed", http.StatusMethodNotAllowed)
 		return
 	}
 
-	var recorder Response
-	config.Reload(file.Config_json_path, &config.Streamers)
-	// Assuming config.Settings.App.Streamers is accessible
-	for _, s := range bot.Bot.ListRecorders() {
-		if s.IsRecording {
-			recorder.Status = "Running"
-			break // No need to continue checking
-		} else {
-			recorder.Status = "Stopped"
+	// Reload streamer list from config file
+	db.Config.Reload(file.API_keys_file, &db.Config.Streamers)
 
+	bot.Bot.StopRunningEmpty()
+	// Fetch current recording status
+	recorderStatus := bot.Bot.ListRecorders()
+	isRecording := false
+	for _, s := range recorderStatus {
+		if s.IsRecording {
+			isRecording = true
+			break
 		}
 	}
-	recorder.BotStatus = bot.Bot.Status()
 
+	// Prepare response
+	recorder := Response{
+		BotStatus: recorderStatus,
+		Status:    "Stopped",
+	}
+
+	if isRecording {
+		recorder.Status = "Running"
+	}
+
+	// Send JSON response
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(recorder)
+	if err := json.NewEncoder(w).Encode(recorder); err != nil {
+		http.Error(w, "Failed to encode response", http.StatusInternalServerError)
+	}
 }
 
 func ResponseHandler(w http.ResponseWriter, r *http.Request, message string, data interface{}) {

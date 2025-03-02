@@ -1,0 +1,9 @@
+{
+  "Keys": [
+    {
+      "User": "User_who_created_key",
+      "Name": "Name_of_key",
+      "Key": "A_hashed_secret_key"
+    }
+  ]
+}

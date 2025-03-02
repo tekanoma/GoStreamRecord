@@ -5,6 +5,7 @@ import "strings"
 var (
 	Config_json_path     string = "./internal/settings/settings.json"
 	Streamers_json_path  string = "./internal/settings/db/streamers.json"
+	API_keys_file        string = "./internal/settings/db/api_keys.json"
 	Users_json_path      string = "./internal/settings/db/users.json"
 	YoutubeDL_configPath string = "./internal/settings/youtube-dl.config"
 	Index_path           string = "./internal/web/index.html"
@@ -12,8 +13,6 @@ var (
 	Videos_folder        string = "./output/videos"
 	Log_path             string = "./output/GoRecordurbate.log"
 )
-
-
 
 // isVideoFile returns true if the file extension indicates a video file.
 func IsVideoFile(filename string) bool {

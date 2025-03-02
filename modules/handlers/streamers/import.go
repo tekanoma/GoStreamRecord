@@ -1,7 +1,8 @@
 package streamers
 
 import (
-	"GoRecordurbate/modules/config"
+	"GoRecordurbate/modules/db"
+	"GoRecordurbate/modules/handlers/cookies"
 	web_status "GoRecordurbate/modules/handlers/status"
 	"encoding/json"
 	"fmt"
@@ -14,6 +15,10 @@ import (
 // Handles POST /api/upload.
 // It reads an uploaded file and returns a dummy success response.
 func UploadHandler(w http.ResponseWriter, r *http.Request) {
+	if !cookies.Session.IsLoggedIn(w, r) {
+		http.Redirect(w, r, "/login", http.StatusFound)
+		return
+	}
 	if r.Method != http.MethodPost {
 		http.Error(w, "Only POST allowed", http.StatusMethodNotAllowed)
 		return
@@ -43,27 +48,17 @@ func UploadHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Error reading file", http.StatusInternalServerError)
 		return
 	}
-	newStreamers := []string{}
+	counter := 0
 	for _, line := range strings.Split(string(fileContent), "\n") {
-		exist := false
-		for _, s := range config.Streamers.StreamerList {
-			if line == s.Name {
-				exist = true
-			}
-		}
-		if exist {
+		if db.Config.Streamers.Exist(line) {
 			continue
 		}
-		newStreamers = append(newStreamers, line)
-	}
-	for _, line := range newStreamers {
-		if len(line) == 0 {
-			continue
-		}
-		config.AddStreamer(line)
+		counter++
+		db.Config.AddStreamer(line)
 	}
 	resp := web_status.Response{
-		Message: fmt.Sprintf("Added %d new streamers!", len(newStreamers)),
+		Status:  "success",
+		Message: fmt.Sprintf("Added %d new streamers!", counter),
 	}
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(resp)

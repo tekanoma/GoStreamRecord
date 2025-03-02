@@ -2,8 +2,10 @@ package streamers
 
 import (
 	"GoRecordurbate/modules/bot"
-	"GoRecordurbate/modules/config"
+	"GoRecordurbate/modules/db"
+	"GoRecordurbate/modules/handlers/cookies"
 	"GoRecordurbate/modules/handlers/status"
+	"GoRecordurbate/modules/web/provider"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -12,6 +14,10 @@ import (
 // Handles POST /api/add-streamer.
 // It decodes a JSON payload with a "data" field and returns a dummy response.
 func AddStreamer(w http.ResponseWriter, r *http.Request) {
+	if !cookies.Session.IsLoggedIn(w, r) {
+		http.Redirect(w, r, "/login", http.StatusFound)
+		return
+	}
 	if r.Method != http.MethodPost {
 		http.Error(w, "Only POST allowed", http.StatusMethodNotAllowed)
 		return
@@ -27,7 +33,7 @@ func AddStreamer(w http.ResponseWriter, r *http.Request) {
 	}
 
 	resp := status.Response{
-		Message: config.AddStreamer(reqData.Data),
+		Message: db.Config.AddStreamer(reqData.Data),
 		Data:    reqData.Data,
 	}
 
@@ -38,6 +44,10 @@ func AddStreamer(w http.ResponseWriter, r *http.Request) {
 // Handles POST /api/remove-streamer.
 // It decodes a JSON payload with the selected option and returns a dummy response.
 func RemoveStreamer(w http.ResponseWriter, r *http.Request) {
+	if !cookies.Session.IsLoggedIn(w, r) {
+		http.Redirect(w, r, "/login", http.StatusFound)
+		return
+	}
 	if r.Method != http.MethodPost {
 		http.Error(w, "Only POST allowed", http.StatusMethodNotAllowed)
 		return
@@ -53,7 +63,7 @@ func RemoveStreamer(w http.ResponseWriter, r *http.Request) {
 	}
 
 	resp := status.Response{
-		Message: config.RemoveStreamer(reqData.Selected),
+		Message: db.Config.RemoveStreamer(reqData.Selected),
 		Data:    reqData.Selected,
 	}
 
@@ -63,6 +73,10 @@ func RemoveStreamer(w http.ResponseWriter, r *http.Request) {
 
 // Handles GET /api/get-streamers.
 func GetStreamers(w http.ResponseWriter, r *http.Request) {
+	if !cookies.Session.IsLoggedIn(w, r) {
+		http.Redirect(w, r, "/login", http.StatusFound)
+		return
+	}
 	if r.Method != http.MethodGet {
 		http.Error(w, "Only GET allowed", http.StatusMethodNotAllowed)
 		return
@@ -71,13 +85,18 @@ func GetStreamers(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
 	list := []string{}
-	for _, s := range config.Streamers.StreamerList {
+	for _, s := range db.Config.Streamers.Streamers {
 		list = append(list, s.Name)
 	}
 	json.NewEncoder(w).Encode(list)
 }
 
 func CheckOnlineStatus(w http.ResponseWriter, r *http.Request) {
+
+	if !cookies.Session.IsLoggedIn(w, r) {
+		http.Redirect(w, r, "/login", http.StatusFound)
+		return
+	}
 	if r.Method != http.MethodPost {
 		http.Error(w, "Only POST allowed", http.StatusMethodNotAllowed)
 		return
@@ -96,7 +115,7 @@ func CheckOnlineStatus(w http.ResponseWriter, r *http.Request) {
 		status.ResponseHandler(w, r, "Streamer name is required", nil)
 		return
 	}
-	msg := bot.Bot.IsOnline(reqData.Streamer)
+	msg := provider.Web.IsOnline(reqData.Streamer)
 	status.ResponseHandler(w, r, fmt.Sprintf("%v", msg), nil)
 }
 
@@ -115,6 +134,6 @@ func StopProcess(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	status.ResponseHandler(w, r, "Stopping process for "+reqData.Streamer, nil)
-	bot.Bot.Stop(reqData.Streamer)
+	bot.Bot.StopProcess(reqData.Streamer)
 	status.ResponseHandler(w, r, "Stopped process for"+reqData.Streamer, nil)
 }

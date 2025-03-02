@@ -2,6 +2,7 @@ package controller
 
 import (
 	"GoRecordurbate/modules/file"
+	"GoRecordurbate/modules/handlers/cookies"
 	"encoding/json"
 	"io/ioutil"
 	"net/http"
@@ -11,6 +12,10 @@ import (
 
 // handleLogs returns log lines from "logs.txt" via GET /api/logs.
 func HandleLogs(w http.ResponseWriter, r *http.Request) {
+	if !cookies.Session.IsLoggedIn(w, r) {
+		http.Redirect(w, r, "/login", http.StatusFound)
+		return
+	}
 	if _, err := os.Stat(file.Log_path); os.IsNotExist(err) {
 		// If no log file exists, return an empty array.
 		w.Header().Set("Content-Type", "application/json")

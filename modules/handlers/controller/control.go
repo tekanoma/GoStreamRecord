@@ -2,6 +2,7 @@ package controller
 
 import (
 	"GoRecordurbate/modules/bot"
+	"GoRecordurbate/modules/handlers/cookies"
 	web_status "GoRecordurbate/modules/handlers/status"
 	"encoding/json"
 	"fmt"
@@ -11,6 +12,10 @@ import (
 // dcodes a JSON payload with a "command" field (start, stop, or restart)
 // and returns a dummy response.
 func ControlHandler(w http.ResponseWriter, r *http.Request) {
+	if !cookies.Session.IsLoggedIn(w, r) {
+		http.Redirect(w, r, "/login", http.StatusFound)
+		return
+	}
 	if r.Method != http.MethodPost {
 		http.Error(w, "Only POST allowed", http.StatusMethodNotAllowed)
 		return
@@ -25,10 +30,11 @@ func ControlHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Invalid request payload", http.StatusBadRequest)
 		return
 	}
-
+	
 	go bot.Bot.Command(reqData.Command, reqData.Name)
 	resp := web_status.Response{
-		Message: fmt.Sprintf("Control command '%s' executed", reqData.Command),
+		Message: fmt.Sprintf("Exected command '%s'", reqData.Command),
+		Status:  "success",
 	}
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(resp)

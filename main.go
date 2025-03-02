@@ -2,11 +2,12 @@ package main
 
 import (
 	"GoRecordurbate/modules/bot"
-	"GoRecordurbate/modules/config"
+	"GoRecordurbate/modules/db"
 	"GoRecordurbate/modules/file"
 	"GoRecordurbate/modules/handlers"
 	"GoRecordurbate/modules/handlers/cookies"
 	"GoRecordurbate/modules/handlers/login"
+	"GoRecordurbate/modules/web/provider"
 	"context"
 	_ "embed"
 	"fmt"
@@ -29,6 +30,7 @@ var IndexHTML string
 var LoginHTML string
 
 func init() {
+	provider.Init("chaturbate")
 	handlers.IndexHTML = IndexHTML
 	handlers.LoginHTML = LoginHTML
 	err := godotenv.Load(".env")
@@ -68,9 +70,9 @@ func main() {
 		newPassword := os.Args[3]
 		userFound := false
 
-		for i, u := range config.Users.Users {
+		for i, u := range db.Config.Users.Users {
 			if u.Name == username {
-				config.Users.Users[i].Key = string(login.HashedPassword(newPassword))
+				db.Config.Users.Users[i].Key = string(login.HashedPassword(newPassword))
 				userFound = true
 				break
 			}
@@ -79,9 +81,9 @@ func main() {
 		if !userFound {
 			log.Println("No matching username found.")
 			fmt.Println("No matching username found.")
-			return 
+			return
 		}
-		config.Update(file.Users_json_path, config.Users)
+		db.Config.Update(file.Users_json_path, db.Config.Users)
 		log.Println("Password updated for", username)
 		fmt.Println("Password updated for", username)
 		return // Exit after resetting password
@@ -91,7 +93,7 @@ func main() {
 	//http.Handle("/", fs)
 	handlers.Handle()
 	server := &http.Server{
-		Addr: fmt.Sprintf(":%d", config.Settings.App.Port),
+		Addr: fmt.Sprintf(":%d", db.Config.Settings.App.Port),
 	}
 
 	// Channel to listen for termination signals
@@ -100,8 +102,8 @@ func main() {
 
 	// Run the server in a separate goroutine
 	go func() {
-		log.Printf("Server starting on http://127.0.0.1:%d", config.Settings.App.Port)
-		fmt.Printf("Server starting on http://127.0.0.1:%d\n", config.Settings.App.Port)
+		log.Printf("Server starting on http://127.0.0.1:%d", db.Config.Settings.App.Port)
+		fmt.Printf("Server starting on http://127.0.0.1:%d\n", db.Config.Settings.App.Port)
 		if err := server.ListenAndServe(); err != http.ErrServerClosed {
 			log.Fatalf("Server failed: %v", err)
 		}

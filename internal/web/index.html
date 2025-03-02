@@ -118,13 +118,15 @@
 
 <body>
   <!-- Header with Title and Status -->
+
   <header>
     <h1>GoRecordurbate WebUI</h1>
-    <div id="statusIndicator">Status:</div>
   </header>
 
+  <div id="statusIndicator">Status:</div>
   <div class="container-fluid">
     <div class="row">
+
       <!-- Sidebar Navigation -->
       <aside class="col-md-3">
         <nav class="nav flex-column nav-pills" id="v-pills-tab" role="tablist" aria-orientation="vertical">
@@ -160,6 +162,7 @@
                 <button type="button" class="btn btn-secondary" id="restartAllCommand">Restart all recordings</button>
               </div>
             </div>
+
             <!-- Monitor Card with Nested Tabs -->
             <div class="card">
               <div class="card-header">Details</div>
@@ -197,9 +200,6 @@
           <section class="tab-pane fade" id="settingsSection" role="tabpanel" aria-labelledby="v-pills-settings-tab">
             <div class="card">
 
-
-
-
               <div class="card-header">Settings</div>
               <div class="card-body">
                 <ul class="nav nav-tabs" id="settingsTabs" role="tablist">
@@ -210,6 +210,10 @@
                   <li class="nav-item" role="presentation">
                     <button class="nav-link" id="recorder-management-tab" data-bs-toggle="tab"
                       data-bs-target="#recorderManagementSection" type="button" role="tab">Recorder</button>
+                  </li>
+                  <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="api-management-tab" data-bs-toggle="tab"
+                      data-bs-target="#apiManagementSection" type="button" role="tab">API</button>
                   </li>
                 </ul>
                 <div class="tab-content mt-3">
@@ -255,6 +259,36 @@
                       </article>
                     </div>
                   </div>
+
+
+
+
+
+                  <div class="tab-pane fade" id="apiManagementSection" role="tabpanel">
+
+                    <div class="card-header" id="apiHeader">API keys</div>
+                    <div class="card-body">
+                      <form id="apiForm" class="mb-3">
+                        <label for="generateNewAPI" class="form-label">Generate new API secret key</label>
+                        <div class="input-group">
+                          <button type="button" class="btn btn-primary" id="generateNewAPIButton">Add</button>
+                        </div>
+                      </form>
+                      <article class="mb-4">
+                        <div class="card-header">API Keys</div>
+                        <ul class="list-group" id="apiKeyList">
+                          <!-- Dynamically populated -->
+                        </ul>
+
+                      </article>
+                    </div>
+
+
+
+
+
+                  </div>
+
                   <div class="tab-pane fade" id="recorderManagementSection" role="tabpanel">
 
                     <div class="card-header">Streamers</div>
@@ -373,6 +407,156 @@
       setTimeout(() => alertDiv.remove(), 5000);
     };
 
+    /* ------------------ API SECTION -----------------------*/
+    document.addEventListener("DOMContentLoaded", function () {
+      const generateButton = document.getElementById("generateNewAPIButton");
+      const apiKeyList = document.getElementById("apiKeyList");
+      generateButton.addEventListener("click", async function () {
+        const apiKeyName = prompt("Enter a name for the new API key:");
+        if (!apiKeyName) return;
+
+        try {
+          const response = await fetch("/api/generate-api-key?name=" + apiKeyName, { method: "POST" });
+          const data = await response.json();
+
+          if (data.status) {
+            displayApiKey(data.key);
+            addAPIKeyToList(apiKeyName, data.key); // Store locally for display
+          } else {
+            showError("Error generating API key.");
+          }
+        } catch (error) {
+          console.error("Request failed", error);
+          showError("An unexpected error occurred.");
+        }
+      });
+
+    });
+    const fetchApiKey = async () => {
+      try {
+        const response = await fetch(`/api/keys`, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json"
+          }
+        });
+
+        if (!response.ok) {
+          throw new Error("Failed to retrieve API keys.");
+        }
+
+        const data = await response.json();
+
+        // Log or handle API keys (display them in the UI, for instance)
+        data.forEach((key) => {
+          // Example: Display key on the page (or handle it as needed)
+          addAPIKeyToList(key.name, "*************")
+        });
+      } catch (error) {
+        console.error("Error fetching API key:", error);
+        alert("Error fetching API key.");
+      }
+    };
+    function displayApiKey(key) {
+      // Remove existing API key div if present
+      const existingDiv = document.getElementById("api-key-display");
+      if (existingDiv) existingDiv.remove();
+
+      // Create new div
+      const keyDiv = document.createElement("div");
+      keyDiv.id = "api-key-display";
+      keyDiv.style.position = "fixed";
+      keyDiv.style.top = "20px";
+      keyDiv.style.left = "20px";
+      keyDiv.style.background = "#fff";
+      keyDiv.style.padding = "10px";
+      keyDiv.style.border = "1px solid #ccc";
+      keyDiv.style.boxShadow = "0px 0px 10px rgba(0, 0, 0, 0.1)";
+      keyDiv.style.zIndex = "1000";
+      keyDiv.style.fontFamily = "monospace";
+
+      keyDiv.innerHTML = `
+      <p><strong>Your API Key:</strong></p>
+<p><strong>This will only be shown once!</strong></p>
+<div style="display: flex; flex-direction: column; gap: 10px;">
+    <input type="text" value="${key}" id="api-key-input" readonly 
+        style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px; box-sizing: border-box; background-color: #f9f9f9;">
+    <button id="copy-api-key" 
+        style="padding: 8px 16px; background-color: #4CAF50; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 14px; transition: background-color 0.3s;">
+        Copy
+    </button>
+    <button id="close-api-key" 
+        style="padding: 8px 16px; background-color: #f44336; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 14px; transition: background-color 0.3s;">
+        Close
+    </button>
+</div>
+
+`;
+
+      document.body.appendChild(keyDiv);
+
+      // Copy to clipboard functionality
+      document.getElementById("copy-api-key").addEventListener("click", function () {
+        const input = document.getElementById("api-key-input");
+        input.select();
+        document.execCommand("copy");
+        this.innerText = "Copied!";
+        setTimeout(() => (this.innerText = "Copy"), 2000);
+      });
+
+      document.getElementById('close-api-key').addEventListener('click', function () {
+        this.parentElement.parentElement.remove(); // Removes the API key display
+      });
+      // Remove the div after 30 seconds
+      setTimeout(() => keyDiv.remove(), 30000);
+    };
+
+    function showError(message) {
+      const errorDiv = document.createElement("div");
+      errorDiv.innerText = message;
+      errorDiv.style.position = "fixed";
+      errorDiv.style.bottom = "20px";
+      errorDiv.style.right = "20px";
+      errorDiv.style.background = "#ff4d4d";
+      errorDiv.style.color = "#fff";
+      errorDiv.style.padding = "10px";
+      errorDiv.style.borderRadius = "5px";
+      errorDiv.style.zIndex = "1000";
+
+      document.body.appendChild(errorDiv);
+      setTimeout(() => errorDiv.remove(), 5000);
+    };
+
+
+    function addAPIKeyToList(name, key) {
+      const li = document.createElement("li");
+      li.className = "list-group-item d-flex justify-content-between align-items-center";
+      li.innerHTML = `
+            <span>${name}</span>
+            <button class="btn btn-danger btn-sm delete-key">Delete</button>
+        `;
+
+      li.querySelector(".delete-key").addEventListener("click", async function () {
+        if (confirm(`Are you sure you want to delete '${name}'?`)) {
+          try {
+            const res = await fetch("/api/delete-api-key", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ data: { new: name } })
+            });
+            const data = await res.json();
+            showResponse(data.message, false);
+          } catch (err) {
+            console.error(err);
+            showResponse("Error deleting api key.", true);
+          }
+          li.remove();
+        }
+      });
+
+      apiKeyList.appendChild(li);
+    }
+
     /* ------------------ STREAMERS SECTION ------------------ */
     const addStreamer = async () => {
       const input = document.getElementById("streamerInput");
@@ -388,7 +572,7 @@
           body: JSON.stringify({ data: name })
         });
         const data = await res.json();
-        showResponse("Streamer added: " + JSON.stringify(data));
+        showResponse(data.message, false);
         input.value = "";
         populateStreamers();
       } catch (err) {
@@ -427,7 +611,7 @@
           body: JSON.stringify({ selected: name })
         });
         const data = await res.json();
-        showResponse("Streamer removed: " + JSON.stringify(data));
+        showResponse(data.message, false);
         populateStreamers();
       } catch (err) {
         console.error(err);
@@ -444,7 +628,7 @@
           body: JSON.stringify({ command, name })
         });
         const data = await res.json();
-        showResponse(`Sent : ${JSON.stringify(data)}`);
+        showResponse(data.message, false);
 
       } catch (err) {
         console.error(err);
@@ -468,7 +652,8 @@
           body: formData
         });
         const data = await res.json();
-        showResponse("File uploaded: " + JSON.stringify(data));
+        showResponse(data.message, false);
+        //         showResponse("File uploaded: " + JSON.stringify(data));
       } catch (err) {
         console.error(err);
         showResponse("Error uploading file.", true);
@@ -589,7 +774,7 @@
         // Remove deleted videos from the list
         const result = await res.json();
         if (result.data.success) {
-          showResponse(result.data.message, !result.data.success);
+          showResponse(result.data.message, false);
           populateVideos(); // refresh list
         }
       } catch (err) {
@@ -656,80 +841,105 @@
           return data.message === "true"; // Ensures it returns a boolean
         })
         .catch((err) => {
-          console.error("Error starting process:", err);
+          showResponse("Error starting process: " + err, true);
           return false; // Return false in case of an error
         });
     }
-
-
-    const updateRecorders = async () => {
-      const container = document.getElementById("recorderProcessesContainer");
-      container.innerHTML = "";
-
-      // Fetch all possible streamers
-      const res = await fetch("/api/get-streamers");
-      const streamers = await res.json();
-
-      // Fetch currently active recorder processes
-      if (recorder_processes && Array.isArray(recorder_processes.processes)) {
-        activeProcesses = recorder_processes.processes;
-      }
-
-      // Map active processes by name for quick lookup
-      const activeMap = new Map(activeProcesses.map((p) => [p.name, p]));
-
-      for (const streamer of streamers) {
-        const process = activeMap.get(streamer) || { name: streamer, isRecording: false };
-
-        // Check if the live is available
-        const isAvailable = await checkSourceAvailability(streamer);
-
-        const processElement = document.createElement("div");
-        processElement.className = "recorder-process";
-        processElement.innerHTML = `
-<div class="process-info" style="display: flex; align-items: center; justify-content: space-between; padding: 14px; border: 1px solid #ddd; border-radius: 12px; margin-bottom: 10px; background-color: #fafafa;">
-  <div class="status-text" style="font-weight: bold; color: ${process.isRecording ? '#2ecc71' : '#e74c3c'};">
-   ${process.isRecording ? "Recording" : "Not Recording"}
-  </div>
-  <div class="status-text" style="font-weight: bold; color: ${isAvailable ? '#2ecc71' : '#e74c3c'};">
-     ${process.name} - ${isAvailable ? "Online" : "Not Online"}
-  </div>
-  <div>
-    <button class="start-button" style="padding: 8px 14px; background-color: #2ecc71; border: none; border-radius: 20px; color: #fff;" ${process.isRecording || !isAvailable ? "disabled" : ""}>Start</button>
-    <button class="stop-button" style="padding: 8px 14px; background-color: #e74c3c; border: none; border-radius: 20px; color: #fff; margin-left: 5px;" ${!process.isRecording ? "disabled" : ""}>Stop</button>
-    <button class="restart-button" style="padding: 8px 14px; background-color: #f1c40f; border: none; border-radius: 20px; color: #fff; margin-left: 5px;" ${!process.isRecording ? "disabled" : ""}>Restart</button>
-  </div>
-</div>`;
-
-        const startButton = processElement.querySelector(".start-button");
-        const stopButton = processElement.querySelector(".stop-button");
-        const restartButton = processElement.querySelector(".restart-button");
-
-        startButton.addEventListener("click", () => sendCommand("start",process.name));
-        stopButton.addEventListener("click", () => sendCommand("stop",process.name));
-        restartButton.addEventListener("click", () => sendCommand("restart",process.name));
-
-
-        container.appendChild(processElement);
-      }
-    };
-
-
     /* ------------------ STATUS INDICATOR ------------------ */
     const updateStatus = async () => {
       try {
         const res = await fetch("/api/status");
         const data = await res.json();
         const statusIndicator = document.getElementById("statusIndicator");
-        if (!data.status) {
-          data.status = "Not recording";
-        }
-        recorder_processes = Object.keys(data.botStatus).length ? data.botStatus : null;
-        statusIndicator.innerText = "Status: " + data.status;
+
+        // Ensure status always has a value
+        data.status = data.status || "Not recording";
+
+        // Ensure botStatus is always an array
+        recorder_processes = Array.isArray(data.botStatus) ? data.botStatus : [];
+
+        // Update status display
+        statusIndicator.textContent = "Status: " + data.status;
         statusIndicator.style.backgroundColor = data.status === "Running" ? "#3dbb24af" : "#fab1a0";
-        //updateRecorders();
+
+        updateRecorders();
       } catch (err) {
         console.error("Error fetching status:", err);
+      }
+    };
+
+    /* ------------------ RECORDER UPDATER ------------------ */
+    const updateRecorders = async () => {
+      const container = document.getElementById("recorderProcessesContainer");
+
+      // Fetch all possible streamers
+      const res = await fetch("/api/get-streamers");
+      const streamers = await res.json();
+
+      // Create a map of active processes using botStatus data
+      const activeMap = new Map(recorder_processes.map((p) => [p.Name, p.IsRecording]));
+
+      // Get existing elements in DOM for tracking duplicates
+      const existingElements = new Map();
+      container.querySelectorAll(".recorder-process").forEach((el) => {
+        const name = el.dataset.name;
+        if (name) existingElements.set(name, el);
+      });
+
+      for (const streamer of streamers) {
+        let isRecording = activeMap.get(streamer) || false;
+
+        recorder_processes.forEach((process) => {
+          if (streamer === process.name) {
+            isRecording=process.isRecording
+          }
+        });
+        const isAvailable = await checkSourceAvailability(streamer);
+
+        if (existingElements.has(streamer)) {
+          // Update existing element
+          const processElement = existingElements.get(streamer);
+          processElement.querySelector(".status-text").innerHTML = isRecording
+            ? "Recording"
+            : "Not Recording";
+
+          processElement.querySelector(".status-text:nth-child(2)").innerHTML = `
+        ${streamer} - ${isAvailable ? "Online" : "Not Online"}`;
+
+          // Enable/Disable buttons accordingly
+          processElement.querySelector(".start-button").disabled = isRecording || !isAvailable;
+          processElement.querySelector(".stop-button").disabled = !isRecording;
+          processElement.querySelector(".restart-button").disabled = !isRecording;
+        } else {
+          // Create new element if not in DOM
+          const processElement = document.createElement("div");
+          processElement.className = "recorder-process";
+          processElement.dataset.name = streamer;
+          processElement.innerHTML = `
+<div class="process-info" style="display: flex; align-items: center; justify-content: space-between; padding: 14px; border: 1px solid #ddd; border-radius: 12px; margin-bottom: 10px; background-color: #fafafa;">
+  <div class="status-text" style="font-weight: bold; color: ${isRecording ? '#2ecc71' : '#e74c3c'};">
+   ${isRecording ? "Recording" : "Not Recording"}
+  </div>
+  <div class="status-text" style="font-weight: bold; color: ${isAvailable ? '#2ecc71' : '#e74c3c'};">
+     ${streamer} - ${isAvailable ? "Online" : "Not Online"}
+  </div>
+  <div>
+    <button class="start-button" style="padding: 8px 14px; background-color: #2ecc71; border: none; border-radius: 20px; color: #fff;" ${isRecording || !isAvailable ? "disabled" : ""}>Start</button>
+    <button class="stop-button" style="padding: 8px 14px; background-color: #e74c3c; border: none; border-radius: 20px; color: #fff; margin-left: 5px;" ${!isRecording ? "disabled" : ""}>Stop</button>
+    <button class="restart-button" style="padding: 8px 14px; background-color: #f1c40f; border: none; border-radius: 20px; color: #fff; margin-left: 5px;" ${!isRecording ? "disabled" : ""}>Restart</button>
+  </div>
+</div>`;
+
+          const startButton = processElement.querySelector(".start-button");
+          const stopButton = processElement.querySelector(".stop-button");
+          const restartButton = processElement.querySelector(".restart-button");
+
+          startButton.addEventListener("click", () => sendCommand("start", streamer));
+          stopButton.addEventListener("click", () => sendCommand("stop", streamer));
+          restartButton.addEventListener("click", () => sendCommand("restart", streamer));
+
+          container.appendChild(processElement);
+        }
       }
     };
 
@@ -780,7 +990,7 @@
           body: JSON.stringify({ username, password })
         });
         const data = await res.json();
-        showResponse("User added: " + JSON.stringify(data));
+        showResponse(data.message, false);
         document.getElementById("addUserName").value = "";
         document.getElementById("addUserPassword").value = "";
         populateUsers();
@@ -789,6 +999,7 @@
         showResponse("Error adding user.", true);
       }
     };
+
 
     const updateUser = async () => {
       if (!selectedUser) {
@@ -808,7 +1019,7 @@
           body: JSON.stringify({ oldUsername: selectedUser, newUsername, newPassword })
         });
         const data = await res.json();
-        showResponse("User updated: " + JSON.stringify(data));
+        showResponse(data.message, false);
         selectedUser = null;
         document.getElementById("updateUserName").value = "";
         document.getElementById("updateUserPassword").value = "";
@@ -847,9 +1058,9 @@
       // Streamers events
       document.getElementById("addStreamerButton").addEventListener("click", addStreamer);
       // Recorder events
-      document.getElementById("startAllCommand").addEventListener("click", () => sendCommand("start",""));
-      document.getElementById("stopAllCommand").addEventListener("click", () => sendCommand("stop",""));
-      document.getElementById("restartAllCommand").addEventListener("click", () => sendCommand("restart",""));
+      document.getElementById("startAllCommand").addEventListener("click", () => sendCommand("start", ""));
+      document.getElementById("stopAllCommand").addEventListener("click", () => sendCommand("stop", ""));
+      document.getElementById("restartAllCommand").addEventListener("click", () => sendCommand("restart", ""));
       // File management events
       document.getElementById("uploadFileButton").addEventListener("click", uploadFile);
       document.getElementById("downloadFileButton").addEventListener("click", downloadFile);
@@ -857,6 +1068,7 @@
       document.getElementById("addUserButton").addEventListener("click", addUser);
       document.getElementById("updateUserButton").addEventListener("click", updateUser);
       // Live stream form event
+      document.getElementById("api-management-tab").addEventListener("click", fetchApiKey);
       document.getElementById("livestreamForm").addEventListener("submit", function (event) {
         event.preventDefault();
         const selectedValue = document.querySelector('input[name="livestream-option"]:checked').value;
@@ -883,6 +1095,7 @@
       document.getElementById("video-tab").addEventListener("click", populateVideos);
       document.getElementById("recorderStatus-tab").addEventListener("click", updateRecorders);
     });
+
   </script>
 </body>
 
