@@ -115,6 +115,8 @@ _Online status with a small bug at the time of uploading this.._
   - view current recording length
   - view current recording video
 - ~~Better video view~~
+- Add support for multiple websites
+- Add option to try and use a custom url.
 
 
 ### Disclaimer 
