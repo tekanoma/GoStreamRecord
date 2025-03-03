@@ -1,7 +1,8 @@
 {
-  "StreamerList": [
+  "streamers": [
     {
-      "name":"default"
+      "name": "Remove_me_in_webUI",
+      "provider": "chaturbate"
     }
   ]
 }

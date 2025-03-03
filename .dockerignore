@@ -1,0 +1,13 @@
+
+*.log
+*.service
+docker/
+
+# Ignore output files
+output/
+
+# Ignore docs and other files generated during build
+**/node_modules
+tools/
+README.mod
+LICENSE

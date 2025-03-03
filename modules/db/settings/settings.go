@@ -1,20 +1,10 @@
 package settings
 
-import (
-	"sync"
-)
-
 type Settings struct {
-	App        app       `json:"app"`
-	YoutubeDL  youtubeDL `json:"youtube-dl"`
-	AutoReload bool      `json:"auto_reload_config"`
+	App app `json:"app"`
 }
 
-type youtubeDL struct {
-	Binary string `json:"binary"`
-}
 type app struct {
-	mux           sync.Mutex
 	Port          int        `json:"port"`
 	Loop_interval int        `json:"loop_interval_in_minutes"`
 	Videos_folder string     `json:"video_output_folder"`

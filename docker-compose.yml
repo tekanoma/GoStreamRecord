@@ -1,14 +1,24 @@
 services:
-  GoRecord-WebUI:
-    container_name: Go-Recordurbate-WebUI
-    image: Go-Recordurbate-WebUI:latest
+# App
+  GoRecord:
+    container_name: Go-Record-WebUI
+    image:  docker.io/lunanightbyte/gorecord:v0.0.1
     build:
       context: .
-      dockerfile: Dockerfile 
+      dockerfile: docker/Dockerfile.run 
     ports:
       - "8050:80"
     volumes:
-      - ./internal/settings/docker_settings.json:/app/internal/settings/settings.json
-      - ./output:/app/videos
+      - ./.env:/app/.env
+      - ./internal/settings:/app/internal/settings
     tty: true
     privileged: true
+
+# BUILD
+# Core dependencies
+  base: 
+    image:  docker.io/lunanightbyte/gorecord-base:v0.0.1
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.base 
+

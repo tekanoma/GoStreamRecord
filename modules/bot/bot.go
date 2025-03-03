@@ -110,10 +110,9 @@ func (b *controller) RecordLoop(streamerName string) {
 								return
 							}
 							b.mux.Unlock()
-							// Optionally reload configuration.
-							if db.Config.Settings.AutoReload {
-								db.Config.Reload(file.Config_json_path, &db.Config.Settings)
-							}
+
+							db.Config.Reload(file.Config_json_path, &db.Config.Settings)
+
 							log.Printf("Checking %s online status...", sName)
 							if !status.Website.Interface.IsOnline(sName) {
 								log.Printf("Streamer %s is not online.", sName)

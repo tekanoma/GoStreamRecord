@@ -1,17 +1,12 @@
 {
   "app": {
-    "port": 8055,
+    "port": 80,
     "loop_interval_in_minutes": 2,
     "video_output_folder": "output/videos",
+    "default_export_location": "./output/list.txt",
     "rate_limit": {
       "enable": true,
       "time": 5
-    },
-    "default_export_location": "./output/list.txt"
-
-  },
-  "youtube-dl": {
-    "binary": "youtube-dl"
-  },
-  "auto_reload_config": true
+    }
+  }
 }

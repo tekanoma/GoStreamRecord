@@ -1,9 +1,9 @@
 {
   "Keys": [
     {
-      "User": "User_who_created_key",
-      "Name": "Name_of_key",
-      "Key": "A_hashed_secret_key"
+      "User": "admin",
+      "Name": "Remove_me_in_webUI",
+      "Key": "$2a$10$RZYlByRCrbu74nOeEmzE0eEZUTP0ssh3DMiYhd3HGyrcs8u0WNiwy"
     }
   ]
 }
