@@ -9,10 +9,10 @@ import (
 )
 
 type API_secrets struct {
-	Keys []api `json:keys`
+	Keys []ApiKeys `json:keys`
 }
 
-type api struct {
+type ApiKeys struct {
 	User string `json:user`
 	Name string `json:name`
 	Key  string `json:secret`
@@ -22,12 +22,12 @@ func (a *API_secrets) Load() error {
 	return file.ReadJson(file.API_keys_file, &a)
 }
 
-func (a API_secrets) NewKey() api {
-	return api{}
+func (a API_secrets) NewKey() ApiKeys {
+	return ApiKeys{}
 }
 
 // GenerateAPIKey creates a secure random API key
-func (a *api) GenerateAPIKey(length int) (string, error) {
+func (a *ApiKeys) GenerateAPIKey(length int) (string, error) {
 	bytes := make([]byte, length)
 	_, err := rand.Read(bytes)
 	if err != nil {
@@ -36,7 +36,7 @@ func (a *api) GenerateAPIKey(length int) (string, error) {
 	return hex.EncodeToString(bytes), nil
 }
 
-func (a *api) HashAPIKey(apiKey string) (string, error) {
+func (a *ApiKeys) HashAPIKey(apiKey string) (string, error) {
 	hash, err := bcrypt.GenerateFromPassword([]byte(apiKey), bcrypt.DefaultCost)
 	return string(hash), err
 }

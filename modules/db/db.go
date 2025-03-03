@@ -21,7 +21,7 @@ type configs struct {
 
 var (
 	Config = configs{
-		APIKeys:   dbapi.API_secrets{},
+		APIKeys:   dbapi.API_secrets{Keys: []dbapi.ApiKeys{}},
 		Settings:  settings.Settings{},
 		Streamers: streamers.List{Streamers: []streamers.Streamer{}},
 		Users:     dblogin.Logins{Users: []dblogin.Login{}},
@@ -33,26 +33,34 @@ func init() {
 }
 func loadConfigurations() {
 	loadConfig(file.API_keys_file, &Config.APIKeys)
-	loadConfig(file.Config_json_path, &Config.Settings)
+	err := loadConfig(file.Config_json_path, &Config.Settings)
+	if err != nil {
+		log.Fatal(err)
+	}
 	loadConfig(file.Streamers_json_path, &Config.Streamers)
-	loadConfig(file.Users_json_path, &Config.Users)
+
+	err = loadConfig(file.Users_json_path, &Config.Users)
+	if err != nil {
+		log.Fatal(err)
+	}
 }
-func loadConfig(path string, target any) {
+func loadConfig(path string, target any) error {
 	data, err := os.ReadFile(path)
 	if err != nil {
 		if os.IsNotExist(err) {
-			log.Fatalf("Config file %s not found.", path)
+			return fmt.Errorf("Config file %s not found.", path)
 		}
-		log.Fatalf("Error reading file %s: %v", path, err)
+		return fmt.Errorf("Error reading file %s: %v", path, err)
 	}
 
 	if ok, err := file.CheckJson(path, target); !ok {
-		log.Fatalf("Invalid JSON format in %s: %v", path, err)
+		return fmt.Errorf("Invalid JSON format in %s: %v", path, err)
 	}
 
 	if err = json.Unmarshal(data, target); err != nil {
-		log.Fatalf("Failed to parse JSON in %s: %v", path, err)
+		return fmt.Errorf("Failed to parse JSON in %s: %v", path, err)
 	}
+	return nil
 }
 
 // ----------------- Streamers -----------------

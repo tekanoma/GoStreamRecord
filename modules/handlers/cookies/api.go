@@ -127,6 +127,12 @@ func DeleteAPIKeyHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	session, err := Session.Store().Get(r, "session")
+	if err != nil {
+		fmt.Println(err)
+		http.Error(w, "Error getting session..", http.StatusBadRequest)
+		return
+	}
+
 	username := session.Values["user"].(string)
 
 	for _, k := range db.Config.APIKeys.Keys {
