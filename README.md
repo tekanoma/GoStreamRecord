@@ -69,8 +69,8 @@ To change forgotten password, start the program with the `reset-pwd` argument. I
 New login for the user `admin` would then be `newpassword`
 ### Docker
 Files / folders needed to save app settings is (only need env file to just test the container):
-- `.env` for password hashing.
-- `settings` save login, api and streamer lists.
+- [`.env`](https://github.com/luna-nightbyte/GoRecord-WebUI/blob/main/tools/examples/.env.example) for password hashing.
+- [`settings`](https://github.com/luna-nightbyte/GoRecord-WebUI/tree/main/internal/settings) save login, api and streamer lists.
 - `output` folder for saving output videos.
 
 App uses port __80__ by default internally.
