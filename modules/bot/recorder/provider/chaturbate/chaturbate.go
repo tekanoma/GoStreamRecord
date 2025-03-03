@@ -12,15 +12,14 @@ import (
 )
 
 type Chaturbate struct {
-	Type          string `json:"type"`
 	Url           string `json:"url"`
 	CorrectedName string `json:"username"`
 }
 
 var provider_url string = "https://chaturbate.com/"
 
-func (b *Chaturbate) Init(webType, username string) any {
-	b.Type = webType
+
+func (b *Chaturbate) Init(username string) any {
 	b.Url = provider_url
 	b.CorrectedName = username
 	return b
@@ -31,15 +30,14 @@ func (c *Chaturbate) IsOnline(username string) bool {
 	// Short delay before making the call.
 
 	//Check once if a thumbnail is available
-	urlStr := "https://jpeg.live.mmcdn.com/stream?room=" + username
+	urlStr := "https://jpeg.live.mmcdn.com/stream?room=" + c.TrueName(username)
 	resp, err := http.Get(urlStr)
 	if err != nil {
 		log.Printf("Error in making request: %v", err)
 		return false
 	}
 	defer resp.Body.Close()
-
-	if resp.StatusCode != http.StatusOK { // Streamer is not online if response if not 200
+	if resp.StatusCode != http.StatusOK && resp.StatusCode != http.StatusOK { // Streamer is not online if response if not 200
 		return false
 
 	}

@@ -11,15 +11,13 @@ import (
 )
 
 type BongaCams struct {
-	Type          string `json:"type"`
 	Url           string `json:"url"`
 	CorrectedName string `json:"username"`
 }
 
 var provider_url string = "https://bongacams.com/"
 
-func (b *BongaCams) Init(webType, username string) any {
-	b.Type = webType
+func (b *BongaCams) Init( username string) any {
 	b.Url = provider_url
 	b.CorrectedName = b.TrueName(username)
 	return b
