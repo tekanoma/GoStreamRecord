@@ -31,7 +31,7 @@ __important__: You will still need to have the `internal/settings` folder and it
 
 - Download this repo and open a terminal in this folder. Ask ChatGPT how to find the folder path and how to move into it via cli if you dont know.
 
-- Copy [`.env.example`](https://github.com/luna-nightbyte/Recordurbate-WebUI/blob/main/.env.example) to `.env` and add your own session key. (se the one below as long as the app is not exposed outside your local network__IF__ you dont know how to create one. _hint: just ask chatGPT_). 
+- Copy [`.env.example`](https://github.com/luna-nightbyte/GoRecord-WebUI/blob/main/tools/examples/.env.example) to `.env` and add your own session key. (se the one below as long as the app is not exposed outside your local network__IF__ you dont know how to create one. _hint: just ask chatGPT_). 
     - Can be generated with this command on linux.: `head -c 32 /dev/urandom | base64`
       I.e:
       ```bash
