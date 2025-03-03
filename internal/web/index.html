@@ -455,8 +455,7 @@
           addAPIKeyToList(key.name, "*************")
         });
       } catch (error) {
-        console.error("Error fetching API key:", error);
-        alert("Error fetching API key.");
+        showResponse("Error fetching API key.",true);
       }
     };
     function displayApiKey(key) {
