@@ -2,10 +2,10 @@ package streamers
 
 import (
 	"GoRecordurbate/modules/bot"
+	"GoRecordurbate/modules/bot/recorder"
 	"GoRecordurbate/modules/db"
 	"GoRecordurbate/modules/handlers/cookies"
 	"GoRecordurbate/modules/handlers/status"
-	"GoRecordurbate/modules/web/provider"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -121,11 +121,20 @@ func CheckOnlineStatus(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	p := provider.Init(reqData.Provider)
-	tBot := bot.Provider{Site: p}
-	tmp := bot.Recorder{Web: &tBot}
-	tmp.Web.Username = tmp.Web.Site.TrueName((reqData.Streamer))
-	is_online := fmt.Sprintf("%v", tmp.Web.Site.IsOnline(tmp.Web.Username))
+	if reqData.Provider == "" {
+		fmt.Println("Provider name is required")
+		status.ResponseHandler(w, r, "Streamer name is required", nil)
+		return
+	}
+
+	var re recorder.Recorder
+	err := re.Website.New(reqData.Provider, reqData.Streamer)
+	if err != nil {
+		fmt.Println(err)
+		http.Error(w, "Internal recorder error!", http.StatusInternalServerError)
+		return
+	}
+	is_online := fmt.Sprintf("%v", re.Website.Interface.IsOnline(reqData.Streamer))
 	status.ResponseHandler(w, r, is_online, nil)
 }
 

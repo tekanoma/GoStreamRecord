@@ -1,6 +1,7 @@
 package bot
 
 import (
+	"GoRecordurbate/modules/bot/recorder"
 	"GoRecordurbate/modules/db"
 	"GoRecordurbate/modules/file"
 	"fmt"
@@ -11,19 +12,21 @@ import (
 
 func (b *controller) AddProcess(provider_type, streamerName string) {
 	// Only add if not already present
+	next_index := len(b.status)
 	for _, rec := range b.status {
-		if rec.Name == streamerName {
+		if rec.Website.Username == streamerName {
 			return
 		}
 	}
-	b.status = append(b.status, Recorder{Name: streamerName, Web: NewProvider(provider_type, streamerName)})
+	b.status = append(b.status, recorder.Recorder{})
+	b.status[next_index].Website.New(provider_type, streamerName)
 }
-func (b *controller) Status(name string) Recorder {
+func (b *controller) Status(name string) recorder.Recorder {
 	return getProcess(name, b)
 }
 
 // ListRecorders returns the current list of recorder statuses.
-func (b *controller) ListRecorders() []Recorder {
+func (b *controller) ListRecorders() []recorder.Recorder {
 	b.mux.Lock()
 	defer b.mux.Unlock()
 	return b.status
@@ -36,13 +39,13 @@ func (b *controller) StopRunningEmpty() {
 func (b *controller) StopProcess(processName string) {
 	b.mux.Lock()
 	// Create a copy of status indices to avoid modification during iteration.
-	statusCopy := make([]Recorder, len(b.status))
+	statusCopy := make([]recorder.Recorder, len(b.status))
 	copy(statusCopy, b.status)
 	b.mux.Unlock()
 
 	for _, rec := range statusCopy {
 		// Stop only the specified process (or all if processName is empty).
-		if processName != "" && rec.Name != processName {
+		if processName != "" && rec.Website.Username != processName {
 			continue
 		}
 		b.stopProcessIfRunning(rec)
@@ -56,11 +59,11 @@ func (b *controller) checkProcesses() int {
 	defer b.mux.Unlock()
 	for i := 0; i < len(b.status); i++ {
 		// Use signal 0 to check if process is still running.
-		if !b.status[i].StopStatus {
+		if !b.status[i].StopSignal {
 			continue
 		}
-		if err := b.status[i].Cmd.Process.Signal(syscall.Signal(0)); err != nil {
-			log.Printf("Process for %s has stopped", b.status[i].Name)
+		if err := b.status[i].Cmd.Process.Signal(syscall.SIGTERM); err != nil {
+			log.Printf("Process for %s has stopped", b.status[i].Website.Username)
 			b.status = append(b.status[:i], b.status[i+1:]...)
 			i--
 		}
@@ -68,21 +71,23 @@ func (b *controller) checkProcesses() int {
 	return len(b.status)
 }
 
-func (b *controller) stopProcessIfRunning(bs Recorder) {
+func (b *controller) stopProcessIfRunning(bs recorder.Recorder) {
 
 	for i, s := range b.status {
-		if bs.Cmd != nil && s.Name == bs.Name {
-			b.status[i].StopStatus = true
-			if err := s.Cmd.Process.Signal(syscall.Signal(0)); err != nil {
+		if bs.Cmd != nil && s.Website.Username == bs.Website.Username {
+			b.status[i].StopSignal = true
+			if err := s.Cmd.Process.Signal(syscall.SIGINT); err != nil {
 				i--
 			}
-			log.Printf("Process for %s has stopped", bs.Name)
+
+			b.StopBot(bs.Website.Username)
+			log.Printf("Command for %s has stopped", bs.Website.Username)
 			b.status = append(b.status[:i], b.status[i+1:]...)
 			break
 		}
-		if s.Cmd == nil && s.Name == bs.Name {
-			b.status[i].StopStatus = true
-			log.Printf("Process for %s has stopped", bs.Name)
+		if s.Cmd == nil && s.Website.Username == bs.Website.Username {
+			b.status[i].StopSignal = true
+			log.Printf("Process for %s was already stopped", bs.Website.Username)
 			b.status = append(b.status[:i], b.status[i+1:]...)
 			break
 		}
@@ -93,22 +98,22 @@ func (b *controller) stopProcessIfRunning(bs Recorder) {
 // isRecorderActive returns true if a recorder for the given streamer is already running.
 func (b *controller) isRecorderActive(streamerName string) bool {
 	for _, rec := range b.status {
-		if rec.Name == streamerName && rec.IsRecording {
+		if rec.Website.Username == streamerName && rec.IsRecording {
 			return true
 		}
 	}
 	return false
 }
 
-func getProcess(name string, b *controller) Recorder {
+func getProcess(name string, b *controller) recorder.Recorder {
 	b.mux.Lock()
 	defer b.mux.Unlock()
 	for _, s := range b.status {
-		if name == s.Name {
+		if name == s.Website.Username {
 			return s
 		}
 	}
-	return Recorder{StopStatus: false, Name: name, IsRecording: false, Cmd: nil}
+	return recorder.Recorder{StopSignal: false, IsRecording: false, Cmd: nil}
 }
 
 // writeYoutubeDLdb writes the youtube-dl configuration file.
@@ -132,8 +137,8 @@ func (b *controller) StopBot(streamerName string) {
 	log.Println("Stopping bot..")
 	// Give current recorders time to finish (or exit gracefully).
 	for i := range b.status {
-		if b.status[i].Name == streamerName {
-			b.status[i].StopStatus = true
+		if b.status[i].Website.Username == streamerName {
+			b.status[i].StopSignal = true
 		}
 	}
 }

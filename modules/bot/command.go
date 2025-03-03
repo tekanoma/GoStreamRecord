@@ -1,6 +1,7 @@
 package bot
 
 import (
+	"GoRecordurbate/modules/bot/recorder"
 	"context"
 	"log"
 	"strings"
@@ -21,7 +22,7 @@ func (b *controller) Command(command string, name string) {
 		}
 
 		for _, s := range b.status {
-			if name == s.Name && s.Cmd != nil {
+			if name == s.Website.Username  && s.Cmd != nil {
 				log.Println("Bot already running..")
 				return
 			}
@@ -42,10 +43,10 @@ func (b *controller) Command(command string, name string) {
 		// Iterate over a copy of the status slice to avoid closure capture issues.
 		for _, s := range b.status {
 			// Stop only the specified process (or all if name is empty).
-			if name == "" || s.Name == name {
+			if name == "" || s.Website.Username  == name {
 
 				b.stopProcessIfRunning(s)
-				sName := s.Name
+				sName := s.Website.Username 
 				wg.Add(1)
 				go func(n string) {
 					defer wg.Done()
@@ -70,7 +71,7 @@ func (b *controller) Command(command string, name string) {
 			// Stop a single process.
 			process := getProcess(name, b)
 
-			b.Command("stop", process.Name)
+			b.Command("stop", process.Website.Username )
 			recorders = append(recorders, name)
 
 		} else {
@@ -78,7 +79,7 @@ func (b *controller) Command(command string, name string) {
 			// Stop all running recorders.
 			// Create a copy of b.status to avoid data races when stopping processes.
 			b.mux.Lock()
-			statusCopy := make([]Recorder, len(b.status))
+			statusCopy := make([]recorder.Recorder, len(b.status))
 			copy(statusCopy, b.status)
 			b.mux.Unlock()
 			for _, s := range statusCopy {
@@ -87,20 +88,20 @@ func (b *controller) Command(command string, name string) {
 				// Mark that the process is being restarted.
 				// (Assuming b.status is the source of truth; you might also update the copy)
 				for i, rec := range b.status {
-					if rec.Name == s.Name {
-						b.status[i].WasRestart = true
+					if rec.Website.Username  == s.Website.Username  {
+						b.status[i].IsRestarting = true
 						b.stopProcessIfRunning(b.status[i])
 						break
 					}
 				}
 				b.mux.Unlock()
 				wg.Add(1)
-				recorders = append(recorders, s.Name)
+				recorders = append(recorders, s.Website.Username )
 				go func(n string) {
 					b.Command("stop", n)
 					log.Println("Stopped", n)
 					wg.Done()
-				}(s.Name)
+				}(s.Website.Username )
 			}
 			wg.Wait()
 		}
