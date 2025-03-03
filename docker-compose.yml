@@ -2,7 +2,7 @@ services:
 # App
   GoRecord:
     container_name: Go-Record-WebUI
-    image:  docker.io/lunanightbyte/gorecord:v0.0.1
+    image:  docker.io/lunanightbyte/gorecord:latest
     build:
       context: .
       dockerfile: docker/Dockerfile.run 
@@ -15,9 +15,15 @@ services:
     privileged: true
 
 # BUILD
+# Vue dependencies
+  vue: 
+    image:  docker.io/lunanightbyte/gorecord-extra:v0.0.1
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.extra 
 # Core dependencies
   base: 
-    image:  docker.io/lunanightbyte/gorecord-base:v0.0.1
+    image:  docker.io/lunanightbyte/gorecord-base:latest
     build:
       context: .
       dockerfile: docker/Dockerfile.base 
