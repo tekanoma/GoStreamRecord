@@ -11,6 +11,7 @@ services:
     volumes:
       - ./.env:/app/.env
       - ./internal/settings:/app/internal/settings
+      - ./output:/app/output #Safest to alway have output files in this folder.
     tty: true
     privileged: true
 
