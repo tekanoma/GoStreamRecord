@@ -298,8 +298,8 @@
                         <div class="input-group">
                           <input type="text" id="streamerInput" class="form-control" placeholder="Streamer name"
                             required />
-                            <input type="text" id="providerInput" class="form-control" placeholder="Hosting site"
-                              required />
+                          <input type="text" id="providerInput" class="form-control" placeholder="Hosting site"
+                            required />
                           <button type="button" class="btn btn-primary" id="addStreamerButton">Add</button>
                         </div>
                       </form>
@@ -455,7 +455,7 @@
           addAPIKeyToList(key.name, "*************")
         });
       } catch (error) {
-        showResponse("Error fetching API key.",true);
+        showResponse("Error fetching API key.", true);
       }
     };
     function displayApiKey(key) {
@@ -569,7 +569,7 @@
         return;
       }
       try {
-        const res = await fetch("/api/add-streamer?provider="+provider, {
+        const res = await fetch("/api/add-streamer?provider=" + provider, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ data: name })
@@ -857,7 +857,6 @@
 
         // Ensure status always has a value
         data.status = data.status || "Not recording";
-
         // Ensure botStatus is always an array
         recorder_processes = Array.isArray(data.botStatus) ? data.botStatus : [];
 
@@ -865,7 +864,6 @@
         statusIndicator.textContent = "Status: " + data.status;
         statusIndicator.style.backgroundColor = data.status === "Running" ? "#3dbb24af" : "#fab1a0";
 
-        updateRecorders();
       } catch (err) {
         console.error("Error fetching status:", err);
       }
@@ -880,7 +878,8 @@
       const streamers = await res.json();
 
       // Create a map of active processes using botStatus data
-      const activeMap = new Map(recorder_processes.map((p) => [p.Name, p.IsRecording]));
+      // Create a map of active processes using botStatus data
+      const activeMap = new Map(recorder_processes.map((p) => [p.website.username, p.is_recording]));
 
       // Get existing elements in DOM for tracking duplicates
       const existingElements = new Map();
@@ -892,9 +891,11 @@
       for (const streamer of streamers) {
         let isRecording = activeMap.get(streamer) || false;
 
+
         recorder_processes.forEach((process) => {
-          if (streamer === process.name) {
-            isRecording=process.isRecording
+          if (streamer === process.website.username) {
+            isRecording = process.is_recording
+            isRestarting = process.restarting
           }
         });
         const isAvailable = await checkSourceAvailability(streamer, "chaturbate");
@@ -1088,13 +1089,16 @@
           liveStreamSrc = `https://cbxyz.com/in/?tour=Limj&campaign=Ln9WI&track=embed&signup_notice=1&b=${streamer}&disable_sound=1&mobileRedirect=never`;
         }
         populateLiveStream();
+
       });
 
+      updateRecorders();
       populateStreamers();
       populateUsers();
       updateLogs();
       setInterval(updateLogs, 3000);
       setInterval(updateStatus, 5000);
+      setInterval(updateRecorders, 5000)
       document.getElementById("video-tab").addEventListener("click", populateVideos);
       document.getElementById("recorderStatus-tab").addEventListener("click", updateRecorders);
     });
