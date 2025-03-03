@@ -1,4 +1,3 @@
-# ~~GoRecordurbate WebUI~~
 # GoRecord WebUI
 
 __API NOTE__: The API is still in early development. I've added checks for login/API, but i would not recommend exposing the port for this app on your router as of now. 
@@ -23,7 +22,6 @@ __API NOTE__: The API is still in early development. I've added checks for login
 - Docker configuration and service examples for straightforward deployment.
 - Install [Golang](https://go.dev/doc/install) to run the source or build binary.
 ## Usage
-
 |Username|Password|
 |-|-|
 |`admin`|see [this](https://github.com/luna-nightbyte/Recordurbate-WebUI/tree/main?tab=readme-ov-file#reset-password)|
@@ -69,7 +67,24 @@ To change forgotten password, start the program with the `reset-pwd` argument. I
 ./GoRecordurbate reset-pwd admin newpassword 
 ```
 New login for the user `admin` would then be `newpassword`
-### Build
+### Docker
+Files / folders needed to save app settings is (only need env file to just test the container):
+- `.env` for password hashing.
+- `settings` save login, api and streamer lists.
+- `output` folder for saving output videos.
+
+App uses port __80__ by default internally.
+```
+docker run -d -v ./.env:/app/.env -v ./output:/app/output -v ./settings:/app/internal/settings --name GoRecord -p 8050:80 docker.io/lunanightbyte/gorecord:latest
+```
+
+Optionally, use the docker compose file: 
+```
+docker compose up GoRecord
+```
+
+### Source
+#### Build
 Building the code wil create a binary for your os system. Golang is [cross-compatible](https://go.dev/wiki/GccgoCrossCompilation) for windows, linux and mac.
 ```bash
 go mod init GoRecordurbate # Only run this line once
@@ -77,17 +92,14 @@ go mod tidy
 go build
 ./GoRecordurbate #windows will have 'GoRecordurbate.exe'
 ```
-### Source
+#### Source
 ```bash
 go mod init GoRecordurbate # Only run this line once
 go mod tidy
 go run main.go
 ```
 
-## Notes
-This is un-tested on Windows and Mac, but golang is cross-compatible which means that this should run just as fine on Windows as on Linux.
-
-## WebUI (Will probably be modified)
+## WebUI (outdated)
 
 
 <p align="center">
