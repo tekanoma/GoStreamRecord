@@ -10,17 +10,18 @@ type List struct {
 }
 
 type Streamer struct {
-	Name string `json:"name"`
+	Name     string `json:"name"`
+	Provider string `json:"provider"`
 }
 
-func (s *List) Add(streamerName string) string {
+func (s *List) Add(provider, streamerName string) string {
 	for _, streamer := range s.Streamers {
 		if streamerName == streamer.Name {
 			log.Printf("%s has already been addded.", streamerName)
 			return fmt.Sprintf("%s has already been addded.", streamerName)
 		}
 	}
-	s.Streamers = append(s.Streamers, Streamer{Name: streamerName})
+	s.Streamers = append(s.Streamers, Streamer{Name: streamerName, Provider: provider})
 	return fmt.Sprintf("%s has been added", streamerName)
 }
 

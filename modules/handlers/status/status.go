@@ -11,10 +11,10 @@ import (
 
 // Response is a generic response structure for our API endpoints.
 type Response struct {
-	Status    string          `json:"status"`
-	Message   string          `json:"message,omitempty"`
-	Data      interface{}     `json:"data,omitempty"`
-	BotStatus []bot.BotStatus `json:"botStatus"`
+	Status    string         `json:"status"`
+	Message   string         `json:"message,omitempty"`
+	Data      interface{}    `json:"data,omitempty"`
+	BotStatus []bot.Recorder `json:"botStatus"`
 }
 
 func StatusHandler(w http.ResponseWriter, r *http.Request) {

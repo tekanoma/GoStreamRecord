@@ -298,6 +298,8 @@
                         <div class="input-group">
                           <input type="text" id="streamerInput" class="form-control" placeholder="Streamer name"
                             required />
+                            <input type="text" id="providerInput" class="form-control" placeholder="Hosting site"
+                              required />
                           <button type="button" class="btn btn-primary" id="addStreamerButton">Add</button>
                         </div>
                       </form>
@@ -391,7 +393,7 @@
   <script>
 
     // Variables
-    let recorder_processes = null;
+    let recorder_processes = [];
     let liveStreamSrc = null;
     let selectedUser = null;
     let videoFiles = [];
@@ -560,13 +562,15 @@
     /* ------------------ STREAMERS SECTION ------------------ */
     const addStreamer = async () => {
       const input = document.getElementById("streamerInput");
+      const providerInput = document.getElementById("providerInput");
+      const provider = providerInput.value.trim();
       const name = input.value.trim();
       if (!name) {
         showResponse("Streamer name cannot be empty.", true);
         return;
       }
       try {
-        const res = await fetch("/api/add-streamer", {
+        const res = await fetch("/api/add-streamer?provider="+provider, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ data: name })
@@ -830,11 +834,11 @@
       spinnerListRunning = spinnerListRunning.filter((item) => item !== folder);
     }
 
-    function checkSourceAvailability(streamer) {
+    function checkSourceAvailability(streamer, provider) {
       return fetch("/api/get-online-status", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ streamer: streamer }),
+        body: JSON.stringify({ streamer: streamer, provider: provider }),
       })
         .then((res) => res.json())
         .then((data) => {
@@ -894,7 +898,7 @@
             isRecording=process.isRecording
           }
         });
-        const isAvailable = await checkSourceAvailability(streamer);
+        const isAvailable = await checkSourceAvailability(streamer, "chaturbate");
 
         if (existingElements.has(streamer)) {
           // Update existing element

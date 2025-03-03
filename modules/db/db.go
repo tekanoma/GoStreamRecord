@@ -57,8 +57,8 @@ func loadConfig(path string, target any) {
 
 // ----------------- Streamers -----------------
 
-func (c *configs) AddStreamer(streamerName string) string {
-	c.Streamers.Add(streamerName)
+func (c *configs) AddStreamer(streamerName, provider string) string {
+	c.Streamers.Add(streamerName, provider)
 	ok := write(file.Streamers_json_path, c.Streamers)
 	if !ok {
 		log.Printf("Error adding %s..\n", streamerName)

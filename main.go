@@ -7,7 +7,6 @@ import (
 	"GoRecordurbate/modules/handlers"
 	"GoRecordurbate/modules/handlers/cookies"
 	"GoRecordurbate/modules/handlers/login"
-	"GoRecordurbate/modules/web/provider"
 	"context"
 	_ "embed"
 	"fmt"
@@ -30,7 +29,7 @@ var IndexHTML string
 var LoginHTML string
 
 func init() {
-	provider.Init("chaturbate")
+
 	handlers.IndexHTML = IndexHTML
 	handlers.LoginHTML = LoginHTML
 	err := godotenv.Load(".env")

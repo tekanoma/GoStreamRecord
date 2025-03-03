@@ -3,6 +3,7 @@ package chaturbate
 import (
 	"GoRecordurbate/modules/db"
 	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
 	"net/url"
@@ -10,11 +11,23 @@ import (
 	"time"
 )
 
-type Chaturbare struct {
+type Chaturbate struct {
+	Type          string `json:"type"`
+	Url           string `json:"url"`
+	CorrectedName string `json:"username"`
+}
+
+var provider_url string = "https://chaturbate.com/"
+
+func (b *Chaturbate) Init(webType, username string) any {
+	b.Type = webType
+	b.Url = provider_url
+	b.CorrectedName = username
+	return b
 }
 
 // IsOnline checks if the streamer is online by checking if a thumbnail is available from the stream.
-func (c *Chaturbare) IsOnline(username string) bool {
+func (c *Chaturbate) IsOnline(username string) bool {
 	// Short delay before making the call.
 
 	//Check once if a thumbnail is available
@@ -27,7 +40,6 @@ func (c *Chaturbare) IsOnline(username string) bool {
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK { // Streamer is not online if response if not 200
-
 		return false
 
 	}
@@ -36,9 +48,10 @@ func (c *Chaturbare) IsOnline(username string) bool {
 
 // Old method from recordurbate. Not really used in this app.
 // IsRoomPublic checks if a given room is public by sending a POST request.
-func (c *Chaturbare) IsRoomPublic(username string) bool {
+func (c *Chaturbate) IsRoomPublic(username string) bool {
 	// Wait for the dbured rate limit.
 	time.Sleep(time.Duration(db.Config.Settings.App.RateLimit.Time) * time.Second)
+	fmt.Println("Checking ", username)
 	urlStr := "https://chaturbate.com/get_edge_hls_url_ajax/"
 	data := url.Values{}
 	data.Set("room_slug", username)
@@ -67,4 +80,14 @@ func (c *Chaturbare) IsRoomPublic(username string) bool {
 		return false
 	}
 	return res.Success && res.RoomStatus == "public"
+}
+
+// Not necessary for this as of now.
+func (b *Chaturbate) TrueName(name string) string {
+	return name
+}
+
+// Not necessary for this as of now.
+func (b *Chaturbate) Settings(provider any) any {
+	return b
 }

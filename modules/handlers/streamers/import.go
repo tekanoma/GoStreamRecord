@@ -32,6 +32,7 @@ func UploadHandler(w http.ResponseWriter, r *http.Request) {
 
 	// Retrieve file from posted form-data
 	file, handler, err := r.FormFile("file")
+
 	if err != nil {
 		http.Error(w, "Error retrieving the file", http.StatusBadRequest)
 		return
@@ -54,7 +55,7 @@ func UploadHandler(w http.ResponseWriter, r *http.Request) {
 			continue
 		}
 		counter++
-		db.Config.AddStreamer(line)
+		db.Config.AddStreamer(line, r.FormValue("provider"))
 	}
 	resp := web_status.Response{
 		Status:  "success",
