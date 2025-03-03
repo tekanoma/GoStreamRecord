@@ -1,14 +1,17 @@
-# GoRecordurbate WebUI
+# ~~GoRecordurbate WebUI~~
+# GoRecord WebUI
 
 __API NOTE__: The API is still in early development. I've added checks for login/API, but i would not recommend exposing the port for this app on your router as of now. 
 ## Core Features
 ### Recorder:
+- API supported handlers with key generation for each user.
 - Streamer status checks bypasses rate limits; recording rate limits still under testing.
 - Start, stop, and restart all recordings.
 - View active recorders in real-time (More data will be added)
 - Start, stop restart  individual recordings as needed.
 - Add or delete streamers dynamically (no need to restart the recorder).
-- Import/export streamer lists for easier management.
+- Import/export streamer lists for easier management
+
 
 ### WebUI:
 - Secure login using cookies for each client (prevents unauthorized access).
