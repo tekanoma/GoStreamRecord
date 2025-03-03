@@ -3,11 +3,12 @@ FROM alpine:latest AS final
 
 WORKDIR /app
 
-COPY --from=lunanightbyte/gorecord-base:v0.0.1 /compiled/server ./server
-
-
+COPY --from=lunanightbyte/gorecord-base:latest /compiled/server ./server
+RUN mkdir -p /app/internal/settings
+COPY ./internal/settings/* /app/internal/settings
+COPY ./internal/settings/db /app/internal/settings/db
 # Expose the port the server listens on
-EXPOSE 8055
+EXPOSE 80
 
 # Start the application
 CMD ["./server"]
