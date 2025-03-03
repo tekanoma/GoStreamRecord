@@ -14,7 +14,7 @@ type Streamer struct {
 	Provider string `json:"provider"`
 }
 
-func (s *List) Add(provider, streamerName string) string {
+func (s *List) Add(streamerName, provider string) string {
 	for _, streamer := range s.Streamers {
 		if streamerName == streamer.Name {
 			log.Printf("%s has already been addded.", streamerName)

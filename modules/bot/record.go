@@ -50,7 +50,7 @@ func (b *controller) RecordLoop(streamerName string) {
 				continue
 			}
 			b.mux.Lock()
-			b.AddProcess(db.Config.Streamers.Streamers[i1].Provider, streamer.Name) 
+			b.AddProcess(db.Config.Streamers.Streamers[i1].Name, streamer.Name)
 			b.mux.Unlock()
 			// Find the Recorder for the streamer.
 			for i2 := range b.status {
