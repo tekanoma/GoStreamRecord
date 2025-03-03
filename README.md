@@ -4,7 +4,6 @@
 __API NOTE__: The API is still in early development. I've added checks for login/API, but i would not recommend exposing the port for this app on your router as of now. 
 ## Core Features
 ### Recorder:
-- API supported handlers with key generation for each user.
 - Streamer status checks bypasses rate limits; recording rate limits still under testing.
 - Start, stop, and restart all recordings.
 - View active recorders in real-time (More data will be added)
@@ -15,6 +14,7 @@ __API NOTE__: The API is still in early development. I've added checks for login
 
 ### WebUI:
 - Secure login using cookies for each client (prevents unauthorized access).
+- Manage api secret keys.
 - Manage multiple user accounts.
 - Directly view logs and recorded videos through the WebUI.
 - Watch live streams directly from the WebUI.
