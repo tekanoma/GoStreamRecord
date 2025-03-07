@@ -33,7 +33,7 @@ jobs:
 
       - name: Build Base
         run: |
-          docker build -t lunanightbyte/gorecord-base:${{ env.VERSION }} .
+          docker build -f docker/Dockerfile.base -t lunanightbyte/gorecord-base:${{ env.VERSION }} .
           docker tag lunanightbyte/gorecord-base:${{ env.VERSION }} lunanightbyte/gorecord-base:latest
       - name: Push Base image
         run: |
@@ -42,7 +42,7 @@ jobs:
 
       - name: Build Minimal
         run: |
-          docker build -t lunanightbyte/gorecord:${{ env.VERSION }} .
+          docker build -f docker/Dockerfile.run -t lunanightbyte/gorecord:${{ env.VERSION }} .
           docker tag lunanightbyte/gorecord:${{ env.VERSION }} lunanightbyte/gorecord:latest
           
       - name: Push Minimal image
