@@ -88,7 +88,7 @@ user@hostname:~$ docker run \
 | |_| | (_) |__) | |_| | |  __/ (_| | | | | | |  _ <  __/ (_| (_) | | | (_| |
  \____|\___/____/ \__|_|  \___|\__,_|_| |_| |_|_| \_\___|\___\___/|_|  \__,_|
 
-	 🚀 GoStreamRecorder - 
+	 🚀 GoStreamRecorder - v0.1.2
 
 🔹 Written in Go — Fast. Reliable. Efficient.
 🔹 Manage streamers, users, and API keys.
