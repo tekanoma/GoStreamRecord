@@ -26,6 +26,7 @@ var (
 		Streamers: streamers.List{Streamers: []streamers.Streamer{}},
 		Users:     dblogin.Logins{Users: []dblogin.Login{}},
 	}
+	Version string = "dev"
 )
 
 func init() {
