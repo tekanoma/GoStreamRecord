@@ -81,22 +81,6 @@ user@hostname:~$ docker run \
   -v ./settings:/app/internal/settings \
   -p 8050:80 \
   docker.io/lunanightbyte/gorecord:latest
-
-  ____      ____  _                            ____                        _ 
- / ___| ___/ ___|| |_ _ __ ___  __ _ _ __ ___ |  _ \ ___  ___ ___  _ __ __| |
-| |  _ / _ \___ \| __| '__/ _ \/ _' | '_ ' _ \| |_) / _ \/ __/ _ \| '__/ _' |
-| |_| | (_) |__) | |_| | |  __/ (_| | | | | | |  _ <  __/ (_| (_) | | | (_| |
- \____|\___/____/ \__|_|  \___|\__,_|_| |_| |_|_| \_\___|\___\___/|_|  \__,_|
-
-	 🚀 GoStreamRecorder - v0.1.2
-
-🔹 Written in Go — Fast. Reliable. Efficient.
-🔹 Manage streamers, users, and API keys.
-🔹 Record what you want, when you want.
-🔹 API Ready. Automation Friendly.
-
-📂 Docs: https://github.com/luna-nightbyte/GoStreamRecord
-
 ```
 
 Optionally, use the docker compose file: 
