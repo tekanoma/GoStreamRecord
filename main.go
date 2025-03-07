@@ -17,6 +17,8 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/fatih/color"
+
 	"github.com/joho/godotenv"
 )
 
@@ -29,7 +31,28 @@ var IndexHTML string
 var LoginHTML string
 
 func init() {
+	cyan := color.New(color.FgCyan).SprintFunc()
+	green := color.New(color.FgGreen).SprintFunc()
+	yellow := color.New(color.FgYellow).SprintFunc()
+	boldWhite := color.New(color.FgWhite, color.Bold).SprintFunc()
+	boldBlue := color.New(color.FgBlue, color.Bold).SprintFunc()
 
+	fmt.Print(boldBlue(`
+  ____      ____  _                            ____                        _ 
+ / ___| ___/ ___|| |_ _ __ ___  __ _ _ __ ___ |  _ \ ___  ___ ___  _ __ __| |
+| |  _ / _ \___ \| __| '__/ _ \/ _' | '_ ' _ \| |_) / _ \/ __/ _ \| '__/ _' |
+| |_| | (_) |__) | |_| | |  __/ (_| | | | | | |  _ <  __/ (_| (_) | | | (_| |
+ \____|\___/____/ \__|_|  \___|\__,_|_| |_| |_|_| \_\___|\___\___/|_|  \__,_|
+
+	 `))
+
+	fmt.Println(green("🚀 GoStreamRecorder - ") + boldWhite(db.Version+"\n"))
+	fmt.Println(yellow("🔹 Written in Go — Fast. Reliable. Efficient."))
+	fmt.Println(yellow("🔹 Manage streamers, users, and API keys."))
+	fmt.Println(yellow("🔹 Record what you want, when you want."))
+	fmt.Println(yellow("🔹 API Ready. Automation Friendly."))
+	fmt.Println()
+	fmt.Println(cyan("📂 Docs: https://github.com/luna-nightbyte/GoStreamRecord"))
 	handlers.IndexHTML = IndexHTML
 	handlers.LoginHTML = LoginHTML
 	err := godotenv.Load(".env")
@@ -122,3 +145,7 @@ func main() {
 
 	log.Println("Server exited gracefully")
 }
+
+var startup_message string = `
+
+`
