@@ -1,8 +1,15 @@
 name: Go Record Webui
 
 on:
-  release:
-    types: [published]
+  push:
+    branches: [ "main" ]
+
+env:
+  # Use docker.io for Docker Hub if empty
+  REGISTRY: ghcr.io
+  # github.repository as <account>/<repo>
+  IMAGE_NAME: ${{ github.repository }}
+
 
 jobs:
   build-and-push:
@@ -21,11 +28,12 @@ jobs:
           else
             echo "DOCKERHUB secrets found."
           fi
-      - name: Log in to DockerHub
+      - name: Log into registry ${{ env.REGISTRY }}
         uses: docker/login-action@v3
         with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Extract version from tag
         id: get_version
