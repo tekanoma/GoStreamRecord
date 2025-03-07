@@ -43,3 +43,19 @@ RUN go mod tidy && go mod download
 
 # Build
 RUN mkdir -p /compiled && CGO_ENABLED=0 GOOS=linux go build -v -ldflags="-X 'GoRecordurbate/modules/db.Version=$(git describe --tags --always --dirty)'" -a -installsuffix cgo -o /compiled/server main.go
+
+# Run
+FROM alpine:latest AS final
+
+
+WORKDIR /app
+
+COPY --from=lunanightbyte/gorecord-base:latest /compiled/server ./server
+RUN mkdir -p /app/internal/settings
+COPY ./internal/settings/* /app/internal/settings
+COPY ./internal/settings/db /app/internal/settings/db
+# Expose the port the server listens on
+EXPOSE 80
+
+# Start the application
+CMD ["./server"]
