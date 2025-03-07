@@ -2,6 +2,7 @@
 
 __API NOTE__: The API is still in early development. I've added checks for login/API, but i would not recommend exposing the port for this app on your router as of now. 
 ## Core Features
+- Pre-built docker images. Base and minimal image. See the [docker section](https://github.com/luna-nightbyte/GoStreamRecord?tab=readme-ov-file#docker) for example startup command.
 ### Recorder:
 - Streamer status checks bypasses rate limits; recording rate limits still under testing.
 - Start, stop, and restart all recordings.
@@ -74,8 +75,28 @@ Files / folders needed to save app settings is (only need env file to just test 
 - `output` folder for saving output videos.
 
 App uses port __80__ by default internally.
-```
-docker run -d -v ./.env:/app/.env -v ./output:/app/output -v ./settings:/app/internal/settings --name GoRecord -p 8050:80 docker.io/lunanightbyte/gorecord:latest
+```bash
+user@hostname:~$ docker run \
+  -v ./.env:/app/.env  \
+  -v ./settings:/app/internal/settings \
+  -p 8050:80 \
+  docker.io/lunanightbyte/gorecord:latest
+
+  ____      ____  _                            ____                        _ 
+ / ___| ___/ ___|| |_ _ __ ___  __ _ _ __ ___ |  _ \ ___  ___ ___  _ __ __| |
+| |  _ / _ \___ \| __| '__/ _ \/ _' | '_ ' _ \| |_) / _ \/ __/ _ \| '__/ _' |
+| |_| | (_) |__) | |_| | |  __/ (_| | | | | | |  _ <  __/ (_| (_) | | | (_| |
+ \____|\___/____/ \__|_|  \___|\__,_|_| |_| |_|_| \_\___|\___\___/|_|  \__,_|
+
+	 🚀 GoStreamRecorder - 
+
+🔹 Written in Go — Fast. Reliable. Efficient.
+🔹 Manage streamers, users, and API keys.
+🔹 Record what you want, when you want.
+🔹 API Ready. Automation Friendly.
+
+📂 Docs: https://github.com/luna-nightbyte/GoStreamRecord
+
 ```
 
 Optionally, use the docker compose file: 
